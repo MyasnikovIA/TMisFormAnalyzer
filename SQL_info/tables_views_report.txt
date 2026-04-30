@@ -1,236 +1,394 @@
 ====================================================================================================
 === ОТЧЕТ ПО ТАБЛИЦАМ И ВЬЮХАМ ===
-Дата создания: Thu Apr 30 18:15:26 NOVT 2026
-Всего уникальных объектов: 45
+Дата создания: Thu Apr 30 20:04:09 NOVT 2026
+Всего уникальных объектов: 76
 ====================================================================================================
 
 === ТАБЛИЦЫ (0) ===
 
-=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (45) ===
-
-- D_V_ACC_FARM_PROD
-    Используется в формах: 1
-    Формы:
-         ARMMainDoc/main_doc.frm;
-
-- D_V_AGENTS
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
+=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (76) ===
 
 - D_V_AGENTS_BASE
-    Используется в формах: 1
+    Используется в формах: 2
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_AGENT_ORPH_CATEGORIES
+- D_V_AGENT_PREGNANCY
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_BEDS_FUND
+- D_V_AGENT_REGIONAL_PRIVS
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
 
-- D_V_BED_TYPES
+- D_V_AGENT_REGIONAL_PRIVS_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_AGENT_SOCIAL_STATES
+    Используется в формах: 1
+    Формы:
+         Agents/agent_social_states/agent_social_states_edit.frm;
+
+- D_V_CATALOGS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_CERTIFICATE_FORMS_BASE
+    Используется в формах: 1
+    Формы:
+         Agents/subforms_fields/death.frm;
+
+- D_V_CF_DEATH_CONTENTS
+    Используется в формах: 1
+    Формы:
+         Agents/subforms_fields/death.frm;
+
+- D_V_CF_PERDEATH_CONTENTS
+    Используется в формах: 1
+    Формы:
+         Agents/subforms_fields/death.frm;
+
+- D_V_CONTINGENTS
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_CONTINGENTS_BASE
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
 
 - D_V_DEPS
     Используется в формах: 1
     Формы:
-         ARMMainDoc/main_doc.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_DIRECTIONS
+- D_V_DEP_REQUISITES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_DIRECTIONS_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_DIRECTION_CONDITIONS
+- D_V_DIRECTION_SERVICES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
-
-- D_V_DIRECTION_FORMS
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
-
-- D_V_DIRECTION_KINDS
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_DIRECTION_SERVICES_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_DIRECTORIES
+- D_V_DIRECTORIES_DATA_VER
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
-
-- D_V_DIRECTORIES_FN_DATA
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_DIR_THERAPY_SCHEMES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_EMPLOYERS
+- D_V_DISEASECASES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_HOSPITALIZATIONKINDS
+- D_V_DOC_ACCESSORIES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/subforms_fields/death.frm;
 
-- D_V_HOSPITALIZATION_TYPES
+- D_V_DOC_TYPES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/subforms_fields/death.frm;
 
-- D_V_HOSP_HISTORIES
+- D_V_DOSE_MEASURES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_EMPLOYERS_BASE
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_GEOGRAFY
+    Используется в формах: 1
+    Формы:
+         Agents/subforms_fields/death.frm;
+
+- D_V_GOODSSUPPLIES
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_HOSP_HISTORIES_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_HOSP_PLAN_KINDS
+- D_V_HOSP_HISTORY_DEPS
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_HOSP_REASONS
+- D_V_HOSP_HISTORY_DEPS_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_HPK_PLANS_BASE
+- D_V_HOSP_HISTORY_DIAGNS
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
-
-- D_V_HPK_PLAN_CONTROL
-    Используется в формах: 1
-    Формы:
-         ARMMainDoc/main_doc.frm;
-
-- D_V_HPK_PLAN_JOURNALS
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_HPK_PLAN_JOURNALS_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
-
-- D_V_HPK_SCHEDULE_REG
-    Используется в формах: 1
-    Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_LPU
-    Используется в формах: 1
+    Используется в формах: 2
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_LPUDICT
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
 
-- D_V_LPUDICT_BASE
+- D_V_MEASURES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_LPU_BASE
+- D_V_MED_FORMS
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MED_FORM_USE_METHODS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MED_THERAPY_SCHEMES_DESC
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MED_USE_METHODS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MED_ZHNVLP
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_MKB10
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
 
 - D_V_MKB10_BASE
-    Используется в формах: 1
+    Используется в формах: 2
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_MKB10_POLYTR
+- D_V_MP_ADD_ATTRIBUTES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_OPERATING_ROOMS
+- D_V_MP_DESCRIBES
     Используется в формах: 1
     Формы:
-         ARMMainDoc/main_doc.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_OUTER_DIRECTIONS
+- D_V_MP_DESCRIBES_ACTIVE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_OUTER_DIRECTIONS_BASE
+- D_V_MP_DESC_TIMES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_PERSMEDCARD
+- D_V_MP_PRESCRIBES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MP_PRESCRIBE_SPECS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MP_PRESCRIBE_SPECS_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MP_PRESC_SP_PRICES_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_MP_TYPES
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_MKBS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_MNN
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_MNN_ACTIVE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_MNN_ACTIVE_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMBASE_NOMMODIF_COMB
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMMODIF
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMMODIF_ACM
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMMODIF_ACM_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMMODIF_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_NOMMODIF_COMPLEX
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 - D_V_PERSMEDCARD_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_SERVTYPES
+- D_V_PERSMEDCARD_FIO
     Используется в формах: 1
     Формы:
-         ARMMainDoc/main_doc.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_TYPE_MED_HELP
+- D_V_PRESCRIBE_ONK_SCH_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_VMP
+- D_V_PRESCRIBE_ONK_SCH_SP_BASE
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
-- D_V_VMP_LINKS
+- D_V_PRIV_DIS_DIAPASONES
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
 
-- D_V_VMP_TALONS
+- D_V_PRIV_DIS_GROUPS
     Используется в формах: 1
     Формы:
-         HospPlan/hp_directions_edit.frm;
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_PRIV_TYPES
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_RECIPS
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_SOCIALSTATES
+    Используется в формах: 1
+    Формы:
+         Agents/agent_social_states/agent_social_states_edit.frm;
+
+- D_V_SOCIALSTATES_BASE
+    Используется в формах: 1
+    Формы:
+         Agents/agent_social_states/agent_social_states_edit.frm;
+
+- D_V_SOCIALSTATES_SORT
+    Используется в формах: 1
+    Формы:
+         Agents/agent_social_states/agent_social_states_edit.frm;
+
+- D_V_TARGET_PROGRAM_BASE
+    Используется в формах: 1
+    Формы:
+         Agents/agent_regional_privs/regional_priv_edit.frm;
+
+- D_V_VISITS_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_VISIT_CON_FIELDS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+
+- D_V_VIS_DIAGNOSISES_BASE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
 
 ====================================================================================================

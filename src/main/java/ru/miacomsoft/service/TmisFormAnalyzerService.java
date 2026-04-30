@@ -59,15 +59,19 @@ public class TmisFormAnalyzerService {
                 baseContent, baseFormPathObj.toString(), null
         );
 
+// После добавления констант в formInfo
         for (SqlInfo sql : sqlQueries) {
             formInfo.addSqlQuery(sql);
             for (String tv : sql.getTablesViews()) formInfo.addTableView(tv);
             for (String pf : sql.getPackagesFunctions()) formInfo.addPackageFunction(pf);
-            for (String proc : sql.getUserProcedures()) formInfo.addUserProcedure(proc);  // ЭТО ДОЛЖНО БЫТЬ
+            for (String proc : sql.getUserProcedures()) formInfo.addUserProcedure(proc);
             for (String opt : sql.getSystemOptions()) formInfo.addSystemOption(opt);
             for (String unknown : sql.getUnknownObjects()) formInfo.addUnknownObject(unknown);
+            for (String constant : sql.getConstants()) {
+                formInfo.addConstant(constant);
+                System.out.println("[DEBUG] Добавлена константа в FormInfo: " + constant + " для формы " + formPath);
+            }
         }
-
         // Если есть ПОЛНОЕ переопределение, можно также проанализировать и его
         if (formInfo.isFullyReplaced() && formInfo.getReplacementPath() != null) {
             String userContent = scannerService.readFileContent(Path.of(formInfo.getReplacementPath()));
@@ -76,6 +80,44 @@ public class TmisFormAnalyzerService {
                 // Можно добавить в отдельный список или сравнить
             }
         }
+
+        // После извлечения SQL запросов, добавьте принудительный поиск констант
+        Set<String> forceConstants = new LinkedHashSet<>();
+        Pattern constPattern = Pattern.compile("D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*'([^']+)'", Pattern.DOTALL);
+        Matcher constMatcher = constPattern.matcher(baseContent);
+        while (constMatcher.find()) {
+            String constant = constMatcher.group(1);
+            forceConstants.add(constant);
+            System.out.println("Принудительно найдена константа: " + constant);
+        }
+
+        for (String constant : forceConstants) {
+            formInfo.addConstant(constant);
+        }
+
+        System.out.println("[DEBUG] Всего констант в FormInfo для формы " + formPath + ": " + formInfo.getConstants().size());
+
+        // ПРЯМОЙ ПОИСК КОНСТАНТ В СОДЕРЖИМОМ ФОРМЫ
+        Pattern directConstPattern = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+        Matcher directMatcher = directConstPattern.matcher(baseContent);
+        Set<String> directConstants = new LinkedHashSet<>();
+        while (directMatcher.find()) {
+            String constant = directMatcher.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                directConstants.add(constant);
+                System.out.println("[DEBUG DIRECT] Найдена константа в форме: " + constant);
+            }
+        }
+
+        for (String constant : directConstants) {
+            formInfo.addConstant(constant);
+        }
+
+        System.out.println("[DEBUG DIRECT] Всего констант найдено прямым поиском: " + directConstants.size());
+
 
         return formInfo;
     }

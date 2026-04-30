@@ -3,3 +3,8 @@
 /Forms/HospPlan/hospitalisation.frm
 /Forms/ArmPatientsInDep/SubForms/hh_deps_edit.frm
 /Forms/ArmAidsCenter/Registr_vich.frm
+
+
+
+/Forms/ARMMainDoc/main_doc.frm
+/Forms/HospPlan/hp_directions_edit.frm

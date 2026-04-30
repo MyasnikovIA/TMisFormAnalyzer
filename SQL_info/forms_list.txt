@@ -1,6 +1,6 @@
 # Список всех проанализированных форм T-MIS
-# Дата создания: Thu Apr 30 18:15:26 NOVT 2026
-# Всего форм: 2
+# Дата создания: Thu Apr 30 20:04:09 NOVT 2026
+# Всего форм: 4
 #
 # Формат: СТАТУС | ПУТЬ К ФОРМЕ | БАЗОВАЯ ФОРМА | ЗАМЕНА/ПЕРЕОПРЕДЕЛЕНИЯ
 #
@@ -9,5 +9,7 @@
 #   [FULL]    - полностью заменена UserForms
 #   [PARTIAL] - частично переопределена
 #
-[PARTIAL] ARMMainDoc/main_doc.frm (переопределения: UserFormsKrasnodarOD, UserFormsMagadan)
-[PARTIAL] HospPlan/hp_directions_edit.frm (переопределения: UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsRKB3, UserFormsRostov, UserFormsRostov, UserFormsRostov)
+[FULL] Agents/agent_regional_privs/regional_priv_edit.frm -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/Agents/agent_regional_privs/regional_priv_edit.frm
+[PARTIAL] Agents/agent_social_states/agent_social_states_edit.frm (переопределения: UserFormsEgis3Novosib, UserFormsEgis3Novosib)
+[BASE] Agents/subforms_fields/death.frm
+[PARTIAL] ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm (переопределения: UserFormsMoscowNIIBlohina, UserFormsMoscowNIIBlohina, UserFormsMoscowNIIBlohina)

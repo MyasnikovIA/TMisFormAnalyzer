@@ -21,7 +21,8 @@ public class ReportGeneratorService {
     private Map<String, TableViewInfo> allTablesViews;
     private Map<String, PackageFunctionInfo> allPackagesFunctions;
     private int totalSqlQueries;
-    private Map<String, UnknownObjectInfo> allUnknownObjects;  // ДОБАВИТЬ
+    private Map<String, UnknownObjectInfo> allUnknownObjects;
+    private Map<String, ConstantInfo> allConstants;  // ДОБАВИТЬ ДЛЯ КОНСТАНТ
 
 
     public ReportGeneratorService() {
@@ -29,12 +30,25 @@ public class ReportGeneratorService {
         this.allTablesViews = new LinkedHashMap<>();
         this.allPackagesFunctions = new LinkedHashMap<>();
         this.allUnknownObjects = new LinkedHashMap<>();
+        this.allConstants = new LinkedHashMap<>();  // ДОБАВИТЬ
         this.totalSqlQueries = 0;
     }
 
     public void addAnalysisResult(FormInfo formInfo) {
         analyzedForms.add(formInfo);
         totalSqlQueries += formInfo.getTotalSqlQueries();
+
+
+        // Очищаем unknown объекты от констант
+        Set<String> cleanedUnknown = new LinkedHashSet<>();
+        for (String unknown : formInfo.getUnknownObjects()) {
+            if (!unknown.contains("D_PKG_CONSTANTS")) {
+                cleanedUnknown.add(unknown);
+            }
+        }
+        formInfo.getUnknownObjects().clear();
+        formInfo.getUnknownObjects().addAll(cleanedUnknown);
+
 
         for (String tvName : formInfo.getTablesViews()) {
             allTablesViews.computeIfAbsent(tvName, TableViewInfo::new)
@@ -46,14 +60,32 @@ public class ReportGeneratorService {
                     .addUsage(formInfo.getFormPath(), getSqlPreview(formInfo, pfName));
         }
 
-        // ДОБАВИТЬ ЭТОТ БЛОК
         for (String unknownName : formInfo.getUnknownObjects()) {
             allUnknownObjects.computeIfAbsent(unknownName, UnknownObjectInfo::new)
                     .addUsage(formInfo.getFormPath(), getSqlPreviewForUnknown(formInfo, unknownName));
         }
+
+        // ДОБАВИТЬ БЛОК ДЛЯ КОНСТАНТ
+        for (String constantName : formInfo.getConstants()) {
+            allConstants.computeIfAbsent(constantName, ConstantInfo::new)
+                    .addUsage(formInfo.getFormPath(), getSqlPreviewForConstant(formInfo, constantName));
+        }
     }
 
-    // Добавить вспомогательный метод:
+    // Добавить вспомогательный метод для констант:
+    private String getSqlPreviewForConstant(FormInfo formInfo, String constantName) {
+        for (SqlInfo sql : formInfo.getSqlQueries()) {
+            if (sql.getConstants().contains(constantName)) {
+                String cleanSql = sql.getCleanSql();
+                if (cleanSql.length() > 200) {
+                    return cleanSql.substring(0, 200) + "...";
+                }
+                return cleanSql;
+            }
+        }
+        return "";
+    }
+
     private String getSqlPreviewForUnknown(FormInfo formInfo, String name) {
         for (SqlInfo sql : formInfo.getSqlQueries()) {
             if (sql.getUnknownObjects().contains(name)) {
@@ -89,6 +121,7 @@ public class ReportGeneratorService {
         generateFormsListReport();
         generateSummaryReport();
         generateViewDependenciesReport();
+        generateConstantsReport();  // ДОБАВИТЬ ВЫЗОВ
         System.out.println("\n  Все отчеты успешно сгенерированы!");
     }
 
@@ -154,6 +187,7 @@ public class ReportGeneratorService {
 
         System.out.println("  Создан: forms_report_all.txt (полный отчет)");
     }
+
 
     /**
      * Запись отчета о форме в итоговый файл
@@ -310,6 +344,115 @@ public class ReportGeneratorService {
         }
     }
 
+    /**
+     * Запись отчета о форме в итоговый файл (без SQL)
+     */
+    private void writeFormReportToSummaryWithoutSql(PrintWriter writer, FormInfo formInfo) {
+        writer.println("-".repeat(100));
+        writer.println("ФОРМА: " + formInfo.getFormPath());
+        writer.println("-".repeat(100));
+        writer.println("Базовая форма: " + formInfo.getBaseFormPath());
+
+        if (formInfo.isFullyReplaced()) {
+            writer.println("СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА");
+            writer.println("Файл замены: " + formInfo.getReplacementPath());
+        } else if (!formInfo.getOverrides().isEmpty()) {
+            writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
+            writer.println("Переопределения:");
+            for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
+                writer.println("  - " + override.toString());
+            }
+        } else {
+            writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
+        }
+
+        writer.println();
+
+        // Блок ЮЗЕРФОРМЫ
+        writeUserFormsSection(writer, formInfo);
+
+        // Блок SubForm и JS формы
+        writer.println("Список подключаемых форм subForm:");
+        if (formInfo.getSubForms().isEmpty()) {
+            writer.println("     (не найдено)");
+        } else {
+            for (String subForm : formInfo.getSubForms()) {
+                writer.println("     " + subForm);
+            }
+        }
+        writer.println();
+
+        writer.println("Список вызываемых форм в JS:");
+        if (formInfo.getJsForms().isEmpty()) {
+            writer.println("     (не найдено)");
+        } else {
+            for (String jsForm : formInfo.getJsForms()) {
+                writer.println("     " + jsForm);
+            }
+        }
+        writer.println();
+
+        // Только количество SQL запросов, без их содержимого
+        writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
+        writer.println("     (содержимое SQL запросов исключено для краткости)");
+        writer.println();
+
+        // Таблицы и вьюхи
+        if (!formInfo.getTablesViews().isEmpty()) {
+            writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
+            for (String tv : formInfo.getTablesViews()) {
+                writer.println("  - " + tv);
+            }
+            writer.println();
+        }
+
+        // Пакеты и функции
+        if (!formInfo.getPackagesFunctions().isEmpty()) {
+            writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
+            for (String pf : formInfo.getPackagesFunctions()) {
+                writer.println("  - " + pf);
+            }
+            writer.println();
+        }
+
+        // Пользовательские процедуры
+        if (!formInfo.getUserProcedures().isEmpty()) {
+            writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
+            for (String proc : formInfo.getUserProcedures()) {
+                writer.println("  - " + proc);
+            }
+            writer.println();
+        }
+
+
+        // Системные опции
+        if (!formInfo.getSystemOptions().isEmpty()) {
+            writer.println("СИСТЕМНЫЕ ОПЦИИ:");
+            for (String opt : formInfo.getSystemOptions()) {
+                writer.println("  - " + opt);
+            }
+            writer.println();
+        }
+
+        // ========== БЛОК КОНСТАНТ ==========
+        if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
+            writer.println("КОНСТАНТЫ:");
+            for (String constant : formInfo.getConstants()) {
+                writer.println("  - " + constant);
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
+
+        // Неизвестные объекты
+        if (!formInfo.getUnknownObjects().isEmpty()) {
+            writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
+            for (String obj : formInfo.getUnknownObjects()) {
+                writer.println("  - " + obj);
+            }
+            writer.println();
+        }
+    }
     private void writeFormReportHeader(PrintWriter writer, int batchNumber, int batchSize) {
         writer.println("=".repeat(100));
         writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS (ПАКЕТ " + batchNumber + ") ===");
@@ -318,6 +461,41 @@ public class ReportGeneratorService {
         writer.println("=".repeat(100));
         writer.println();
     }
+    // ДОБАВИТЬ МЕТОД ДЛЯ ГЕНЕРАЦИИ ОТЧЕТА ПО КОНСТАНТАМ
+    private void generateConstantsReport() throws IOException {
+        Path filePath = Paths.get(OUTPUT_DIR, "constants_report.txt");
+
+        try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(filePath))) {
+            writer.println("=".repeat(100));
+            writer.println("=== ОТЧЕТ ПО КОНСТАНТАМ (D_PKG_CONSTANTS.SEARCH_*) ===");
+            writer.println("Дата создания: " + new Date());
+            writer.println("Всего уникальных констант: " + allConstants.size());
+            writer.println("=".repeat(100));
+            writer.println();
+
+            List<ConstantInfo> sortedConstants = new ArrayList<>(allConstants.values());
+            sortedConstants.sort(Comparator.comparing(ConstantInfo::getName));
+
+            for (ConstantInfo constant : sortedConstants) {
+                writer.println("- " + constant.getName());
+                writer.println("    Используется в формах: " + constant.getUsedInForms().size());
+                writer.println("    Формы:");
+                for (String form : constant.getUsedInForms()) {
+                    writer.println("         " + form + ";");
+                }
+                writer.println();
+            }
+
+            writer.println("=".repeat(100));
+            writer.println("=== КОНЕЦ ОТЧЕТА ПО КОНСТАНТАМ ===");
+            writer.println("=".repeat(100));
+        }
+
+        System.out.println("  Создан: constants_report.txt");
+    }
+
+    // ДОБАВИТЬ БЛОК ВЫВОДА КОНСТАНТ В ОТЧЕТЫ ПО ФОРМАМ
+    // Найдите метод writeFormReport и добавьте туда этот блок:
 
     private void writeFormReport(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
@@ -367,6 +545,16 @@ public class ReportGeneratorService {
         writer.println();
         // ========== КОНЕЦ БЛОКОВ ==========
 
+        // ========== БЛОК КОНСТАНТ ==========
+        if (!formInfo.getConstants().isEmpty()) {
+            writer.println("КОНСТАНТЫ (D_PKG_CONSTANTS.SEARCH_*):");
+            for (String constant : formInfo.getConstants()) {
+                writer.println("  - " + constant);
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
+
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
         writer.println();
 
@@ -413,13 +601,11 @@ public class ReportGeneratorService {
                 }
             }
 
-           // Системные опции
-            if (!formInfo.getSystemOptions().isEmpty()) {
-                writer.println("СИСТЕМНЫЕ ОПЦИИ:");
-                for (String opt : formInfo.getSystemOptions()) {
-                    writer.println("  - " + opt);
+            if (!sql.getConstants().isEmpty()) {
+                writer.println("      Константы (D_PKG_CONSTANTS):");
+                for (String constant : sql.getConstants()) {
+                    writer.println("          " + constant + ";");
                 }
-                writer.println();
             }
 
             writer.println();
@@ -454,7 +640,6 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-
 
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
@@ -832,6 +1017,23 @@ public class ReportGeneratorService {
             writer.println("  Всего объектов для разбора: " + unknownCount);
             writer.println();
 
+
+            // После блока системных опций в summary отчете
+            writer.println("СТАТИСТИКА ПО КОНСТАНТАМ:");
+            writer.println("  Всего уникальных констант: " + allConstants.size());
+            writer.println();
+
+            writer.println("ТОП-10 НАИБОЛЕЕ ЧАСТО ИСПОЛЬЗУЕМЫХ КОНСТАНТ:");
+            allConstants.values().stream()
+                    .sorted((a, b) -> Integer.compare(b.getUsedInForms().size(), a.getUsedInForms().size()))
+                    .limit(10)
+                    .forEach(c -> {
+                        writer.println("  " + c.getName() + " - используется в " +
+                                c.getUsedInForms().size() + " формах");
+                    });
+            writer.println();
+
+
             writer.println("ТОП-10 НЕИЗВЕСТНЫХ ОБЪЕКТОВ (требуют анализа):");
             allUnknownObjects.values().stream()
                     .sorted((a, b) -> Integer.compare(b.getUsedInForms().size(), a.getUsedInForms().size()))
@@ -998,108 +1200,8 @@ public class ReportGeneratorService {
         System.out.println("  Создан: forms_report_all_without_sql.txt (полный отчет без SQL)");
     }
 
-    /**
-     * Запись отчета о форме в итоговый файл (без SQL)
-     */
-    private void writeFormReportToSummaryWithoutSql(PrintWriter writer, FormInfo formInfo) {
-        writer.println("-".repeat(100));
-        writer.println("ФОРМА: " + formInfo.getFormPath());
-        writer.println("-".repeat(100));
-        writer.println("Базовая форма: " + formInfo.getBaseFormPath());
 
-        if (formInfo.isFullyReplaced()) {
-            writer.println("СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА");
-            writer.println("Файл замены: " + formInfo.getReplacementPath());
-        } else if (!formInfo.getOverrides().isEmpty()) {
-            writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
-            writer.println("Переопределения:");
-            for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
-            }
-        } else {
-            writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
-        }
 
-        writer.println();
-
-        // Блок ЮЗЕРФОРМЫ
-        writeUserFormsSection(writer, formInfo);
-
-        // Блок SubForm и JS формы
-        writer.println("Список подключаемых форм subForm:");
-        if (formInfo.getSubForms().isEmpty()) {
-            writer.println("     (не найдено)");
-        } else {
-            for (String subForm : formInfo.getSubForms()) {
-                writer.println("     " + subForm);
-            }
-        }
-        writer.println();
-
-        writer.println("Список вызываемых форм в JS:");
-        if (formInfo.getJsForms().isEmpty()) {
-            writer.println("     (не найдено)");
-        } else {
-            for (String jsForm : formInfo.getJsForms()) {
-                writer.println("     " + jsForm);
-            }
-        }
-        writer.println();
-
-        // Только количество SQL запросов, без их содержимого
-        writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
-        writer.println("     (содержимое SQL запросов исключено для краткости)");
-        writer.println();
-
-        // Таблицы и вьюхи
-        if (!formInfo.getTablesViews().isEmpty()) {
-            writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
-            for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
-            }
-            writer.println();
-        }
-
-        // Пакеты и функции
-        if (!formInfo.getPackagesFunctions().isEmpty()) {
-            writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
-            for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
-            }
-            writer.println();
-        }
-
-        // Пользовательские процедуры
-        if (!formInfo.getUserProcedures().isEmpty()) {
-            writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
-            for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
-            }
-            writer.println();
-        }
-
-// Системные опции
-        if (!formInfo.getSystemOptions().isEmpty()) {
-            writer.println("СИСТЕМНЫЕ ОПЦИИ:");
-            for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
-            }
-            writer.println();
-        }
-
-        // Неизвестные объекты
-        if (!formInfo.getUnknownObjects().isEmpty()) {
-            writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
-            for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
-            }
-            writer.println();
-        }
-    }
-
-    /**
-     * Запись отчета о форме в пакетный файл (без SQL)
-     */
     private void writeFormReportWithoutSql(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
         writer.println("ФОРМА: " + formInfo.getFormPath());
@@ -1186,6 +1288,17 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
+
+        // ========== БЛОК КОНСТАНТ ==========
+        // ДОБАВИТЬ ЭТОТ БЛОК!!!
+        if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
+            writer.println("КОНСТАНТЫ:");
+            for (String constant : formInfo.getConstants()) {
+                writer.println("  - " + constant);
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
 
         // Неизвестные объекты
         if (!formInfo.getUnknownObjects().isEmpty()) {

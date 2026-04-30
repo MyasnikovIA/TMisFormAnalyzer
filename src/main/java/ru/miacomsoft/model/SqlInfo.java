@@ -41,6 +41,8 @@ public class SqlInfo {
 
     private Set<String> unknownObjects;  // Объекты для разбора аналитиком
 
+    private Set<String> constants;  // КОНСТАНТЫ из D_PKG_CONSTANTS.SEARCH_*
+
 
     public SqlInfo() {
         this.tablesViews = new LinkedHashSet<>();
@@ -48,6 +50,7 @@ public class SqlInfo {
         this.userProcedures = new LinkedHashSet<>();
         this.systemOptions = new LinkedHashSet<>();
         this.unknownObjects = new LinkedHashSet<>();
+        this.constants = new LinkedHashSet<>();  // ДОБАВИТЬ
     }
 
     // Getters и Setters
@@ -81,16 +84,24 @@ public class SqlInfo {
     public Set<String> getSystemOptions() { return systemOptions; }
     public void addSystemOption(String option) { this.systemOptions.add(option); }
 
-    // Добавить getter/setter:
     public Set<String> getUnknownObjects() { return unknownObjects; }
     public void addUnknownObject(String obj) { this.unknownObjects.add(obj); }
 
+    public Set<String> getUserProcedures() { return userProcedures; }
+    public void addUserProcedure(String proc) { this.userProcedures.add(proc); }
+
+    // ДОБАВИТЬ МЕТОДЫ ДЛЯ КОНСТАНТ
+    public Set<String> getConstants() { return constants; }
+    public void addConstant(String constant) {
+        if (constant != null && !constant.isEmpty()) {
+            this.constants.add(constant);
+            System.out.println("[DEBUG] SqlInfo.addConstant: " + constant);
+        }
+    }
 
     @Override
     public String toString() {
         return String.format("[%s] %s: %s", sourceType, componentName,
                 cleanSql != null ? cleanSql.substring(0, Math.min(100, cleanSql.length())) : "");
     }
-    public Set<String> getUserProcedures() { return userProcedures; }
-    public void addUserProcedure(String proc) { this.userProcedures.add(proc); }
 }

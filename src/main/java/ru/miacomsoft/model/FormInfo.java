@@ -44,6 +44,7 @@ public class FormInfo {
     private Set<String> subForms;
     private Set<String> jsForms;
     private Set<String> unknownObjects;  // Объекты для разбора аналитиком
+    private Set<String> constants;  // КОНСТАНТЫ из D_PKG_CONSTANTS.SEARCH_*
 
 
     public FormInfo(String formPath) {
@@ -57,6 +58,7 @@ public class FormInfo {
         this.subForms = new LinkedHashSet<>();
         this.jsForms = new LinkedHashSet<>();
         this.unknownObjects = new LinkedHashSet<>();
+        this.constants = new LinkedHashSet<>();  // ДОБАВИТЬ
         this.fullyReplaced = false;
     }
 
@@ -94,7 +96,6 @@ public class FormInfo {
 
     public int getTotalSqlQueries() { return sqlQueries.size(); }
 
-
     public Set<String> getSubForms() { return subForms; }
     public void setSubForms(Set<String> subForms) { this.subForms = subForms; }
     public void addSubForm(String subForm) { this.subForms.add(subForm); }
@@ -103,13 +104,19 @@ public class FormInfo {
     public void setJsForms(Set<String> jsForms) { this.jsForms = jsForms; }
     public void addJsForm(String jsForm) { this.jsForms.add(jsForm); }
 
-
-
-    // Добавить методы (где-нибудь в середине класса, например после getSystemOptions):
     public Set<String> getUnknownObjects() { return unknownObjects; }
     public void setUnknownObjects(Set<String> unknownObjects) { this.unknownObjects = unknownObjects; }
     public void addUnknownObject(String obj) { this.unknownObjects.add(obj); }
 
+    public Set<String> getUserProcedures() { return userProcedures; }
+    public void addUserProcedure(String proc) { this.userProcedures.add(proc); }
+
+    public Set<String> getSystemOptions() { return systemOptions; }
+    public void addSystemOption(String option) { this.systemOptions.add(option); }
+
+    // ДОБАВИТЬ МЕТОДЫ ДЛЯ КОНСТАНТ
+    public Set<String> getConstants() { return constants; }
+    public void addConstant(String constant) { this.constants.add(constant); }
 
     @Override
     public String toString() {
@@ -119,11 +126,6 @@ public class FormInfo {
                 ", sqlCount=" + sqlQueries.size() +
                 '}';
     }
-    public Set<String> getUserProcedures() { return userProcedures; }
-    public void addUserProcedure(String proc) { this.userProcedures.add(proc); }
-
-    public Set<String> getSystemOptions() { return systemOptions; }
-    public void addSystemOption(String option) { this.systemOptions.add(option); }
 
     /**
      * Информация о переопределении формы
@@ -164,8 +166,6 @@ public class FormInfo {
         public OverrideType getType() { return type; }
         public String getBaseTarget() { return baseTarget; }
         public String getPosition() { return position; }
-
-
 
         @Override
         public String toString() {
