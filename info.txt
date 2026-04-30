@@ -1,0 +1,34 @@
+
+1) вытащить имя unit  и composition из JS если встречается 'UniversalComposition/UniversalComposition'
+```
+            openWindow({name: 'UniversalComposition/UniversalComposition',
+                        unit: 'MKB10',
+                        composition: 'MKB10_INJURY'}, true)
+                    .addListener('onafterclose', function() {
+                        if (+getVar('ModalResult') === 1) {
+                            setValue('EX_CAUSE_MKB_ID', getVar('return_id'));
+                            setCaption('EX_CAUSE_MKB', getVar('return'));
+                        }
+                    }, null, false);
+
+```
+TMisFormAnalyzer_002_jar
+2) искать openWindow по всему документу, а не только в скрипте
+ <component cmptype="ButtonEdit" name="REG_EMPLOYER" unit="EMPLOYERS" buttononclick="openWindow({name:'UniversalComposition/UniversalComposition', unit:'EMPLOYERS', composition:'EMP_MEDIC2'}, true)
+
+3) дописать вынос в отдельный блок констант:
+ Извлечь константы из D_PKG_CONSTANTS.SEARCH_STR и SEARCH_NUM
+    D_PKG_CONSTANTS.SEARCH_DATE
+    D_PKG_CONSTANTS.SEARCH_STR
+    D_PKG_CONSTANTS.SEARCH_NUM
+
+4) починить получения списка юзерформ
+
+
+5) вынести в отдельный блок получение композиций в UnitEdit  unit="INJURE_KINDS"  composition="DEFAULT"
+```
+<component cmptype="UnitEdit" name="INJURE_KIND" unit="INJURE_KINDS" composition="DEFAULT" width="100%"/>
+<component cmptype="UnitEdit" name="PERSMEDCARD" unit="PERSMEDCARD" composition="BUTTON_EDIT_DEFAULT" width="100%" enabled="false" emptyMask="true">
+```
+
+

@@ -1,0 +1,3804 @@
+====================================================================================================
+=== ОТЧЕТ ПО ФОРМАМ T-MIS (ПАКЕТ 1) ===
+Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+Количество форм в пакете: 2
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/main_doc.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d/main_doc.dfrm
+  - [UserFormsMagadan] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d/main_doc.dfrm
+
+ЮЗЕРФОРМЫ:
+     /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.dmain_doc.dfrm
+     /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d
+             /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.dmain_doc.dfrm
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+Список вызываемых форм в JS:
+     ARMMainDoc/stac_pat_in_hpk_plan.frm
+     ARMMainDoc/stac_pat_in_deps.frm
+     ARMMainDoc/stac_pat_in_oper.frm
+     ARMMainDoc/neotl_patients.frm
+     ARMMainDoc/polik_patients.frm
+
+SQL ЗАПРОСЫ (12):
+
+  [1] M2 Action: getSYS_DATE
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                  begin
+                      :SYS_DATE_VAR := to_char(sysdate,'dd.mm.yyyy');
+                      :BjNoticeVK_MSE := coalesce(D_PKG_OPTIONS.GET('BjNoticeVK_MSE', :LPU, 0), 0);
+                  end;
+              
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [2] M2 Action: getSYS_DATE_PREV_NEXT
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+              begin
+                  select to_char(to_date(:SYS_DATE_N)+:DATE_NUM,'dd.mm.yyyy')
+                    into :SYS_DATE
+                    from  dual;
+              end;
+              
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [3] M2 DataSet: DS_DEP_COUNTS
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+              select t.DEP_ID,
+                     t.DEP_NAME,
+                     t.FREE_BEDS,
+                     t.OCCUP_BEDS,
+                     t.OCCUP_BEDS_REL,
+                     t.FREE_NORM_BEDS REGULATORY_BEDS,
+                     t.FREE_NOTNORM_BEDS ACTUALLY_BEDS,
+                     t.READY_FOR_OUT,
+                     t.OVERLIE,
+                     t.ALREADY_OUT
+                from table(cast(D_PKG_CHIEFDOC.GET_DEP_BED_INF(:LPU, to_date(:SDATE, 'dd.mm.yyyy'),
+                     @if (:CHK1==1) {
+                       :CHK1
+                     @}else {
+                       null
+                     @}
+                  ) as D_CL_DEP_BED_CONTROL)) t
+              order by (case when t.DEP_ID = -1 then null else t.DEP_NAME end) nulls last
+              
+
+      Пакеты/функции:
+          D_PKG_CHIEFDOC.GET_DEP_BED_INF;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [4] M2 DataSet: DS_HPK_PLAN_CONTROL
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select g.HPK,
+                       g.HPK_NAME,
+                       g.HOSP_COUNT,
+                       g.REG_COUNT,
+                       g.ORD
+                  from (select t.HPK        HPK,
+                               t.HPK_NAME   HPK_NAME,
+                               t.HOSP_COUNT HOSP_COUNT,
+                               t.REG_COUNT  REG_COUNT,
+                               0            ORD
+                          from D_V_HPK_PLAN_CONTROL t
+                         where t.PLAN_DATE = to_date(:SDATE, 'dd.mm.yyyy')
+                           and t.LPU = :LPU
+                        union
+                        select -1 HPK,
+                               'Всего' HPK_NAME,
+                               case
+                                 when (SUM(t.HOSP_COUNT) is null) then
+                                  0
+                                 else
+                                  SUM(t.HOSP_COUNT)
+                               end HOSP_COUNT,
+                               case
+                                 when (SUM(t.REG_COUNT) is null) then
+                                  0
+                                 else
+                                  SUM(t.REG_COUNT)
+                               end REG_COUNT,
+                               1 ORD
+                          from D_V_HPK_PLAN_CONTROL t
+                         where t.PLAN_DATE = to_date(:SDATE, 'dd.mm.yyyy')
+                           and t.LPU = :LPU) g
+                 order by (case
+                            when g.HPK = -1 then
+                             null
+                            else
+                             g.HPK_NAME
+                          end) nulls last
+                
+
+      Таблицы/вьюхи:
+          D_V_HPK_PLAN_CONTROL;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [5] M2 DataSet: DS_OPER_BL_COUNTS
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+              select *
+                from table(cast(D_PKG_CHIEFDOC.GET_OPERS_STATUS(:LPU, to_date(:SDATE, 'dd.mm.yyyy')) as
+                                      D_CL_OPER_ROOMS_CONTROL)) t
+                      join D_V_OPERATING_ROOMS op_r on op_r.ID = t.OPER_ROOM
+                     where exists (select null
+                              from table(D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS(:LPU,
+                                                                                   'OPERATING_ROOMS',
+                                                                                   '3',
+                                                                                   :EMPLOYER)) c
+                             where c.COLUMN_VALUE = op_r.ID)
+                     order by t.OPER_ROOM_NAME
+              
+
+      Таблицы/вьюхи:
+          D_V_OPERATING_ROOMS;
+      Пакеты/функции:
+          D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS;
+          D_PKG_CHIEFDOC.GET_OPERS_STATUS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [6] M2 DataSet: DS_NEOTL
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.*,
+                       (t.RECEIVED_TODAY) RECEIV, -- +t.RECEIVED_YEST
+                       (t.HOSP_TODAY) HOSP,       -- +t.HOSP_YEST
+                       decode(t.MKB_ID, -1, 1, 0) FLAG
+                  from table(cast(D_PKG_CHIEFDOC.GET_EMERGENCY_INFO(:LPU, to_date(:SDATE, 'dd.mm.yyyy')) as
+                                  D_CL_EMERGENCY_INFO)) t
+                 order by FLAG, t.MKB_NAME
+              
+
+      Пакеты/функции:
+          D_PKG_CHIEFDOC.GET_EMERGENCY_INFO;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [7] M2 DataSet: DS_POLIKLINIKA
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.*,
+                       (t.COMMERC_REG || '(' || t.COMMERC_DONE || ')') COMMERC,
+                       (t.UNCOMM_REG || '(' || t.UNCOMM_DONE || ')') UNCOMMERC,
+                       ((t.COMMERC_REG + t.UNCOMM_REG) || '(' ||
+                       (t.COMMERC_DONE + t.UNCOMM_DONE) || ')') TOTAL,
+                       nvl(st.ST_NAME, 'Всего') ST_NAME
+                  from table(cast(D_PKG_CHIEFDOC.GET_SERVICE_TYPES(:LPU, to_date(:SDATE, 'dd.mm.yyyy')) as
+                                  D_CL_GET_SERVICE_TYPES)) t,
+                       D_V_SERVTYPES st
+                 where t.SERVICE_TYPE = st.ID(+)
+              
+
+      Таблицы/вьюхи:
+          D_V_SERVTYPES;
+      Пакеты/функции:
+          D_PKG_CHIEFDOC.GET_SERVICE_TYPES;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [8] M2 DataSet: DS_NOMMO_DEPS
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.ID, t.DP_CODE, t.DP_NAME
+                  from D_V_DEPS t
+                 where t.LPU = :LPU
+                   and t.ID in (select *
+                                  from table(cast(D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS(:LPU,
+                                                                                        'DEPS',
+                                                                                        4,
+                                                                                        :CABLAB) as D_C_ID)))
+              
+
+      Таблицы/вьюхи:
+          D_V_DEPS;
+      Пакеты/функции:
+          D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [9] M2 DataSet: DS_NOMMO_FARM
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.ID,
+                       t.AFP_NAME
+                  from D_V_ACC_FARM_PROD t
+                 where t.VERSION = D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'ACC_FARM_PROD')
+              
+
+      Таблицы/вьюхи:
+          D_V_ACC_FARM_PROD;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [10] M2 DataSet: DS_NOMMO_HEAD
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.*,
+                       t.DEP_ID || t.NOMMODIF_ID || t.PAYMENT_KIND_ID UNIQ_ID
+                  from table(cast(D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE(:DEPS,
+                                                                           :LPU,
+                                                                           :ACC_FP,
+                                                                           :DATE1,
+                                                                           :DATE2) as
+                                  D_CL_MP_PRESC_EXPENSE)) t
+              
+
+      Пакеты/функции:
+          D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [11] M2 DataSet: DS_NOMMO_DETAIL
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                select t.*,
+                       t.PATIENT_ID || t.HEALING_EMP_ID UNIQ_ID
+                  from table(cast(D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC(:DEPS,
+                                                                                :LPU,
+                                                                                :ACC_FP,
+                                                                                :DATE1,
+                                                                                :DATE2,
+                                                                                null,
+                                                                                :NOMMODIF_ID,
+                                                                                :PAYMENT_KIND_ID) as
+                                  D_CL_MP_PRESC_EXPENSE_SPEC)) t
+                 where t.NOMMODIF_ID = :NOMMODIF_ID
+                   and t.DEP_ID = :DEP_ID
+                   and t.PAYMENT_KIND_ID = :PAYMENT_KIND_ID
+              
+
+      Пакеты/функции:
+          D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+  [12] M2 Action: setDepForNommo
+      Источник: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+      SQL:
+      
+                begin
+                  :DEPS := null;
+                  for cur in (select *
+                                from table(cast(D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS(:LPU,
+                                                                                      'DEPS',
+                                                                                      4,
+                                                                                      :CABLAB) as
+                                                D_C_ID))) loop
+                    :DEPS := :DEPS || ',' || cur.COLUMN_VALUE;
+                  end loop;
+                  :DEPS := substr(:DEPS, 2);
+                end;
+              
+
+      Пакеты/функции:
+          D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_HPK_PLAN_CONTROL
+  - D_V_OPERATING_ROOMS
+  - D_V_SERVTYPES
+  - D_V_DEPS
+  - D_V_ACC_FARM_PROD
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_CHIEFDOC.GET_DEP_BED_INF
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS
+  - D_PKG_CHIEFDOC.GET_OPERS_STATUS
+  - D_PKG_CHIEFDOC.GET_EMERGENCY_INFO
+  - D_PKG_CHIEFDOC.GET_SERVICE_TYPES
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_OPTIONS.GET
+  - D_CL_DEP_BED_CONTROL
+  - D_CL_OPER_ROOMS_CONTROL
+  - D_CL_EMERGENCY_INFO
+  - D_CL_GET_SERVICE_TYPES
+  - D_CL_MP_PRESC_EXPENSE
+  - D_CL_MP_PRESC_EXPENSE_SPEC
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: HospPlan/hp_directions_edit.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/view.dfrm
+
+ЮЗЕРФОРМЫ:
+     /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dscript.dfrm
+             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dview.dfrm
+     /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.ddata.dfrm
+             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.dscript.dfrm
+     /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.ddata.dfrm
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dscript.dfrm
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dview.dfrm
+
+Список подключаемых форм subForm:
+     HospPlanJournal/DirectionHospDirectTypes
+
+Список вызываемых форм в JS:
+     OuterDirections/outerdirections_view.frm
+     HospPlan/select_mes_by_mkb.frm
+     ArmPatientsInDep/SubForms/select_mkb_exact.frm
+     Persmedcard/persmedcard_edit.frm
+     EHR/simple_ehrdocs_form.frm
+     HospPlan/hospplanperiod.frm
+     HospPlan/hospplan.frm
+     HospPlan/select_lpu_outer_hosp.frm
+     UniversalComposition/UniversalComposition.frm
+     NoticeDirect/doctor_notices_call.frm
+     Compositions/depdict_grid.frm
+     HospPlan/hp_bed_days_loads.frm
+     Vmp/subforms/vmp_patient_list.frm
+     HospPlan/hp_select_schedule.frm
+     System/messagedlg.frm
+     HospPlan/select_vmp.frm
+
+SQL ЗАПРОСЫ (34):
+
+  [1] M2 Script: MainScript
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              Form.ctrlDepDom = null;
+              var MainForm = this;
+              // чтоб передать колбэк с д3-шной сабформы, по другому не придумал
+              setVar('checksAfterSaveArray', getVar('checksAfterSaveArray') || []);
+              Form.OnCreate = function() {
+                  if (empty(getVar('PATIENT_ID'))) setVar('PATIENT_ID', getVar('PATIENT_ID', 1));
+                  setVar('DIR_ID', getVar('DIR_ID'));
+                  if (empty(getVar('VISIT_ID'))) setVar('VISIT_ID', getVar('VISIT_ID', 1));
+                  if (!empty(getVar('VISIT_ID'))) {
+                      setValue('OUTERDIRECTIONS', null);
+                      setControlProperty('OUTERDIRECTIONS', 'enabled', false);
+                  }
+                  if (empty(getVar('DIR_ID'))) executeAction('checkHospDirections', null, null, null, 0, 0);
+                  setVar('mode', getVar('SHOW_ONLY') ? 'preview' : (empty(getVar('DIR_ID')) ? 'add' : 'edit'));
+              };
+              Form.OnClose = function() {
+                  if (getValue('DIR_NUMB')) executeAction('freeDirNumbReserve');
+              };
+              Form.GenDirNumb = function() {
+                  if (getValue('DIR_NUMB')) {
+                      executeAction('freeDirNumbReserve', function() {
+                          executeAction('GetDirNumb');
+                      });
+                  } else {
+                      executeAction('GetDirNumb');
+                  };
+              };
+              Form.OnShow = function() {
+                  // для подключения д3-сабформ
+                  var d3tabs = [
+                      {
+                          name: 'Files',
+                          path: 'HospPlan/SubForms/joined_docs'
+                      }
+                  ];
+                  setVar('DOC_ID', getVar('DIR_ID'));
+                  d3tabs.forEach(function(tab) {
+                      D3Api.showForm(
+                          tab.path,
+                          D3Api.getDomBy(MainForm.containerForm, '#hp-' + tab.name),
+                          {
+                              vars: {
+                                  DOC_ID: getVar('DOC_ID'),
+                                  UNITCODE: 'DIRECTIONS',
+                                  ACTION: getVar('DOC_ID') ? 'edit' : 'new'
+                              }
+                          }
+                      );
+                  });
+      
+                  if (!empty(getVar('PATIENT_ID'))) {
+                      setValue('PERSMEDCARD', getVar('PATIENT_ID'));
+                      if (getVar('PAT_CARD') || getVar('PAT_CARD', 1)) {
+                          setCaption('PERSMEDCARD', getVar('PAT_CARD') || getVar('PAT_CARD', 1))
+                      } else {
+                          executeAction('getCardNumb');
+                      }
+                      setControlProperty('PERSMEDCARD', 'enabled', false);
+                  } else {
+                      setControlProperty('PERSMEDCARD', 'enabled', true);
+                  }
+                  var wincap = null;
+                  executeAction('getOptionsData', function() {
+                      Form.setDepCtrl('ADD_DIR_HOSP_REASON', 'C_HOSP_REASON');
+                      Form.setDepCtrl('ADD_DIR_HOSP_COMMENT', 'DIR_COMMENT');
+                      Form.setDepCtrl('ADD_DIR_HOSP_TYPE', 'HOSP_TYPE');
+                      Form.setDepCtrl('ADD_DIR_KIND_HOSP', 'DIR_KIND');
+                      Form.setDepCtrl('ADD_DIR_BED_PROFILE', 'BED');
+                      Form.setDepCtrl('ADD_DIR_HOSP_DIAGNOSIS', 'MKB10');
+                      Form.setDepCtrl('AddDirHospPlanDate', 'HOSP_PLAN_DATE');
+                      Form.setDepCtrl('ADD_DIR_HOSPTALIZATION_KIND', 'C_HOSP_KIND');
+      
+                      Form.depCtrlForHospDirParametrs();
+      
+                      if (+getVar('ADD_DIR_HOSP_DEP') === 1) {
+                          setControlProperty('DPC', 'add_req', 'HOSP_DEP');
+                          setControlProperty('DPC2', 'add_req', 'HOSP_DEP');
+                      } else if (+getVar('ADD_DIR_HOSP_DEP') === 2) {
+                          setControlProperty('DPC', 'add_req', 'HOSP_DEP');
+                          setControlProperty('DPC2', 'add_req', 'HOSP_DEP');
+                      } else {
+                          setControlProperty('DPC', 'del_req', 'HOSP_DEP');
+                          setControlProperty('DPC2', 'del_req', 'HOSP_DEP');
+                      }
+      
+                      setControlProperty('BED_FUND_LOADS', 'visible', getVar('BED_FUND_VIEW_FOR_DIRECTION'));
+                      getControlByName('REALISED_DAYS_BLOCK').style.display = +getVar('DAYS_DIR_REALISED_VIEW') ? '' : 'none';
+                      if (Number(getValue('onoffVMP')) && !Number(getVar('VmpFromWaitingList'))) {
+                          setEnabled('TALON_VMP_DATE', true);
+                          setEnabled('TALON_VMP_NUM', true);
+                      }
+                      if (+getVar('ROLES_EDIT_DIRECTION_DATE') !== 1) {
+                          setEnabled('REG_DATE_CTRL', false);
+                          setEnabled('REG_TIME', false);
+                      }
+                      setDomVisible(getControlByName('ueTherapySchemeBlock'), +getVar('SHOW_THERAPY_SCHEMES_FIELD') === 1);
+                      if (getVar('CHECK_ADM_HOSP')) {
+                          switch(+getVar('ADMISSION_HOSP')) {
+                              case 1:
+                                  setDomVisible(getControlByName('ButtonNext'), false);
+                                  setDomVisible(getControlByName('ButtonNextByDay'), false);
+                                  setDomVisible(getControlByName('btnRegForHosp'), true);
+                                  break;
+                              case 2:
+                                  setDomVisible(getControlByName('btnRegForHosp'), true);
+                                  break;
+                          }
+                      }
+                  });
+                  if (getVar('mode') == 'edit' || getVar('mode') == 'preview') {
+                      executeAction('SelectAction', Form.afterSelectAction);
+                  } else {
+                      refreshDataSet('DS_BEDS');
+                      var date = new Date();
+                      setCaption('REG_TIME', date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes());
+                      executeAction('getDefParams');
+                      setWindowCaption('Добавление направления');
+                      if (!empty(getVar('MKB_ID'))) {
+                          executeAction('getMKB');
+                      }
+                      if (!empty(getVar('DIR_COMMENT')))
+                          setValue('DIR_COMMENT', getVar('DIR_COMMENT').substr(0, 500));
+                      if (!empty(getVar('HOSP_MKB_EXACT'))) {
+                          setCaption('HOSP_MKB_EXACT', getVar('HOSP_MKB_EXACT').substr(0, 500));
+                          setValue('HOSP_MKB_EXACT_ID', getVar('HOSP_MKB_EXACT_ID').substr(0, 500));
+                      }
+                      refreshDataSet('DS_HOSP_REASONS');
+                      Form.PatientSelect();
+                  }
+      
+                  getDataSet('DS_BEDS').addEventListener('afterrefresh', "Form.refreshDepControls();");
+                  getPage(0).addListener('onchangepropertyLPUDICT', function(_dom, _cn, _pn, _pv) {
+                      if (_pn === 'value' && _cn === 'LPUDICT') {
+                          Form.setLpuReqs();
+                      }
+                  }, base(), false);
+                  setVar('VMP_UNIQUE_NUMB', -1);
+                  setVar('VMP_MASK_FIELD', -1);
+                  executeAction('getVmpUniqueNumb');
+              };
+      
+              Form.depCtrlForHospDirParametrs = function() {
+                  var hospDirParametrs = getVar('HOSP_DIR_PARAMETRS').split(';');
+                  hospDirParametrs.forEach((param) => {
+                      switch (+param) {
+                          case 1:
+                              setControlProperty('DPC', 'add_req', 'derectionForm');
+                              setControlProperty('DPC2', 'add_req', 'derectionForm');
+                          break;
+                          case 2:
+                              setControlProperty('DPC', 'add_req', 'typeMedHelp');
+                              setControlProperty('DPC2', 'add_req', 'typeMedHelp');
+                          break;
+                          case 3:
+                              setControlProperty('DPC', 'add_req', 'directionCondition');
+                              setControlProperty('DPC2', 'add_req', 'directionCondition');
+                          break;
+                          case 4:
+                              setControlProperty('DPC', 'add_req', 'directionReason');
+                              setControlProperty('DPC2', 'add_req', 'directionReason');
+                          break;
+                          default:
+                      }
+                  });
+              };
+      
+              Form.SetEditMode = function() {
+                  setWindowCaption('Исправление направления');
+                  getControlByName('ButtonPrint').style.display = '';
+                  getControlByName('ButtonEhr').style.display = '';
+                  if (getValue('C_REG_TYPE') == 0) {
+                      executeAction('CheckRightsREC', function() {
+                          if (getVar('CHREC') > 0) {
+                              setControlProperty('btnRegForHosp', 'enabled', true);
+                              setControlProperty('ButtonNext', 'enabled', true);
+                              setControlProperty('ButtonNextByDay', 'enabled', true);
+                          }
+                      }, null, null);
+                  } else {
+                      setControlProperty('btnRegForHosp', 'enabled', false);
+                      setControlProperty('ButtonNext', 'enabled', false);
+                      setControlProperty('ButtonNextByDay', 'enabled', false);
+                  }
+              };
+              Form.SetPreviewMode = function() {
+                  var cmpName;
+                  setWindowCaption('Просмотр направления');
+                  setDomVisible(getControlByName('buttonsBlock'), false);
+                  setDomVisible(getControlByName('GEN_NUMB'), false);
+                  document.querySelectorAll('div[name="hhDirFormContainer"] table[cmpType="Edit"], '
+                                          + 'div[name="hhDirFormContainer"] div[cmpType="DateEdit"], '
+                                          + 'div[name="hhDirFormContainer"] table[cmpType="ComboBox"], '
+                                          + 'div[name="hhDirFormContainer"] table[cmpType="TextArea"], '
+                                          + 'div[name="hhDirFormContainer"] span[cmpType="CheckBox"], '
+                                          + 'div[name="hhDirFormContainer"] div[cmpType="RadioGroup"], '
+                                          + 'div[name="hhDirFormContainer"] table[cmpType="ButtonEdit"], '
+                                          + 'div[name="hhDirFormContainer"] table[cmpType="Button"]').forEach(function(el) {
+                      cmpName = el.getAttribute('name');
+                      setEnabled(cmpName, false);
+                  })
+              };
+      
+              Form.activeRowsFromInfo = function() {
+      
+                  var ctrlList = ['derectionForm', 'typeMedHelp', 'directionCondition', 'directionReason'];
+                  if (!empty(getValue('OUTERDIRECTIONS'))) {
+                      ctrlList.forEach((ctrl) => {
+                          setEnabled(ctrl, false);
+                      });
+                  }
+              };
+      
+              Form.afterSelectAction = function() {
+                  setValue('DATE_TR_DATE', getVar('DATE_TR_DATE'));
+                  setValue('DATE_TR_TIME', getVar('DATE_TR_TIME'));
+                  setValue('INJURE_TIME', parseToOracleFloat(getVar('INJURE_TIME')));
+                  if (getValue('INJURE_TIME') == 0) setValue('INJURE_TIME', null);
+                  refreshDataSet('DS_BEDS');
+                  if (!empty(getValue('EX_CAUSE_MKB')) || !empty(getValue('INJURE_KIND')) || !empty(getValue('INJURE_TIME')))
+                      Form.showhideInjure();
+                  Form.setVisLpu(null, true);
+                  Form.setLpuReqs();
+                  Form.PatientSelect();
+                  refreshDataSet('DS_HOSP_REASONS');
+                  if (getVar('mode') == 'edit') {
+                      Form.SetEditMode();
+                  } else {
+                      Form.SetPreviewMode();
+                  }
+                  if (getValue('TALON_VMP_DATE').length==0) {
+                      setValue('onoffVMP', '0')
+                      setValue('TALON_VMP_NUM', '');
+                      setCaption('TALON_VMP_NUM', '');
+                      setEnabled('TALON_VMP_DATE', false);
+                      setEnabled('TALON_VMP_NUM', false);
+                      setDomVisible(getControlByName('blockVmp'), false);
+                  } else {
+                      setValue('onoffVMP', '1')
+                      setEnabled('TALON_VMP_DATE', true);
+                      setEnabled('TALON_VMP_NUM', true);
+                      setDomVisible(getControlByName('blockVmp'), true);
+                  }
+                  if (Number(getVar('VmpFromWaitingList'))) {
+                      if (Number(getValue('onoffVMP'))) {
+                          setCaption('VMP_TALON_FIELD', getValue('TALON_VMP_NUM'));
+                          setEnabled('TALON_VMP_DATE', false);
+                          setEnabled('TALON_VMP_NUM', false);
+                      }
+                  }
+                  Form.activeRowsFromInfo();
+              };
+              Form.OUTDIRS = function() {
+                  if (+getVar('EMPTY_DATE_OUT') === 0) {
+                      setVar('LOCATE_ID', getValue('OUTERDIRECTIONS'));
+                      setVar('RecordID', getValue('PERSMEDCARD'));
+                      openWindow('OuterDirections/outerdirections_view', true, 850, 550)
+                          .addListener('onafterclose', function(result) {
+                              if (result && result.ModalResult === 1) {
+                                  setValue('OUTERDIRECTIONS', result.return_id);
+                                  setCaption('OUTERDIRECTIONS', result.return_date);
+                                  executeAction('getOuterDirectionData', function() {
+                                      Form.activeRowsFromInfo();
+                                  });
+                              }
+                          })
+                  }
+              };
+              Form.OnButtonOKClick = function(type) {
+                  if (+getVar('VMP_UNIQUE_NUMB') < 1) {
+                     Form.SaveFun(type);
+                     return;
+                  }
+                  executeAction('CheckForDuplicateVMP', function() {
+                     if ((+getVar('DUPLICATE_NUMBER_OF_VMP') === 0 ) && (+getVar('VMP_UNIQUE_NUMB') === 1)) {
+                        showAlert('Талон с номером '+getValue('TALON_VMP_NUM')+' уже существует');
+                     } else if ((+getVar('DUPLICATE_NUMBER_OF_VMP') === 0 ) && (+getVar('VMP_UNIQUE_NUMB') === 2)) {
+                        if (showConfirm('Талон с номером '+getValue('TALON_VMP_NUM')+' уже существует. Хотите продолжить ?', null, 400, 120, function () {
+                           Form.SaveFun(type);
+                        }));
+                     } else {
+                         Form.SaveFun(type);
+                     }
+                  });
+              };
+              Form.SaveFun = function(type) {
+                  if (+getValue('onoffVMP') !== 1) {
+                      // Если RadioGroup ВМП выключен, тогда очищаем Метод ВМП
+                      setValue('DIRECTIONS_VMP', '');
+                      setVar('DIRECTIONS_VMP', '');
+                      setCaption('DIRECTIONS_VMP', '');
+                  } else {
+                      if (empty(getValue('MKB10')) &&  !empty(getVar('DIRECTIONS_VMP'))) {
+                          showAlert('Для сохранения "Метод ВМП" необходимо указать "Диагноз госпитализации"', 'Ошибка', null, null, function() {
+                              getControlByName('MKB10').querySelector('input').focus();
+                          });
+                          return;
+                      }
+                  }
+                  setVar('REG_DATE_VAR', getCaption('REG_DATE_CTRL') + ' ' + getCaption('REG_TIME'));
+                  setVar('INJURE_TIME', getValue('INJURE_TIME'));
+                  if (empty(getVar('LPU'))) {
+                      executeAction('getCurrentLPU', null, null, 0, 0);
+                  }
+                  if (getVar('mode') == 'edit') {
+                      var call_confirm = 0;
+      
+                      executeAction('getCurrentLPUName', null, null, 0, 0);
+                      if (getValue('LLPPUU') == '1') {
+                          if (getVar('DIR_LPUDICT_ID') != getVar('CUR_LPU_DICT_ID') && !empty(getVar('DIR_LPUDICT_ID'))) {
+                              call_confirm = 1;
+                          }
+                      } else {
+                          if (getVar('DIR_LPUDICT_ID') != getValue('LPUDICT')) {
+                              call_confirm = 1;
+                          }
+                      }
+      
+                      if (call_confirm == 1) {
+                          if (confirm('С данной услуги уже было создано направление в МО ' + getVar('DIR_LPUDICT_NAME') + '. Вы действительно хотите направить пациента в МО ' + getVar('CUR_LPU_NAME') + ' и удалить направление в МО ' + getVar('DIR_LPUDICT_NAME') + '?')) {
+                              if (getValue('LLPPUU') == '1') {
+                                  setVar('DIR_LPUDICT_ID', getVar('CUR_LPU_DICT_ID'));
+                              } else {
+                                  setVar('DIR_LPUDICT_ID', getValue('LPUDICT'));
+                              }
+                              Form.UpgradeActionBeforeCheck('UpdateAction', 'DIR_ID', type);
+                          } else {
+                              closeWindow();
+                          }
+                      } else {
+                          Form.UpgradeActionBeforeCheck('UpdateAction', 'DIR_ID', type);
+                      }
+                  }
+                  else
+                      Form.UpgradeActionBeforeCheck('InsertAction', 'NewID', type);
+              };
+              Form.UpgradeActionBeforeCheck = function(actionName, actionValue, type) {
+                  executeAction('UpgradeActionBeforeCheck', function () {
+                      if (!empty(getVar('warnings'))) {
+                          var warnings_msg = '<strong>Предупреждение:</strong> ' + getVar('warnings') + '</br> Продолжить сохранение?';
+                          showConfirm(warnings_msg, null, 490, 200, function() {
+                              if (actionName == 'InsertAction') {
+                                  Form.CheckPreviousDirection(actionName, actionValue, type);
+                              } else {
+                                  Form.UpgradeAction(actionName, actionValue, type);
+                              }
+                          }, null, 'yesno');
+                      } else {
+                          if (actionName == 'InsertAction') {
+                              Form.CheckPreviousDirection(actionName, actionValue, type);
+                          } else {
+                              Form.UpgradeAction(actionName, actionValue, type);
+                          }
+                      }
+                  })
+              };
+              Form.CheckPreviousDirection = function(actionName, actionValue, type) {
+                  executeAction('checkPreviousDirection', function () {
+                      if (!empty(getVar('warnings'))) {
+                          var warnings_msg = '<strong>Предупреждение:</strong> ' + getVar('warnings') + '</br> Продолжить сохранение?';
+                          showConfirm(warnings_msg, null, 490, 200, function() {
+                              Form.UpgradeAction(actionName, actionValue, type);
+                          }, null, 'yesno');
+                      } else {
+                          Form.UpgradeAction(actionName, actionValue, type);
+                      }
+                  });
+              }
+              Form.UpgradeAction = function(actionName, actionValue, type) {
+                  executeAction(actionName, function() {
+                      setVar('DOC_ID', getVar(actionValue));
+                      setVar('checksAfterSaveArrayTmp', getVar('checksAfterSaveArray').slice());
+                      Form.startChecksAfterSave(type);
+                  });
+              };
+              Form.startChecksAfterSave = function(type) {
+                  // проверяем массив с проверками после сохранения, если проверок нет - выходим
+                  // коллбэк-хэл для асинхронщины, которая не умеет синхронить
+                  // если они есть -- запускаем проверки по одной, последовательно удаляя их из массива getVar('checksAfterSaveArray')
+                  if (getVar('checksAfterSaveArrayTmp').length === 0) {
+                      return Form.AfterExecuteActionSuccess(type);
+                  } else {
+                      getVar('checksAfterSaveArrayTmp')[0](type, function() {
+                          getVar('checksAfterSaveArrayTmp').splice(0, 1); // удаляем проверку из массива
+                          Form.startChecksAfterSave(type);
+                      });
+                  }
+              };
+              Form.AfterExecuteActionSuccess = function(type) {
+                  if (getVar('mode') != 'edit')
+                      setVar('newid', getVar('NewID'), 1);
+                  setVar('ModalResult', 'ok', 1);
+                  if (type == 1) {
+                      if (!empty(getVar('DIR_ID'))) {
+                          openD3Form('NoticeDirect/doctor_notices_call', true, {
+                              width: 400,
+                              height: 350,
+                              vars: {
+                                  DIR_ID: getVar('DIR_ID'),
+                                  NOTICE_TYPE: 'HOSPITALIZATION',
+                                  SERVICE_ID: getVar('SERVICE_ID')
+                              },
+                              onclose: function() {
+                                  closeWindow();
+                              }
+                          });
+                      } else {
+                          closeWindow();
+                      }
+                  } else {
+                      setVar('mode', 'edit');
+                      if (empty(getVar('DIR_ID'))) setVar('DIR_ID', getVar('NewID'));
+                      executeAction('SelectAction', null, null, 0, 0);
+                      setValue('DATE_TR_DATE', getVar('DATE_TR_DATE'));
+                      setValue('DATE_TR_TIME', getVar('DATE_TR_TIME'));
+                      setValue('INJURE_TIME', parseToOracleFloat(getVar('INJURE_TIME')));
+                      if (getValue('INJURE_TIME') == 0) setValue('INJURE_TIME', null);
+                      Form.SetEditMode();
+                  }
+              };
+              Form.trySetBedType = function() {
+                  if (!empty(getVar('BED_TYPE'))) {
+                      setValue('BED', getVar('BED_TYPE'));
+                      setVar('BED_TYPE', null);
+                  } else if (!empty(getValue('HOSP_DEP'))) {
+                      executeAction('getOnlyOneBed', function() {
+                          if (!empty(getVar('TEMP_BED_ID')))
+                              setValue('BED', getVar('TEMP_BED_ID'));
+                      });
+                  }
+              };
+              Form.openMesByMkb = function(_dom) {
+                  if (empty(getValue('MKB10'))) {
+                      alert('Не выбран диагноз!');
+                      return;
+                  }
+                  if (empty(getValue('PERSMEDCARD'))) {
+                      alert('Не выбран пациент!');
+                      return;
+                  }
+                  setVar('HOSP_MKB', getValue('MKB10'));
+                  setVar('PATIENT_ID', getValue('PERSMEDCARD'));
+                  openWindow('HospPlan/select_mes_by_mkb', true)
+                          .addListener('onclose', function() {
+                              if (getVar('ModalResult', 1) == 1)
+                                  getValueAfterSelect(_dom);
+                          });
+              };
+              Form.showhideInjure = function() {
+                  var elem1 = getControlByName('INJURES');
+                  if (elem1.style.display == "none") {
+                      elem1.style.display = "block";
+                      setCaption('INJShowHide', 'Скрыть');
+                      Form.switchReqs('DATE_TR_DATE', true);
+                  } else {
+                      elem1.style.display = "none";
+                      setCaption('INJShowHide', 'Показать');
+                      Form.switchReqs('DATE_TR_DATE', false);
+                  }
+              };
+              Form.setVisLpu = function(clear, only_checks) {
+                  if (clear == 1) {
+                      clearControl('HOSP_DEP');
+                      clearControl('LPUDICT');
+                      clearControl('LPUDICT_HANDLE');
+                  }
+                  var enab = (getValue('LLPPUU') != 1);
+                  if (enab) {
+                      Form.switchReqs('LPUDICT', true);
+                      Form.switchReqs('LPUDICT_HANDLE', true);
+                      if (getVar('ADD_DIR_HOSP_DEP') == 2) {
+                          Form.switchReqs('HOSP_DEP', false);
+                      }
+                  } else {
+                      Form.switchReqs('LPUDICT', false);
+                      Form.switchReqs('LPUDICT_HANDLE', false);
+                      if (getVar('ADD_DIR_HOSP_DEP') == 2) {
+                          Form.switchReqs('HOSP_DEP', true);
+                      }
+                  }
+                  setControlProperty('LPUDICT', 'enabled', enab);
+                  if (getVar('AllowSelectAllLpu') == '0') setControlProperty('LPUDICT_HANDLE', 'enabled', enab);
+                  if (!only_checks) {
+                      if (!empty(getVar('HH_LPU_DICT')) && empty(getVar('DEFAULT_LPU_ID')) && getValue('LLPPUU') == 0) {
+                          executeAction('GET_DEFAULT_LPU', function() {
+                              if (!empty(getVar('DEFAULT_LPU_ID'))) {
+                                  setValue('LPUDICT', getVar('DEFAULT_LPU_ID'));
+                                  setCaption('LPUDICT', getVar('DEFAULT_LPU_CODE'));
+                              }
+                          });
+                      } else if (!empty(getVar('DEFAULT_LPU_ID')) && enab) {
+                          setValue('LPUDICT', getVar('DEFAULT_LPU_ID'));
+                          setCaption('LPUDICT', getVar('DEFAULT_LPU_CODE'));
+                      }
+                  }
+              };
+              Form.setLpuReqs = function() {
+                  var ld = getValue('LPUDICT');
+                  var ldh = getValue('LPUDICT_HANDLE');
+                  if (empty(ld) && empty(ldh)) {
+                      Form.switchReqs('LPUDICT', true);
+                      Form.switchReqs('LPUDICT_HANDLE', true);
+                  } else if (empty(ldh)) {
+                      Form.switchReqs('LPUDICT', true);
+                      Form.switchReqs('LPUDICT_HANDLE', false);
+                  } else if (empty(ld)) {
+                      Form.switchReqs('LPUDICT', false);
+                      Form.switchReqs('LPUDICT_HANDLE', true);
+                  } else {
+                      Form.switchReqs('LPUDICT', false);
+                      Form.switchReqs('LPUDICT_HANDLE', true);
+                  }
+              };
+              Form.switchReqs = function(ctrl, add) {
+                  var func = add ? AddReqControl : DelReqControl;
+                  ['DPC', 'DPC2'].forEach(function(depCtrl) {
+                      func(getControlByName(depCtrl), ctrl);
+                  });
+              };
+              Form.clearDeps = function(_dom) {
+                  Form.switchReqs('HOSP_DEP', true);
+                  clearControl('HOSP_DEP');
+                  refreshDataSet('DS_BEDS');
+              }
+              Form.openDeps = function(_dom) {
+                  Form.ctrlDepDom = _dom;
+                  var _form = {}, _filter;
+                  _form.name = 'UniversalComposition/UniversalComposition';
+                  if (getValue('LLPPUU') == 1) {
+                      _form.unit = 'DEPS';
+                      _form.composition = 'GRID';
+                      _filter = 'd_pkg_dep_requisites.get_actual(:LPU, v.ID, to_date(\'' + getValue('REG_DATE_CTRL') + '\')) is not null';
+                      _form.filter = {0: {'unit': 'DEPS', 'method': 'GRID', 'filter': _filter}};
+                      openWindow(_form, true).addListener('onclose', function() {
+                          if (getVar('ModalResult', 1) == 1) {
+                              setControlValue(Form.ctrlDepDom, getVar('return_id', 1));
+                              setControlCaption(Form.ctrlDepDom, getVar('return', 1));
+                              refreshDataSet('DS_BEDS', true, 1);
+                              Form.switchReqs('HOSP_DEP', false);
+                          }
+                      });
+                  } else {
+                      openD3Form('Compositions/depdict_grid', true, {
+                                  width: 800,
+                                  height: 600,
+                                  vars: {
+                                      NULL_LPUDICT_FILTER: empty(getValue('LPUDICT')) ? true : false,
+                                      LPUDICT_FILTER: getValue('LPUDICT')
+                                  },
+                                  onclose: function(mod) {
+                                      if (mod) {
+                                          setValue('HOSP_DEP', mod.return_id);
+                                          setCaption('HOSP_DEP', mod.return);
+                                          refreshDataSet('DS_BEDS');
+                                      }
+                                  }
+                              });
+                  }
+              };
+              Form.OpenEhrDirectionToHosp = function() {
+                  setVar('DIRECTION_ID', (getVar('mode') == 'edit' || getVar('mode') == 'preview') ? getVar('DIR_ID') : getVar('NewID'));
+                  openWindow({name: 'EHR/simple_ehrdocs_form',
+                              vars: {
+                                  EHR_UNIT_ID: getVar('DIRECTION_ID'),
+                                  EHR_UNIT: 'DIRECTIONS'}
+                              }, true, 800, 300);
+              };
+              Form.PrintDirectionToHosp = function() {
+                  if (getVar('mode') == 'edit' || getVar('mode') == 'preview') {
+                      setVar('DIRECTION_ID', getVar('DIR_ID'));
+                  } else {
+                      setVar('DIRECTION_ID', getVar('NewID'));
+                  }
+                  setVar('DIRECTION', getVar('DIRECTION_ID'));
+                  printReportByCode('OutDirServNew');
+              };
+              Form.OnButtonNextClick = function() {
+                  if (getControlProperty('ButtonNext', 'enabled') == 'false') return;
+                  if (getVar('mode') == 'edit') {
+                      setVar('DIRECTION', getVar('DIR_ID'));
+                  } else {
+                      setVar('DIRECTION', getVar('NewID'));
+                  }
+      
+                  if (getValue('LLPPUU') == 0 && !empty(getValue('LPUDICT'))) {
+                      setVar('OUTER_LPUDICT', getValue('LPUDICT'));
+                  }
+                  openWindow({name: 'HospPlan/hospplanperiod',
+                      vars: {
+                          VIS_ID: getVar('VISIT_ID'),
+                          PMC_ID: getValue('PERSMEDCARD')
+                      }
+                  }, true, 1000, 540);
+              };
+              Form.OnButtonNextByDayClick = function() {
+                  if (getControlProperty('ButtonNextByDay', 'enabled') == 'false') return;
+                  if (getVar('mode') == 'edit') {
+                      setVar('DIRECTION', getVar('DIR_ID'));
+                  } else {
+                      setVar('DIRECTION', getVar('NewID'));
+                  }
+      
+                  if (getValue('LLPPUU') == 0 &amp;&amp; !empty(getValue('LPUDICT'))) {
+                      setVar('OUTER_LPUDICT', getValue('LPUDICT'));
+                  }
+                  setVar('PATIENT_ID', getValue('PERSMEDCARD'));
+      
+                  openWindow({
+                      name: 'HospPlan/hospplan',
+                      vars: {VIS_ID: getVar('VISIT_ID'), PMC_ID: getVar('PATIENT_ID'), DDIR_ID: getVar('DIRECTION')}
+                  }, true, 1200, 540)
+                          .addListener('onafterclose', function() {
+                                      executeAction('SelectAction', function() {
+                                          Form.afterSelectAction;
+                                          Form.checkHR;
+                                      });
+                                  });
+              };
+              Form.setOuterLpu = function() {
+                  var input = getControlProperty('LPUDICT', 'input')
+                  input.style = "background-color:white";
+                  if (getCaption('LPUDICT') === '') {
+                      setValue('LPUDICT', '');
+                  } else {
+                      executeAction('setOuterLpu',function() {
+                          var lpudict = getVar('LPUDICT_ID')
+                          if (lpudict == '') {
+                              input.style = "background-color:red";
+                              setValue('LPUDICT', '')
+                          } else {
+                              setValue('LPUDICT',lpudict)
+                          }
+                      })
+                  }
+                  Form.setLpuReqs();
+              };
+              Form.selectOuterHospLPU = function() {
+                  openWindow({
+                      name: 'HospPlan/select_lpu_outer_hosp',
+                      vars: {
+                          lpudict_id: getVar('LPUDICT_ID')
+                      }
+                  }, true)
+                          .addListener('onafterclose', function() {
+                              if (+getVar('ModalResult') === 1)
+                                  Form.afterSelectOuterHospLPU();
+                          });
+              };
+              Form.selectMkbExact = function(_dom) {
+                  setVar('MkbExactValue', getControlValue(buttonEdit_getControl(_dom)));
+                  openWindow('ArmPatientsInDep/SubForms/select_mkb_exact', true)
+                          .addListener('onafterclose', function() {
+                              if (+getVar('ModalResult') === 1)
+                                  setControlValue(buttonEdit_getControl(_dom), getVar('return_value'));
+                          });
+              };
+              Form.afterSelectOuterHospLPU = function() {
+                  setValue('LPUDICT', getVar('return_id'));
+                  setCaption('LPUDICT', getVar('return'));
+              };
+              Form.checkHR = function() {
+                  if (empty(getValue('C_HOSP_REASON')) && !empty(getVar('C_HOSP_REASON'))) {
+                      setValue('C_HOSP_REASON_ACTIVE', null);
+                      ComboBox_SetColor(getControlByName('C_HOSP_REASON'), 'red');
+                      ComboBox_SetCaption(getControlByName('C_HOSP_REASON'), getVar('HOSP_REASON_NAME'), false, true);
+                  } else {
+                      setValue('C_HOSP_REASON_ACTIVE', 'active');
+                  }
+                  Form.setDepCtrl('ADD_DIR_HOSP_REASON', 'C_HOSP_REASON');
+              };
+              Form.setDepCtrl = function(sys_option_name, ctrl_name) {
+                  if (+getVar(sys_option_name) === 1) {
+                      setControlProperty('DPC', 'add_req', ctrl_name);
+                      setControlProperty('DPC2', 'add_req', ctrl_name);
+                  } else {
+                      setControlProperty('DPC', 'del_req', ctrl_name);
+                      setControlProperty('DPC2', 'del_req', ctrl_name);
+                  }
+              };
+              Form.openPersMedCard = function() {
+                  if (empty(getValue('PERSMEDCARD'))) {
+                      alert('Не выбран пациент.');
+                      return;
+                  }
+                  if (+getVar('IS_OUR_PAT') === 0) {
+      
+                      alert('Пациент не относится к текущему МО. Редактирование карты невозможно.');
+                      return;
+                  }
+      
+                  setVar('PERSMEDCARD', getValue('PERSMEDCARD'));
+                  openWindow('Persmedcard/persmedcard_edit', true, 800, 580).addListener('onclose',
+                       function() {
+                           if (getVar('ModalResult', 1) == 1) {
+                               Form.PatientSelect();
+                           }
+                       });
+              };
+              Form.CountHours = function() {
+                  if (getValue('DATE_TR_TIME') == getVar('DATE_TR_TIME')) {
+                      return;
+                  }
+                  setVar('DATE_TR_TIME', null);
+                  if (!empty(getValue('DATE_TR_DATE'))) {
+                      if (!empty(getValue('REG_DATE_CTRL'))) {
+                          var hh_dir_text = getValue('REG_DATE_CTRL') + ' ' + (!empty(getValue('REG_TIME')) ? getValue('REG_TIME') : '00:00');
+                          var today = new Date(hh_dir_text.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+                      } else {
+                          var today = new Date();
+                      }
+                      var text = getValue('DATE_TR_DATE') + ' ' + (!empty(getValue('DATE_TR_TIME')) ? getValue('DATE_TR_TIME') : '00:00')
+                      var date = new Date(text.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+                      setValue('INJURE_TIME', parseToOracleFloat(((today - date) / (1000 * 60 * 60)).toFixed(2)));
+                  } else {
+                      setValue('INJURE_TIME', '');
+                  }
+              };
+              Form.CountTrDate = function() {
+                  if (getValue('INJURE_TIME') == getVar('INJURE_TIME')) {
+                      return;
+                  }
+                  setVar('INJURE_TIME', null);
+                  if (!empty(getValue('INJURE_TIME'))) {
+                      if (!empty(getValue('REG_DATE_CTRL'))) {
+                          var hh_dir_text = getValue('REG_DATE_CTRL') + ' ' + (!empty(getValue('REG_TIME')) ? getValue('REG_TIME') : '00:00');
+                          var today = new Date(hh_dir_text.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+                      } else {
+                          var today = new Date();
+                      }
+                      var hour_in_ms = parseToJSFloat(getValue('INJURE_TIME')) * 1000 * 60 * 60;
+                      var tr_date = new Date(today - hour_in_ms);
+                      var day = tr_date.getDate();
+                      var month = tr_date.getMonth() + 1;
+                      setValue('DATE_TR_DATE', ((day < 10) ? "0" : '') + day + '.' + ((month < 10) ? "0" : '') + month + '.' + tr_date.getFullYear());
+                      var hh = tr_date.getHours();
+                      var min = tr_date.getMinutes();
+                      setValue('DATE_TR_TIME', ((hh < 10) ? "0" : '') + hh + ':' + ((min < 10) ? "0" : '') + min);
+                  } else {
+                      setValue('DATE_TR_DATE', '');
+                      setValue('DATE_TR_TIME', '');
+                  }
+              };
+              Form.PatientSelect = function() {
+                  var el = document.getElementsByClassName('hidden_tr');
+                  executeAction('GetAgentId', function() {
+                      setVar('AGENT', getVar('AGENT'));
+                      executeAction('CheckHomeLess', function() {
+                          if (+getVar('IS_HOMELESS') === 1) {
+                              el[0].style.display = '';
+                          } else {
+                              el[0].style.display = 'none';
+                          }
+                      });
+                  });
+              };
+              Form.refreshDepControls = function() {
+                  DepControls_Refresh('DPC');
+                  DepControls_Refresh('DPC2');
+              };
+              var tmpTALON_VMP_DATE = {"value":"", "text":""};
+              var tmpTALON_VMP_NUM = {"value":"", "text":""};
+              Form.changeOnOffVMP = function() {
+                  if (+getValue('onoffVMP') === 1) {
+                      setValue('TALON_VMP_DATE', tmpTALON_VMP_DATE["value"]);
+                      setCaption('TALON_VMP_DATE', tmpTALON_VMP_DATE["text"]);
+                      setValue('TALON_VMP_NUM', tmpTALON_VMP_NUM["value"]);
+                      setCaption('TALON_VMP_NUM', tmpTALON_VMP_NUM["text"]);
+                      setEnabled('TALON_VMP_DATE', true);
+                      setEnabled('TALON_VMP_NUM', true);
+                      setEnabled('VMP_TALON_FIELD', true);
+                      if (Number(getVar('VmpFromWaitingList'))) {
+                          setCaption('VMP_TALON_FIELD', getValue('TALON_VMP_NUM') || '');
+                          setEnabled('TALON_VMP_DATE', false);
+                          setEnabled('TALON_VMP_NUM', true);
+                          setDomVisible(getControlByName('TalonVmpSection'), true);
+                          MaskInspector_addControl('MainMaskInspector', 'VMP_TALON_FIELD');
+                      } else {
+                          setDomVisible(getControlByName('TalonVmpSection'), false);
+                          MaskInspector_delControl('MainMaskInspector', 'VMP_TALON_FIELD');
+                      }
+                      if (+getVar('VMP_MASK_FIELD') === 1) {
+                         MaskInspector_addControl('MainMaskInspector', 'TALON_VMP_NUM');
+                      } else {
+                         MaskInspector_delControl('MainMaskInspector', 'TALON_VMP_NUM');
+                      }
+                      setDomVisible(getControlByName('blockVmp'), true);
+                  } else {
+                      setEnabled('TALON_VMP_DATE', false);
+                      setEnabled('TALON_VMP_NUM', false);
+                      setEnabled('VMP_TALON_FIELD', false);
+                      setDomVisible(getControlByName('TalonVmpSection'), false);
+                      MaskInspector_delControl('MainMaskInspector', 'VMP_TALON_FIELD');
+                      tmpTALON_VMP_DATE = {"value":getValue('TALON_VMP_DATE'), "text":getCaption('TALON_VMP_DATE')}
+                      tmpTALON_VMP_NUM = {"value":getValue('TALON_VMP_NUM'), "text":getCaption('TALON_VMP_NUM')}
+                      setValue('TALON_VMP_DATE', '');
+                      setCaption('TALON_VMP_DATE', '');
+                      setValue('TALON_VMP_NUM', '');
+                      setCaption('TALON_VMP_NUM', '');
+                      setCaption('VMP_TALON_FIELD', null);
+                      MaskInspector_delControl('MainMaskInspector', 'TALON_VMP_NUM');
+                      getControlByName('TALON_VMP_NUM').querySelector('.input-ctrl').style = "";
+                      setDomVisible(getControlByName('blockVmp'), false);
+                  }
+              };
+              Form.showBedFundsLoads = function() {
+                  openD3Form('HospPlan/hp_bed_days_loads', true, {
+                      width: 850,
+                      height: 450
+                  });
+              };
+              Form.onChangeDiag = function(dom, hospDiagnType) {
+                  if (empty(getControlCaption(dom))) {
+                      Form.ClearMkb(dom);
+                  } else {
+                      setVar('MKB_NEW_CAPTION', getControlCaption(dom));
+                      if (!hospDiagnType) {
+                          hospDiagnType = dom.clone.parentClone.data['ID'];
+                      }
+                      setVar('MKB_TYPE', hospDiagnType);
+                      setVar('ALLOW_IN', null);
+                      executeAction('MKB_callback', function() {
+                          setVar('ALLOW_IN', getVar('ALLOW_IN'));
+                          if (+getVar('ALLOW_IN') === 0) {
+                              alert('Диагноз ['+ getCaption('EX_CAUSE_MKB') + '] недоступен к выбору');
+                              Form.ClearMkb(dom);
+                              return;
+                          }
+                      });
+                  }
+              };
+              Form.onMKB10 = function() {
+                  openWindow({name: 'UniversalComposition/UniversalComposition',
+                              unit: 'MKB10',
+                              composition: 'MKB10_INJURY'}, true)
+                          .addListener('onafterclose', function() {
+                              if (+getVar('ModalResult') === 1) {
+                                  setValue('EX_CAUSE_MKB_ID', getVar('return_id'));
+                                  setCaption('EX_CAUSE_MKB', getVar('return'));
+                              }
+                          }, null, false);
+              };
+              Form.ClearMkb = function(dom) {
+                  $$(dom);
+                      setValue('EX_CAUSE_MKB_ID', '');
+                      setControlCaption(dom, '');
+                      dom.querySelector('input[class="input-ctrl"]').style.backgroundColor = "";
+                  _$$();
+              };
+              Form.showAllTalonsPatient = function() {
+                  var data = { PATIENT_ID: getVar('AGENT') };
+      
+                  if (empty(getVar('AGENT'))) {
+                      data = { PERSMEDCARD: getValue('PERSMEDCARD') };
+                  }
+      
+                  openD3Form('Vmp/subforms/vmp_patient_list', true, {
+                      width: 800,
+                      height: 400,
+                      vars: data,
+                      onclose: function(mode) {
+                          mode = typeof mode !== 'undefined' ? mode : {};
+                          if (!isEmptyObject(mode)) {
+                              setCaption('TALON_VMP_NUM', mode.VMP_NUMB);
+                              setValue('TALON_VMP_NUM', mode.VMP_NUMB);
+                              setCaption('TALON_VMP_DATE', mode.VMP_DATE_ISSUE);
+                              setValue('TALON_VMP_DATE', mode.VMP_DATE_ISSUE);
+                              setValue('VMP_TALON_FIELD', mode.VMP_ID);
+                              setCaption('VMP_TALON_FIELD', mode.VMP_NUMB);
+                          }
+                      }
+                  });
+              };
+              Form.selectPatient = function() {
+                  Form.PatientSelect();
+              };
+              Form.clearVmpFields = function() {
+                  ['VMP_TALON_FIELD', 'TALON_VMP_DATE', 'TALON_VMP_NUM'].forEach(function(element) {
+                      setCaption(element, null);
+                      setValue(element, null);
+                  });
+              }
+              Form.checkTalonVmp = function() {
+                  if (empty(getCaption('VMP_TALON_FIELD'))) {
+                      Form.clearVmpFields();
+                  }
+              };
+              Form.selectHospitalizationTime = function() {
+                  openD3Form('HospPlan/hp_select_schedule', true, {
+                      width: 1200,
+                      height: 700,
+                      vars: {
+                          VISIT_ID: getVar('VISIT_ID'),
+                          DDIR_ID: getVar('CURRENT_DIR_ID'),
+                          PMC_ID: getValue('PERSMEDCARD'),
+                          LPU: getValue('LPUDICT')
+                      },
+                      onclose: function(mod) {
+                          if (mod && +mod.ModalResult === 1) {
+                              closeWindow();
+                          }
+                      }
+                  });
+              };
+              Form.checkBeforeRegForHosp = function() {
+                  executeAction('checkBeforeRegForHosp', function() {
+                      var commonText = `По данному направлению уже существует запись в журнале госпитализации ${getVar('HP_NAME')} на ${getVar('JOUR_REC_DATE')}`;
+                      if (+getVar('SERV_NO_HH') > 0) {
+                          showAlert(`${commonText}. Есть направления на услуги.`);
+                      } else if (+getVar('HH_EXIST') > 0) {
+                          showAlert(`${commonText}. Пациент госпитализирован.`);
+                      } else if (+getVar('SHC_REG_EXIST') > 0) {
+      					openD3Form('System/messagedlg', true, {
+      						width: 600,
+      						height: 190,
+      						vars: {
+      							FORM_CAPTION: '',
+      							MESSAGE: `${commonText}. Выберите действие`,
+      							COMMENTS:'',
+      							BUTTONS: 'Изменить запись;Удалить запись;Отмена'
+      						},
+      						onclose: function(data) {
+      								if (!empty(data)) {
+      									if (data.caption === 'Изменить запись') {
+      										Form.selectHospitalizationTime();
+      									} else if (data.caption === 'Удалить запись') {
+      										D3Api.showConfirm(`Запись ${getVar('AGENT_NAME')} в журнале госпитализации ${getVar('HP_NAME')} на ${getVar('JOUR_REC_DATE')} будет удалена `,
+      											function() {
+      												executeAction('deleteHospJournal');
+      											}, null, {
+      												button_confirm_caption: 'Да',
+      												button_cancel_caption: 'Отмена'
+      											}
+      										);
+      									}
+      								}
+      							}
+      						}
+      					);
+                      } else if (+getVar('HPK_EXIST') > 0) {
+                          showAlert(`Повторное использование запрещено. ${commonText}.`);
+                      } else {
+                          Form.selectHospitalizationTime();
+                      }
+                  });
+              };
+      
+              Form.checkLength = function(res, dom) {
+                  if (!res.ModalResult) {
+                      return;
+                  }
+      
+                  if (res.return.length > 4000 || res.return_id.length > 4000) {
+                      showAlert('Превышен лимит выбранных записей!');
+                      Button_SetEnabled(getControlByName('ButtonOkSave'), false);
+                      Button_SetEnabled(getControlByName('ButtonOk'), false);
+      
+                      dom.querySelector('.input-ctrl').style.backgroundColor = 'yellow';
+      
+                  } else {
+                      dom.querySelector('.input-ctrl').style.backgroundColor = '#EEEEEE';
+      
+                      DepControls_Refresh('DPC');
+                      DepControls_Refresh('DPC2');
+                  }
+              };
+      
+              Form.clearTherapyScheme = function() {
+                  setCaption('ueTherapyScheme', '');
+                  setValue('ueTherapyScheme', null);
+      
+                  DepControls_Refresh('DPC');
+                  DepControls_Refresh('DPC2');
+              };
+              Form.onCangeMKB10 = function() {
+                  setCaption('DIRECTIONS_VMP', '');
+                  setVar('DIRECTIONS_VMP', '');
+              };
+              Form.setVmpUnit = function(dom) {
+                  if (empty(getValue('MKB10'))) {
+                      showAlert('Необходимо указать "Диагноз госпитализации"', 'Ошибка', null, null, function() {
+                          getControlByName('MKB10').querySelector('input').focus();
+                      });
+                      return;
+                  }
+                  openD3Form('HospPlan/select_vmp', 1, {
+                      width: 1020, height: 700,
+                      vars: {
+                          'DIRECTIONS_VMP': getCaption('DIRECTIONS_VMP'),
+                          'DIRECTIONS_VMP_ID': getVar('DIRECTIONS_VMP'),
+                          'MKB_ID': getValue('MKB10')
+                      },
+                      onclose: function(mod) {
+                          if (mod && mod.return_id) {
+                              setCaption('DIRECTIONS_VMP', mod.return_code);
+                              setVar('DIRECTIONS_VMP', mod.return_id);
+                          }
+                      }
+                  });
+              };
+              
+
+      Пакеты/функции:
+          D_PKG_DEP_REQUISITES.GET_ACTUAL;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [2] M2 Action: InsertAction
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare nLPUDICT                NUMBER(17);
+                      nREMOTE_LPU             NUMBER(17);
+                      nPATIENT_ID             NUMBER(17);
+                      nOUTER_DIRECTION        NUMBER(17);
+                      nCURRENT_LPU_AG         NUMBER(17);
+                      nNEW_DIRECTION          NUMBER(17);
+                      nPREF                   VARCHAR2(4);
+                      nNUMB                   VARCHAR2(20);
+                      sDIR_NUMB		        VARCHAR2(20);
+                      sDIR_PREF		        VARCHAR2(20);
+                      sDATE_TIME              date;
+                      nREG_EMPLOYER_AGENT     NUMBER(17);
+                      nREG_EMPLOYER_SPEC_ID   NUMBER(17);
+                      dDATE_TR                date;
+                      nAllowSelectAllLpu      NUMBER(1);
+              begin
+                sDATE_TIME := to_date(:PDREG_DATE,'DD.MM.YYYY HH24:MI');
+                nAllowSelectAllLpu := D_PKG_OPTIONS.GET('AllowSelectAllLpu', :PNLPU);
+                if :LPUDICT is null and :LPUDICT_HANDLE is null then
+                  select t.LPUDICT_ID
+                    into nLPUDICT
+                    from D_V_LPU t
+                   where t.ID = :PNLPU;
+                else
+                  nLPUDICT := :LPUDICT;
+                end if;
+      
+                if :PDDATE_TR_DATE is not null then
+                  dDATE_TR := to_date(:PDDATE_TR_DATE||' '||:PDDATE_TR_TIME, 'DD.MM.YYYY HH24:MI');
+                end if;
+      
+                if :IS_OUR_LPU = 1 then
+                  -- в нашем ЛПУ
+                  D_PKG_DIRECTIONS.ADD(pnD_INSERT_ID            => :PND_INSERT_ID,
+                                       pnLPU                    => :PNLPU,
+                                       pnOUTER_DIRECTION        => :PNOUTER_DIRECTION,
+                                       pnLPU_TO                 => NLPUDICT,
+                                       psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                       pnPATIENT                => :PNPATIENT,
+                                       pnREG_VISIT              => :PNREG_VISIT,
+                                       psDIR_COMMENT            => :PSDIR_COMMENT,
+                                       pnREG_TYPE               => :PNREG_TYPE,
+                                       pnDIR_TYPE               => 1,
+                                       pnHOSP_MKB               => :PNHOSP_MKB,
+                                       pnHOSP_KIND              => :PNHOSP_KIND,
+                                       psDIR_NUMB               => :PSDIR_NUMB,
+                                       pnSPECIALITY             => NULL,
+                                       pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                       pnINJURE_KIND            => :PNINJURE_KIND,
+                                       pnINJURE_TIME            => :PNINJURE_TIME,
+                                       pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                       pnHOSP_DEP               => :PNHOSP_DEP,
+                                       psDIR_PREF               => :PSDIR_PREF,
+                                       pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                       pnMES                    => :PNMES,
+                                       pnHOSP_REASON            => :PNHOSP_REASON,
+                                       pdREG_DATE               => SDATE_TIME,
+                                       pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                       pdDATE_TR                => DDATE_TR,
+                                       pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                     @if (:PNHOSP_DIRECT_TYPES) {
+                                       pnHOSP_DIRECT_TYPE       => :PNHOSP_DIRECT_TYPES,
+                                     @}
+                                       pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                       psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                       pnREG_EMPLOYER           => :PNREG_EMPLOYER,
+                                       pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                       psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                       pnREALISED_DAYS          => :REALISED_DAYS,
+                                       pnVMP                    => :pnDIRECTIONS_VMP,
+                                       pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                       pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                       pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                       psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                  D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => to_number(:PNLPU),
+                                                    pnPID                 => to_number(:PND_INSERT_ID),
+                                                    pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+                else
+                  select ld.AGENT
+                    into nCURRENT_LPU_AG
+                    from D_V_LPU lpu
+                         join D_V_LPUDICT_BASE  ld on ld.ID = lpu.LPUDICT_ID
+                   where lpu.ID = :PNLPU
+                     and ld.ID = lpu.LPUDICT_ID;
+      
+                  if :LPUDICT is not null and nAllowSelectAllLpu in (0,1,2) then
+                    --другое ЛПУ
+                    begin
+                      select coalesce((select l.ID
+                                         from D_V_LPU_BASE l
+                                        where l.LPUDICT = ld.ID),
+                                      (select l.ID
+                                         from D_V_LPU_BASE l
+                                        where l.LPUDICT = ld.HID))
+                        into nREMOTE_LPU
+                        from D_V_LPUDICT_BASE ld
+                       where ld.ID = :LPUDICT;
+                    exception when no_data_found then
+                      nREMOTE_LPU := null;
+                      nPATIENT_ID := :PNPATIENT;
+                    end;
+                    if nREMOTE_LPU is not null then
+                      D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD(pnID         => :PNPATIENT,
+                                                           pnLPU        => :PNLPU,
+                                                           pnREMOTE_LPU => nREMOTE_LPU,
+                                                           pnREMOTE_ID  => nPATIENT_ID);
+                    else
+                      nREMOTE_LPU := null;
+                      nPATIENT_ID := :PNPATIENT;
+                    end if;
+                  else
+                    nREMOTE_LPU := null;
+                    nPATIENT_ID := :PNPATIENT;
+                  end if;
+      
+                  -- DIRECTION в нашем ЛПУ
+                  D_PKG_DIRECTIONS.ADD(pnD_INSERT_ID            => :PND_INSERT_ID,
+                                       pnLPU                    => :PNLPU,
+                                       pnOUTER_DIRECTION        => null,
+                                       pnLPU_TO                 => :LPUDICT,
+                                       psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                       pnPATIENT                => :PNPATIENT,
+                                       pnREG_VISIT              => :PNREG_VISIT,
+                                       psDIR_COMMENT            => :PSDIR_COMMENT,
+                                       pnREG_TYPE               => :PNREG_TYPE,
+                                       pnDIR_TYPE               => 1,
+                                       pnHOSP_MKB               => :PNHOSP_MKB,
+                                       pnHOSP_KIND              => :PNHOSP_KIND,
+                                       psDIR_NUMB               => :PSDIR_NUMB,
+                                       psDIR_PREF               => :PSDIR_PREF,
+                                       pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                       pnSPECIALITY             => null,
+                                       pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                       pnINJURE_KIND            => :PNINJURE_KIND,
+                                       pnINJURE_TIME            => :PNINJURE_TIME,
+                                       pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                       pnHOSP_DEP               => null,
+                                       pnHOSP_REASON            => :PNHOSP_REASON,
+                                       pdREG_DATE               => sDATE_TIME,
+                                       pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                       pdDATE_TR                => dDATE_TR,
+                                       pnHOSP_DEPDICT           => :PNHOSP_DEP,
+                                       pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                     @if (:PNHOSP_DIRECT_TYPES) {
+                                       pnHOSP_DIRECT_TYPE       => :PNHOSP_DIRECT_TYPES,
+                                     @}
+                                       pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                       psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                       pnREG_EMPLOYER           => :PNREG_EMPLOYER,
+                                       pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                       psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                       pnREALISED_DAYS          => :REALISED_DAYS,
+                                       pnVMP                    => :pnDIRECTIONS_VMP,
+                                       pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                       pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                       pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                       psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                  D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => to_number(:PNLPU),
+                                                    pnPID                 => to_number(:PND_INSERT_ID),
+                                                    pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+      
+                  select t.DIR_NUMB,
+                         t.DIR_PREF,
+                         t.REG_EMPLOYER_AGENT,
+                         t.REG_EMPLOYER_SPEC_ID
+                    into sDIR_NUMB,
+                         sDIR_PREF,
+                         nREG_EMPLOYER_AGENT,
+                         nREG_EMPLOYER_SPEC_ID
+                    from D_V_DIRECTIONS t
+                   where t.ID = :PND_INSERT_ID;
+                  -- OUTER_DIRECTION в другом ЛПУ
+                  D_PKG_OUTER_DIRECTIONS.ADD(pnD_INSERT_ID         => nOUTER_DIRECTION,
+                                             pnLPU                 => nvl(nREMOTE_LPU, :PNLPU),
+                                             pnPATIENT             => nPATIENT_ID,
+                                             pdD_DATE              => trunc(sysdate),
+                                             psD_NUMB              => sDIR_NUMB,
+                                             pnREPRESENT           => nCURRENT_LPU_AG,
+                                             psREPRESENT_HANDLE    => null,
+                                             pnDIAGNOSIS           => to_number(:PNHOSP_MKB),
+                                             psDIAGNOSIS_HANDLE    => null,
+                                             pnDOCTOR              => nREG_EMPLOYER_AGENT,
+                                             psDOCTOR_HANDLE       => null,
+                                             psD_PREF              => sDIR_PREF,
+                                             pnREPRESENT_DIRECTION => to_number(:PND_INSERT_ID),
+                                             pdHOSP_PLAN_DATE      => :HOSP_PLAN_DATE,
+                                             pnDOC_SPECIALITY      => nREG_EMPLOYER_SPEC_ID,
+                                             psDIAGNOSIS_EXACT     => :PSHOSP_MKB_EXACT,
+                                             pnDIRECTION_CONDITION => to_number(:DIRECTION_CONDITION),
+                                             pnTYPE_MED_HELP       => to_number(:TYPE_MED_HELP),
+                                             psDIRECTION_REASON    => :DIRECTION_REASON,
+                                             pnDIRECTION_FORM      => to_number(:DIRECTION_FORM));
+      
+                  if nREMOTE_LPU is not null then
+                    -- DIRECTION в другом ЛПУ создается только если ЛПУ в облаке.
+                    nPREF := to_char(sysdate, 'YYYY');
+                    nNUMB := D_PKG_DIRECTIONS.GEN_DIR_NUMB(nREMOTE_LPU, nPREF);
+                    D_PKG_DIRECTIONS.ADD(pnD_INSERT_ID            => nNEW_DIRECTION,
+                                         pnLPU                    => nREMOTE_LPU,
+                                         pnOUTER_DIRECTION        => nOUTER_DIRECTION,
+                                         pnLPU_TO                 => :LPUDICT,
+                                         psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                         pnPATIENT                => nPATIENT_ID,
+                                         pnREG_VISIT              => null,
+                                         psDIR_COMMENT            => :PSDIR_COMMENT,
+                                         pnREG_TYPE               => :PNREG_TYPE,
+                                         pnDIR_TYPE               => 1,
+                                         pnHOSP_MKB               => :PNHOSP_MKB,
+                                         pnHOSP_KIND              => :PNHOSP_KIND,
+                                         psDIR_NUMB               => nNUMB,
+                                         psDIR_PREF               => nPREF,
+                                         pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                         pnSPECIALITY             => null,
+                                         pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                         pnINJURE_KIND            => :PNINJURE_KIND,
+                                         pnINJURE_TIME            => :PNINJURE_TIME,
+                                         pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                         pnHOSP_DEP               => null,
+                                         pnHOSP_REASON            => :PNHOSP_REASON,
+                                         pdREG_DATE               => sDATE_TIME,
+                                         pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                         pdDATE_TR                => dDATE_TR,
+                                         pnHOSP_DEPDICT           => :PNHOSP_DEP,
+                                         pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                       @if (:PNHOSP_DIRECT_TYPES) {
+                                         pnHOSP_DIRECT_TYPE       => :PNHOSP_DIRECT_TYPES,
+                                       @}
+                                         pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                         psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                         pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                         psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                         pnREALISED_DAYS          => :REALISED_DAYS,
+                                         pnVMP                    => :pnDIRECTIONS_VMP,
+                                         pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                         pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                         pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                         psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                    D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => nREMOTE_LPU,
+                                                      pnPID                 => nNEW_DIRECTION,
+                                                      pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+                  end if;
+                end if;
+                  :DIR_LPUDICT_ID := nLPUDICT;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPU;
+          D_V_LPU_BASE;
+          D_V_LPUDICT_BASE;
+          D_V_DIRECTIONS;
+      Пакеты/функции:
+          D_PKG_DIRECTIONS.ADD;
+          D_PKG_DIRECTIONS.GEN_DIR_NUMB;
+          D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL;
+          D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD;
+          D_PKG_OUTER_DIRECTIONS.ADD;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [3] M2 Action: getCardNumb
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select p.CARD_NUMB
+                  into :CARDN
+                  from D_V_PERSMEDCARD p
+                 where p.ID = :PMC;
+              exception when no_data_found then
+                :CARDN := null;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_PERSMEDCARD;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [4] M2 Action: checkPreviousDirection
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare
+                nOPT_TIME_UNIQUE_DIRHOSP NUMBER(20,5);
+                dPREV_HOSP_PLAN_DATE     DATE;
+                dPREV_HOSP_PLAN_DATE2    DATE;
+                sFULLNAME_LPU            VARCHAR2(250);
+                sNAME_LPUDICT            VARCHAR2(100);
+                sDIRHOSP                 VARCHAR2(5);
+              begin
+                nOPT_TIME_UNIQUE_DIRHOSP := D_PKG_OPTIONS.GET('TIME_UNIQUE_DIRHOSP', :pnLPU);
+                sDIRHOSP := D_PKG_OPTIONS.GET('UNIQUE_DIRHOSP', :pnLPU);
+                if sDIRHOSP in ('1', '2') then
+                  begin
+                    select t.HOSP_PLAN_DATE,
+                           (select l.FULLNAME
+                              from D_V_LPU_BASE l
+                             where l.ID = :pnLPU) FULLNAME
+                      into dPREV_HOSP_PLAN_DATE,
+                           sFULLNAME_LPU
+                      from (select d.HOSP_PLAN_DATE,
+                                   row_number() over (order by d.REG_DATE desc) RN
+                              from D_V_DIRECTIONS_BASE d
+                             where d.PATIENT = :pnPATIENT
+                               and d.LPU = :pnLPU
+                               and (:pnHOSP_MKB is not null and d.HOSP_MKB = :pnHOSP_MKB or :pnHOSP_MKB is null and d.HOSP_MKB is null)
+                               and d.HOSP_PLAN_DATE between to_date(:HOSP_PLAN_DATE, D_PKG_STD.FRM_D) - nOPT_TIME_UNIQUE_DIRHOSP and to_date(:HOSP_PLAN_DATE, D_PKG_STD.FRM_D) + nOPT_TIME_UNIQUE_DIRHOSP
+                               and (:pnID is null or d.ID != :pnID)
+                               and not exists (select null
+                                                 from D_V_HOSP_HISTORIES_BASE hh
+                                                      join D_V_HPK_PLAN_JOURNALS_BASE hpj on hpj.ID = hh.HPK_PLAN_JOURNAL
+                                                where hpj.DIRECTION = d.ID
+                                                  and hh.DATE_OUT is not null)
+                               and d.IS_CANCELED = 0) t
+                     where t.RN = 1;
+                  exception when no_data_found then
+                    begin
+                      select t.HOSP_PLAN_DATE,
+                             (select ld.LPU_NAME
+                                from D_V_LPU_BASE l
+                                  join D_V_LPUDICT_BASE ld on ld.ID = l.LPUDICT
+                               where l.ID = :pnLPU) LPU_NAME
+                        into dPREV_HOSP_PLAN_DATE2,
+                             sNAME_LPUDICT
+                        from (select d.HOSP_PLAN_DATE,
+                                     row_number() over (order by d.REG_DATE desc) RN
+                                from D_V_DIRECTIONS_BASE d
+                               where d.PATIENT = :pnPATIENT
+                                 and d.LPU = :pnLPU
+                                 and ((:pnHOSP_MKB is not null and d.HOSP_MKB != :pnHOSP_MKB) or (:pnHOSP_MKB is not null and d.HOSP_MKB is null) )
+                                 and d.HOSP_PLAN_DATE between to_date(:HOSP_PLAN_DATE, D_PKG_STD.FRM_D) - nOPT_TIME_UNIQUE_DIRHOSP and to_date(:HOSP_PLAN_DATE, D_PKG_STD.FRM_D) + nOPT_TIME_UNIQUE_DIRHOSP
+                                 and (:pnID is null or d.ID != :pnID)
+                                 and not exists (select null
+                                                   from D_V_HOSP_HISTORIES_BASE hh
+                                                        join D_V_HPK_PLAN_JOURNALS_BASE hpj on hpj.ID = hh.HPK_PLAN_JOURNAL
+                                                  where hpj.DIRECTION = d.ID
+                                                    and hh.DATE_OUT is not null)
+                                 and d.IS_CANCELED = 0) t
+                       where t.RN = 1;
+                    exception when no_data_found then
+                      dPREV_HOSP_PLAN_DATE2 := null;
+                    end;
+                  end;
+                  if dPREV_HOSP_PLAN_DATE2 is not null and :pnHOSP_MKB is not null then
+                      if sDIRHOSP = '1' then
+                        :DIR_WARNING := '18. Пациенту уже создано направление на госпитализацию от ' || to_char(dPREV_HOSP_PLAN_DATE2, 'dd.mm.yyyy') || ' предыдущего направления';
+                      end if;
+                      if  sDIRHOSP = '2' then
+                        :DIR_WARNING := '18. Пациенту уже создано направление на госпитализацию от ' || to_char(dPREV_HOSP_PLAN_DATE2, 'dd.mm.yyyy') || ' предыдущего направления в МО ' || sNAME_LPUDICT;
+                      end if;
+                  end if;
+                end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPU_BASE;
+          D_V_LPUDICT_BASE;
+          D_V_DIRECTIONS_BASE;
+          D_V_HPK_PLAN_JOURNALS_BASE;
+          D_V_HOSP_HISTORIES_BASE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [5] M2 Action: freeDirNumbReserve
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                D_PKG_DIR_NUMB_RESERV.DEL_BY_NUMB(pnLPU => :LPU,
+                                                  psDIR_NUMB => :DIR_NUMB,
+                                                  psDIR_PREF => :DIR_PREF);
+              end;
+              
+
+      Пакеты/функции:
+          D_PKG_DIR_NUMB_RESERV.DEL_BY_NUMB;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [6] M2 Action: GetDirNumb
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                if :INPREF is null or :PREF = '' then
+                  :PREF := to_char(sysdate, 'YYYY');
+                else
+                  :PREF := :INPREF;
+                end if;
+                :NUMB := D_PKG_DIRECTIONS.GEN_DIR_NUMB(:pnlpu, :PREF);
+              end;
+              
+
+      Пакеты/функции:
+          D_PKG_DIRECTIONS.GEN_DIR_NUMB;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [7] M2 Action: UpdateAction
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare
+                nLPUDICT              NUMBER(17);
+                nREMOTE_LPU           NUMBER(17);
+                nPATIENT_ID           NUMBER(17);
+                nOUTER_DIRECTION      NUMBER(17);
+                nCURRENT_LPU_AG       NUMBER(17);
+                nNEW_DIRECTION        NUMBER(17);
+                nPREF                 VARCHAR2(4);
+                nNUMB                 VARCHAR2(20);
+                sDATE_TIME            DATE;
+                nREG_EMPLOYER_AGENT   NUMBER(17);
+                nREG_EMPLOYER_SPEC_ID NUMBER(17);
+                dDATE_TR              DATE;
+                nOLD_LPU_TO           NUMBER(17);
+                sOLD_LPU_HANDLE_OLD   D_V_DIRECTIONS.LPU_TO_HANDLE%type;
+                nIS_LPU_CHANGE        NUMBER(1);
+                nAllowSelectAllLpu    NUMBER(1);
+                nLID                  NUMBER(17);
+                nLVMP_APPL            NUMBER(17);
+                nLVMP_TALON           NUMBER(17);
+                sHPK_ERROR            VARCHAR2(4000);
+                sREG_EMPLOYER         VARCHAR2(17);
+                sTALON_VMP_NUM        VARCHAR2(20);
+                nIS_ONKO              NUMBER(1);
+                nREALISED_DAYS        NUMBER(17);
+                nDIR_FORM             NUMBER(17);
+                nTHERAPY_SCHEMES      NUMBER(17);
+                nHOSP_HOUR            NUMBER;
+                nTRANSPORTATION_KIND  NUMBER;
+              begin
+                sDATE_TIME         := to_date(:PDREG_DATE, 'DD.MM.YYYY HH24:MI');
+                :NEW_DIR_ID        := :PNID;
+                :NEW_LPU_ID        := :PNLPU;
+                :NEW_OUTER_DIR_ID  := :PNOUTER_DIRECTION;
+                nAllowSelectAllLpu := D_PKG_OPTIONS.GET('AllowSelectAllLpu', :PNLPU);
+                if :LPUDICT is null and :LPUDICT_HANDLE is null then
+                  select t.LPUDICT_ID
+                    into nLPUDICT
+                    from D_V_LPU t
+                   where t.ID = :CURRENT_LPU;
+                else
+                  nLPUDICT := :LPUDICT;
+                end if;
+      
+                begin
+                  /*проверяем было ли изменение в ЛПУ*/
+                  select dir.LPU_TO_ID,
+                         dir.LPU_TO_HANDLE,
+                         dir.REG_EMPLOYER,
+                         dir.TALON_VMP_NUM,
+                         dir.IS_ONKO,
+                         dir.REALISED_DAYS,
+                         dir.DIR_FORM,
+                         dir.MED_THERAPY_SCHEME_ID as THERAPY_SCHEMES,
+                         dir.HOSP_HOUR,
+                         dir.TRANSPORTATION_KIND
+                    into nOLD_LPU_TO,
+                         sOLD_LPU_HANDLE_OLD,
+                         sREG_EMPLOYER,
+                         sTALON_VMP_NUM,
+                         nIS_ONKO,
+                         nREALISED_DAYS,
+                         nDIR_FORM,
+                         nTHERAPY_SCHEMES,
+                         nHOSP_HOUR,
+                         nTRANSPORTATION_KIND
+                    from D_V_DIRECTIONS dir
+                   where dir.id = :PNID;
+      
+                  nIS_LPU_CHANGE := 0;
+                  if (:LPUDICT is not null and nOLD_LPU_TO <> :LPUDICT)
+                     or (:LPUDICT_HANDLE is not null and nOLD_LPU_TO is not null)
+                     or (:IS_OUR_LPU = 1 and (nOLD_LPU_TO <> nLPUDICT or nOLD_LPU_TO is null))
+                     or (sOLD_LPU_HANDLE_OLD is not null and :LPUDICT is not null) then
+                    nIS_LPU_CHANGE := 1;
+                  end if;
+                end;
+      
+                if nIS_LPU_CHANGE = 1 then
+                  /*удаляем только если ЛПУ было изменено*/
+                  for x in (select t.ID,
+                                   l.ID as DID,
+                                   l.LPU as DIR_LPU,
+                                   t.LPU as OD_LPU
+                              from D_V_OUTER_DIRECTIONS t
+                                   left join D_V_DIRECTIONS l
+                                          on l.OUTER_DIRECTION_ID = t.ID
+                             where t.REPRESENT_DIRECTION = :PNID)
+                  loop
+                    if x.DID is not null and x.DID != :PNID then
+                      begin
+                        select 'Направление на госпитализацию уже используется в журнале госпитализации внешнего МО: "' ||
+                               (select l.CODE_LPU || ' - ' || l.LPUDICT_NAME
+                                  from D_V_LPU l
+                                 where l.ID = t.LPU) ||
+                               '", журнал: "' || t.HOSP_PLAN_KIND_NAME || '"' ||
+                               ', дата плана: "' || to_char(t.PLAN_DATE, D_PKG_STD.FRM_D) || '"'
+                          into sHPK_ERROR
+                          from D_V_HPK_PLAN_JOURNALS t
+                         where t.DIRECTION = x.DID
+                           and rownum = 1;
+                        D_P_EXC(sHPK_ERROR);
+                      exception when no_data_found then
+                        sHPK_ERROR := null;
+                      end;
+                      D_PKG_DIRECTIONS.DEL(x.DID, x.DIR_LPU);
+                    end if;
+                    D_PKG_OUTER_DIRECTIONS.DEL(x.ID, x.OD_LPU);
+                  end loop;
+                end if;
+                /*end if;*/
+                if :PDDATE_TR_DATE is not null then
+                  dDATE_TR := to_date(:PDDATE_TR_DATE || ' ' || :PDDATE_TR_TIME, 'DD.MM.YYYY HH24:MI');
+                end if;
+                if :IS_OUR_LPU = 1 then
+                  if nIS_LPU_CHANGE = 1 then
+                    begin
+                      select t.OUTER_DIRECTION_ID
+                        into nOUTER_DIRECTION
+                        from D_V_DIRECTIONS t
+                       where t.ID = :PNID;
+                    end;
+      
+                    if nOUTER_DIRECTION is not null then
+                      for cur in (select out_dir.ID  as OD_ID,
+                                         out_dir.LPU as OD_LPU,
+                                         dir2.ID  as D_ID,
+                                         dir2.LPU as D_LPU
+                                    from D_V_DIRECTIONS dir
+                                         join D_V_OUTER_DIRECTIONS_BASE out_dir on out_dir.ID = dir.OUTER_DIRECTION
+                                         join D_V_DIRECTIONS dir2 on dir2.ID = out_dir.REPRESENT_DIRECTION
+                                   where dir.ID = :PNID) loop
+                        if cur.D_ID != :PNID then
+                          D_PKG_DIRECTIONS.DEL(cur.D_ID, cur.D_LPU);
+                        end if;
+                        D_PKG_OUTER_DIRECTIONS.DEL(cur.OD_ID, cur.OD_LPU);
+                      end loop;
+                    end if;
+      
+                    nPREF := to_char(sysdate, 'YYYY');
+                    nNUMB := D_PKG_DIRECTIONS.GEN_DIR_NUMB(:CURRENT_LPU, nPREF);
+      
+                    D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD(pnID         => :PNPATIENT,
+                                                         pnLPU        => :PNLPU,
+                                                         pnREMOTE_LPU => :CURRENT_LPU,
+                                                         pnREMOTE_ID  => nPATIENT_ID);
+                    :NEW_LPU_ID := :CURRENT_LPU;
+                    :NEW_OUTER_DIR_ID := null;
+                    nOUTER_DIRECTION := :PNOUTER_DIRECTION;
+                  else
+                    nOUTER_DIRECTION := null;
+                  end if;
+                    D_PKG_DIRECTIONS.UPD(pnID                     => :PNID,
+                                         pnLPU                    => :PNLPU,
+                                         pnOUTER_DIRECTION        => coalesce(:PNOUTER_DIRECTION, nOUTER_DIRECTION),
+                                         pnLPU_TO                 => nLPUDICT,
+                                         psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                         psDIR_COMMENT            => :PSDIR_COMMENT,
+                                         pnREG_TYPE               => :PNREG_TYPE,
+                                         pnDIR_TYPE               => 1,
+                                         pnHOSP_MKB               => :PNHOSP_MKB,
+                                         pnHOSP_KIND              => :PNHOSP_KIND,
+                                         psDIR_NUMB               => :PSDIR_NUMB,
+                                         pnSPECIALITY             => null,
+                                         pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                         pnINJURE_KIND            => :PNINJURE_KIND,
+                                         pnINJURE_TIME            => :PNINJURE_TIME,
+                                         pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                         pnHOSP_DEP               => :PNHOSP_DEP,
+                                         psDIR_PREF               => :PSDIR_PREF,
+                                         pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                         pnMES                    => :PNMES,
+                                         pnREG_HPKPJ              => null,
+                                         pnHOSP_REASON            => :PNHOSP_REASON,
+                                         pdREG_DATE               => sDATE_TIME,
+                                         pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                         pdDATE_TR                => dDATE_TR,
+                                         pnHOSP_DEPDICT           => null,
+                                         psDOC_COMMENT            => :DOC_COMMENT,
+                                         pnHOSP_PALAN_KIND        => null,
+                                         pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                         pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                         psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                         pnREG_EMPLOYER           => :PNREG_EMPLOYER,
+                                         pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                         pnREALISED_DAYS          => :REALISED_DAYS,
+                                         vAPI_VERSION             => 14,
+                                         psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                         pnIS_ONKO                => nIS_ONKO,
+                                         pnDIR_FORM               => nDIR_FORM,
+                                         pnTHERAPY_SCHEMES        => nTHERAPY_SCHEMES,
+                                         pnVMP                    => :pnDIRECTIONS_VMP,
+                                         pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                         pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                         pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                         psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                    D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => to_number(:PNLPU),
+                                                      pnPID                 => to_number(:PNID),
+                                                      pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+                    :NEW_DIR_ID := :PNID;
+                else
+      
+                  select lpd.AGENT
+                    into nCURRENT_LPU_AG
+                    from D_V_LPU lpu
+                         join D_V_LPUDICT_BASE lpd on lpd.ID = lpu.LPUDICT_ID
+                   where lpu.ID = :PNLPU;
+      
+                  if :LPUDICT is not null and nAllowSelectAllLpu in (0,1,2) then
+                    --другое ЛПУ
+                    begin
+      				select coalesce(
+      						 (select l.ID
+      							from D_V_LPU_BASE l
+      						   where l.LPUDICT = ld.ID),
+      						 (select l.ID
+      							from D_V_LPU_BASE l
+      						   where l.LPUDICT = ld.HID))
+      				  into nREMOTE_LPU
+      				  from D_V_LPUDICT_BASE ld
+      				 where ld.ID = :LPUDICT;
+                    exception when no_data_found then
+                      nREMOTE_LPU := null;
+                      nPATIENT_ID := :PNPATIENT;
+                    end;
+                    if nREMOTE_LPU is not null then
+                      D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD(pnID         => :PNPATIENT,
+                                                           pnLPU        => :PNLPU,
+                                                           pnREMOTE_LPU => nREMOTE_LPU,
+                                                           pnREMOTE_ID  => nPATIENT_ID);
+                    else
+                      nREMOTE_LPU := null;
+                      nPATIENT_ID := :PNPATIENT;
+                    end if;
+                  else
+                    nREMOTE_LPU := null;
+                    nPATIENT_ID := :PNPATIENT;
+                  end if;
+      
+                  D_PKG_DIRECTIONS.UPD(pnID                     => :PNID,
+                                       pnLPU                    => :PNLPU,
+                                       pnOUTER_DIRECTION        => :PNOUTER_DIRECTION,
+                                       pnLPU_TO                 => :LPUDICT,
+                                       psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                       psDIR_COMMENT            => :PSDIR_COMMENT,
+                                       pnREG_TYPE               => :PNREG_TYPE,
+                                       pnDIR_TYPE               => 1,
+                                       pnHOSP_MKB               => :PNHOSP_MKB,
+                                       pnHOSP_KIND              => :PNHOSP_KIND,
+                                       psDIR_NUMB               => :PSDIR_NUMB,
+                                       psDIR_PREF               => :PSDIR_PREF,
+                                       pnSPECIALITY             => null,
+                                       pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                       pnINJURE_KIND            => :PNINJURE_KIND,
+                                       pnINJURE_TIME            => :PNINJURE_TIME,
+                                       pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                       pnHOSP_DEP               => null,
+                                       pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                       pnMES                    => null,
+                                       pnREG_HPKPJ              => null,
+                                       pnHOSP_REASON            => :PNHOSP_REASON,
+                                       pdREG_DATE               => sDATE_TIME,
+                                       pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                       pdDATE_TR                => dDATE_TR,
+                                       pnHOSP_DEPDICT           => :PNHOSP_DEP,
+                                       psDOC_COMMENT            => :DOC_COMMENT,
+                                       pnHOSP_PALAN_KIND        => null,
+                                       pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                       pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                       psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                       pnREG_EMPLOYER           => :PNREG_EMPLOYER,
+                                       pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                       pnREALISED_DAYS          => :REALISED_DAYS,
+                                       vAPI_VERSION             => 14,
+                                       psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                       pnIS_ONKO                => nIS_ONKO,
+                                       pnDIR_FORM               => nDIR_FORM,
+                                       pnTHERAPY_SCHEMES        => nTHERAPY_SCHEMES,
+                                       pnVMP                    => :pnDIRECTIONS_VMP,
+                                       pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                       pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                       pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                       psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                  D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => to_number(:PNLPU),
+                                                    pnPID                 => to_number(:PNID),
+                                                    pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+      
+                  /*if :pnreg_visit is null then*/
+                  select t.REG_EMPLOYER_AGENT, t.REG_EMPLOYER_SPEC_ID
+                    into nREG_EMPLOYER_AGENT, nREG_EMPLOYER_SPEC_ID
+                    from D_V_DIRECTIONS t
+                   where t.ID = :PNID;
+                  if nIS_LPU_CHANGE = 1 then
+                    /*если изменили ЛПУ, то создаем записи по новому, иначе update старых*/
+                    -- OUTER_DIRECTION в другом ЛПУ
+                    D_PKG_OUTER_DIRECTIONS.ADD(pnD_INSERT_ID         => nOUTER_DIRECTION,
+                                               pnLPU                 => coalesce(nREMOTE_LPU, :PNLPU),
+                                               pnPATIENT             => nPATIENT_ID,
+                                               pdD_DATE              => trunc(sysdate),
+                                               psD_NUMB              => :PSDIR_NUMB,
+                                               pnREPRESENT           => nCURRENT_LPU_AG,
+                                               psREPRESENT_HANDLE    => null,
+                                               pnDIAGNOSIS           => to_number(:PNHOSP_MKB),
+                                               psDIAGNOSIS_HANDLE    => null,
+                                               pnDOCTOR              => nREG_EMPLOYER_AGENT,
+                                               psDOCTOR_HANDLE       => null,
+                                               psD_PREF              => :PSDIR_PREF,
+                                               pnREPRESENT_DIRECTION => to_number(:PNID),
+                                               pdHOSP_PLAN_DATE      => :HOSP_PLAN_DATE,
+                                               pnDOC_SPECIALITY      => nREG_EMPLOYER_SPEC_ID,
+                                               psDIAGNOSIS_EXACT     => :PSHOSP_MKB_EXACT,
+                                               pnDIRECTION_CONDITION => to_number(:DIRECTION_CONDITION),
+                                               pnTYPE_MED_HELP       => to_number(:TYPE_MED_HELP),
+                                               psDIRECTION_REASON    => :DIRECTION_REASON,
+                                               pnDIRECTION_FORM      => to_number(:DIRECTION_FORM));
+                    if nREMOTE_LPU is not null then
+                      -- DIRECTION в другом ЛПУ создается только если ЛПУ в облаке.
+                      nPREF := to_char(sysdate, 'yyyy');
+                      nNUMB := D_PKG_DIRECTIONS.GEN_DIR_NUMB(nREMOTE_LPU, nPREF);
+                      D_PKG_DIRECTIONS.ADD(pnD_INSERT_ID            => nNEW_DIRECTION,
+                                           pnLPU                    => nREMOTE_LPU,
+                                           pnOUTER_DIRECTION        => nOUTER_DIRECTION,
+                                           pnLPU_TO                 => :LPUDICT,
+                                           psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                           pnPATIENT                => nPATIENT_ID,
+                                           pnREG_VISIT              => null,
+                                           psDIR_COMMENT            => :PSDIR_COMMENT,
+                                           pnREG_TYPE               => :PNREG_TYPE,
+                                           pnDIR_TYPE               => 1,
+                                           pnHOSP_MKB               => :PNHOSP_MKB,
+                                           pnHOSP_KIND              => :PNHOSP_KIND,
+                                           psDIR_NUMB               => nNUMB,
+                                           psDIR_PREF               => nPREF,
+                                           pnSPECIALITY             => null,
+                                           pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                           pnINJURE_KIND            => :PNINJURE_KIND,
+                                           pnINJURE_TIME            => :PNINJURE_TIME,
+                                           pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                           pnHOSP_DEP               => null,
+                                           pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                           pnHOSP_REASON            => :PNHOSP_REASON,
+                                           pdREG_DATE               => sDATE_TIME,
+                                           pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                           pdDATE_TR                => dDATE_TR,
+                                           pnHOSP_DEPDICT           => :PNHOSP_DEP,
+                                           pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                           pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                           psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                           pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                           psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                           pnREALISED_DAYS          => :REALISED_DAYS,
+                                           pnVMP                    => :pnDIRECTIONS_VMP,
+                                           pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                           pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                           pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                           psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                      D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => nREMOTE_LPU,
+                                                        pnPID                 => nNEW_DIRECTION,
+                                                        pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+                    end if;
+                  else
+                    for x in (select t.ID          OD_ID,
+                                     l.ID          D2_ID,
+                                     l.DIR_NUMB,
+                                     l.DIR_PREF,
+                                     l.DOC_COMMENT,
+                                     t.REASON_ID
+                                from D_V_OUTER_DIRECTIONS t
+                                join D_V_DIRECTIONS l
+                                  on l.OUTER_DIRECTION_ID = t.ID /*левое, так как для ЛПУ не в облаке direction2 не создается*/
+                                 and t.REPRESENT_DIRECTION = :PNID) loop
+                      -- OUTER_DIRECTION в другом ЛПУ
+                      D_PKG_OUTER_DIRECTIONS.UPD(pnID                  => x.OD_ID,
+                                                 pnLPU                 => coalesce(nREMOTE_LPU, :PNLPU),
+                                                 pnPATIENT             => nPATIENT_ID,
+                                                 pdD_DATE              => trunc(sysdate),
+                                                 psD_NUMB              => :PSDIR_NUMB,
+                                                 pnREPRESENT           => nCURRENT_LPU_AG,
+                                                 psREPRESENT_HANDLE    => null,
+                                                 pnDIAGNOSIS           => to_number(:PNHOSP_MKB),
+                                                 psDIAGNOSIS_HANDLE    => null,
+                                                 pnDOCTOR              => nREG_EMPLOYER_AGENT,
+                                                 psDOCTOR_HANDLE       => null,
+                                                 psD_PREF              => :PSDIR_PREF,
+                                                 pnREPRESENT_DIRECTION => to_number(:PNID),
+                                                 pdHOSP_PLAN_DATE      => :HOSP_PLAN_DATE,
+                                                 pnDOC_SPECIALITY      => nREG_EMPLOYER_SPEC_ID,
+                                                 psDIAGNOSIS_EXACT     => :PSHOSP_MKB_EXACT,
+                                                 pnREASON              => x.REASON_ID,
+                                                 pnDIRECTION_CONDITION => to_number(:DIRECTION_CONDITION),
+                                                 pnTYPE_MED_HELP       => to_number(:TYPE_MED_HELP),
+                                                 psDIRECTION_REASON    => :DIRECTION_REASON,
+                                                 pnDIRECTION_FORM      => to_number(:DIRECTION_FORM));
+      
+                      if nREMOTE_LPU is not null then
+                        -- DIRECTION в другом ЛПУ создается только если ЛПУ в облаке.
+                        D_PKG_DIRECTIONS.UPD(pnID                     => x.D2_ID,
+                                             pnLPU                    => nREMOTE_LPU,
+                                             pnOUTER_DIRECTION        => x.OD_ID,
+                                             pnLPU_TO                 => :LPUDICT,
+                                             psLPU_TO_HANDLE          => :LPUDICT_HANDLE,
+                                             psDIR_COMMENT            => :PSDIR_COMMENT,
+                                             pnREG_TYPE               => :PNREG_TYPE,
+                                             pnDIR_TYPE               => 1,
+                                             pnHOSP_MKB               => :PNHOSP_MKB,
+                                             pnHOSP_KIND              => :PNHOSP_KIND,
+                                             psDIR_NUMB               => x.DIR_NUMB,
+                                             psDIR_PREF               => x.DIR_PREF,
+                                             pnSPECIALITY             => null,
+                                             pnEX_CAUSE_MKB           => :PNEX_CAUSE_MKB,
+                                             pnINJURE_KIND            => :PNINJURE_KIND,
+                                             pnINJURE_TIME            => :PNINJURE_TIME,
+                                             pnDIRECTION_KIND         => :PNDIRECTION_KIND,
+                                             pnHOSP_DEP               => null,
+                                             pnHOSP_BED_TYPE          => :PNHOSP_BED_TYPE,
+                                             pnHOSP_REASON            => :PNHOSP_REASON,
+                                             pdREG_DATE               => sDATE_TIME,
+                                             pdHOSP_PLAN_DATE         => :HOSP_PLAN_DATE,
+                                             pnMES                    => null,
+                                             pnREG_HPKPJ              => null,
+                                             pdDATE_TR                => dDATE_TR,
+                                             pnHOSP_DEPDICT           => :PNHOSP_DEP,
+                                             psDOC_COMMENT            => x.DOC_COMMENT,
+                                             pnHOSP_PALAN_KIND        => null,
+                                             pnHOSP_TYPE              => :PNHOSP_TYPE,
+                                             pnHOSP_REASON_STREETKIDS => :PNHOMELESS_REASON,
+                                             psHOSP_MKB_EXACT         => :PSHOSP_MKB_EXACT,
+                                             pdTALON_VMP_DATE         => :TALON_VMP_DATE,
+                                             psTALON_VMP_NUM          => :TALON_VMP_NUM,
+                                             pnREALISED_DAYS          => :REALISED_DAYS,
+                                             vAPI_VERSION             => 14,
+                                             pnIS_ONKO                => nIS_ONKO,
+                                             pnDIR_FORM               => nDIR_FORM,
+                                             pnTHERAPY_SCHEMES        => nTHERAPY_SCHEMES,
+                                             pnVMP                    => :pnDIRECTIONS_VMP,
+                                             pnDIRECTION_FORM         => :DIRECTION_FORM,
+                                             pnTYPE_MED_HELP          => :TYPE_MED_HELP,
+                                             pnDIRECTION_CONDITION    => :DIRECTION_CONDITION,
+                                             psDIRECTION_REASON       => :DIRECTION_REASON);
+      
+                        D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL(pnLPU                 => nREMOTE_LPU,
+                                                          pnPID                 => x.D2_ID,
+                                                          pcMED_THERAPY_SCHEMES => :THERAPY_SCHEME);
+                      end if;
+                    end loop;
+                  end if;
+                  :DIR_LPUDICT_ID := nLPUDICT;
+                end if;
+      
+                @if (:VmpFromWaitingList == '1' && :CHECK_VMP == '1') {
+                  begin
+                    select vmp_l.ID,
+                           vmp_l.VMP_APPL,
+                           vmp_l.VMP_TALON
+                      into nLID,
+                           nLVMP_APPL,
+                           nLVMP_TALON
+                      from D_V_VMP_LINKS vmp_l
+                           left join D_V_VMP_TALONS vmp_t on vmp_l.VMP_TALON = vmp_t.ID
+                     where vmp_t.ID = :VMP_TALON_FIELD;
+                  exception when no_data_found then
+                    nLID := null;
+                    nLVMP_APPL := null;
+                    nLVMP_TALON := null;
+                  end;
+                  if nLID is not null then
+                    D_PKG_VMP_LINKS.UPD(pnID        => nLID,
+                                        pnLPU       => :CURRENT_LPU,
+                                        pnVMP_APPL  => nLVMP_APPL,
+                                        pnVMP_TALON => nLVMP_TALON,
+                                        pnDIRECTION => :PNID);
+                  end if;
+                @}
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPU;
+          D_V_LPU_BASE;
+          D_V_LPUDICT_BASE;
+          D_V_DIRECTIONS;
+          D_V_VMP_LINKS;
+          D_V_OUTER_DIRECTIONS_BASE;
+          D_V_OUTER_DIRECTIONS;
+          D_V_HPK_PLAN_JOURNALS;
+          D_V_VMP_TALONS;
+      Пакеты/функции:
+          D_PKG_DIRECTIONS.ADD;
+          D_PKG_DIRECTIONS.GEN_DIR_NUMB;
+          D_PKG_OUTER_DIRECTIONS.DEL;
+          D_PKG_OUTER_DIRECTIONS.UPD;
+          D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL;
+          D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD;
+          D_PKG_DIRECTIONS.UPD;
+          D_PKG_DIRECTIONS.DEL;
+          D_PKG_VMP_LINKS.UPD;
+          D_PKG_OUTER_DIRECTIONS.ADD;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [8] M2 Action: SelectAction
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare
+                nLPUDICT NUMBER(17);
+              begin
+                if :LPU_EDIT is null then
+                  :LPU_EDIT := :PNLPU;
+                else
+                  :LPU_EDIT := :LPU_EDIT;
+                end if;
+                select h.OUTER_DIRECTION_ID,
+                       h.OUTER_DIRECTION,
+                       h.PATIENT_ID,
+                       h.PATIENT_CARD,
+                       h.REG_VISIT_ID,
+                       h.DIR_COMMENT,
+                       h.REG_TYPE,
+                       h.HOSP_MKB_ID,
+                       h.HOSP_MKB,
+                       h.HOSP_KIND_ID,
+                       h.DIR_NUMB,
+                       h.DIR_PREF,
+                       coalesce(h.HOSP_DEP_ID,h.HOSP_DEPDICT_ID),
+                       coalesce(h.HOSP_DEP,h.HOSP_DEPDICT_NAME),
+                       h.HOSP_DEPDICT_ID,
+                       h.HOSP_BED_TYPE_ID,
+                       h.DIRECTION_KIND_ID,
+                       h.EX_CAUSE_MKB_ID,
+                       h.EX_CAUSE_MKB,
+                       h.INJURE_KIND_ID,
+                       h.INJURE_KIND,
+                       h.INJURE_TIME,
+                       h.LPU_TO_HANDLE,
+                       h.LPU_TO_ID,
+                       h.LPU_TO,
+                       h.MES_ID,
+                       h.MES,
+                       h.HOSP_REASON_ID,
+                       h.HOSP_REASON_NAME,
+                       to_char(nvl(h.REG_DATE, sysdate), 'DD.MM.YYYY') REG_DATE,
+                       to_char(nvl(h.REG_DATE, sysdate), 'HH24:MI') REG_TIME,
+                       h.HOSP_PLAN_DATE,
+                       to_char(h.DATE_TR, 'dd.mm.yyyy'),
+                       to_char(h.DATE_TR, 'hh24:mi'),
+                       h.DOC_COMMENT,
+                       h.LPU_TO_NAME,
+                       h.LPU_TO_ID,
+                       h.HOSP_TYPE_ID,
+                       h.HOSP_DIRECT_TYPE_ID,
+                       h.HOSP_REASON_STREETKIDS,
+                       h.HOSP_MKB_EXACT,
+                       h.REG_EMPLOYER_ID,
+                       h.REG_EMPLOYER_FIO,
+                       h.TALON_VMP_DATE,
+                       h.TALON_VMP_NUM,
+                       h.REALISED_DAYS,
+                       (select case when hh.DATE_OUT is not null
+                                      then 1
+                                    else 0
+                               end EMPTY_DATE_OUT
+                          from D_V_HOSP_HISTORIES hh
+                               join D_V_HPK_PLAN_JOURNALS hpj
+                                 on hpj.ID = hh.HPK_PLAN_JOURNAL
+                                and hpj.DIRECTION = :DIRID
+                       ) EMPTY_DATE_OUT,
+                       h.HOSP_TYPE_NAME,
+                       (select listagg(dts.THERAPY_SCHEMES_DESC_ID, ';') within group (order by dts.ID)
+                          from D_V_DIR_THERAPY_SCHEMES dts
+                         where dts.PID = to_number(:DIRID)) MED_THERAPY_SCHEME_ID,
+                       (select listagg(dts.THERAPY_SCHEMES_CODE, ';') within group (order by dts.ID)
+                          from D_V_DIR_THERAPY_SCHEMES dts
+                         where dts.PID = to_number(:DIRID)) MED_THERAPY_SCHEME_CODE,
+                       h.VMP,
+                       (select vmp.VMP_CODE
+                          from D_V_VMP vmp
+                         where vmp.ID = h.VMP),
+                       h.DIRECTION_FORM_ID,
+                       h.TYPE_MED_HELP_ID,
+                       h.DIRECTION_CONDITION_ID,
+                       h.DIRECTION_REASON
+                  into :OUTER_DIRECTION_ID,
+                       :OUTER_DIRECTION,
+                       :PATIENT_ID,
+                       :PATIENT_CARD,
+                       :REG_VISIT_ID,
+                       :DIR_COMMENT,
+                       :REG_TYPE,
+                       :HOSP_MKB_ID,
+                       :HOSP_MKB,
+                       :HOSP_KIND_ID,
+                       :DIR_NUMB,
+                       :DIR_PREF,
+                       :HOSP_DEP_ID,
+                       :HOSP_DEP,
+                       :HOSP_DEPDICT_ID,
+                       :HOSP_BED_TYPE_ID,
+                       :DIRECTION_KIND_ID,
+                       :EX_CAUSE_MKB_ID,
+                       :EX_CAUSE_MKB,
+                       :INJURE_KIND_ID,
+                       :INJURE_KIND,
+                       :INJURE_TIME,
+                       :LPUDICT_HANDLE,
+                       :LPUDICT_ID,
+                       :LPUDICT,
+                       :MES_ID,
+                       :MES,
+                       :HOSP_REASON_ID,
+                       :HOSP_REASON,
+                       :REG_DATE,
+                       :REG_TIME,
+                       :HOSP_PLAN_DATE,
+                       :DATE_TR_DATE,
+                       :DATE_TR_TIME,
+                       :DOC_COMMENT,
+                       :DIR_LPUDICT_NAME,
+                       :DIR_LPUDICT_ID,
+                       :HOSP_TYPE,
+                       :HOSP_DIRECT_TYPE_ID,
+                       :HOMELESS_REASON,
+                       :HOSP_MKB_EXACT,
+                       :REG_EMP_ID,
+                       :REG_EMP_FIO,
+                       :TALON_VMP_DATE,
+                       :TALON_VMP_NUM,
+                       :REALISED_DAYS,
+                       :EMPTY_DATE_OUT,
+                       :HOSP_TYPE_NAME,
+                       :THERAPY_SCHEME_ID,
+                       :THERAPY_SCHEME_CODE,
+                       :DIRECTIONS_VMP_ID,
+                       :DIRECTIONS_VMP_CODE,
+                       :DIRECTION_FORM_ID,
+                       :TYPE_MED_HELP_ID,
+                       :DIRECTION_CONDITION_ID,
+                       :DIRECTION_REASON
+                  from D_V_DIRECTIONS h
+                 where h.ID = :DIRID
+                   and h.LPU = :LPU_EDIT;
+      
+                select t.LPUDICT_ID
+                  into nLPUDICT
+                  from D_V_LPU t
+                 where t.ID = :PNLPU;
+                if :LPUDICT_ID = nLPUDICT then
+                  :LPUDICT := null;
+                  :LPUDICT_ID := null;
+                  :CB := 1;
+                else
+                  :CB := 0;
+                end if;
+                select case when pmc.LPU =:PNLPU
+                            then 1
+                            else 0
+                        end
+                  into :IS_OUR_PAT
+                  from D_V_PERSMEDCARD_BASE pmc
+                 where pmc.ID = :PATIENT_ID;
+                begin
+                  select d2.ID
+                    into :OUTER_ID
+                    from D_V_OUTER_DIRECTIONS_BASE od
+                         join D_V_DIRECTIONS_BASE d2 on d2.OUTER_DIRECTION = od.id
+                   where od.REPRESENT_DIRECTION = :DIRID;
+                exception when no_data_found then
+                  :OUTER_ID := null;
+                end;
+                if :OUTER_DIRECTION_ID is not null then
+                  select od.DIRECTION_FORM_ID,
+                         od.TYPE_MED_HELP_ID,
+                         od.DIRECTION_CONDITION_ID,
+                         od.DIRECTION_REASON
+                    into :DIRECTION_FORM_ID,
+                         :TYPE_MED_HELP_ID,
+                         :DIRECTION_CONDITION_ID,
+                         :DIRECTION_REASON
+                    from D_V_OUTER_DIRECTIONS od
+                   where od.id = to_number(:OUTER_DIRECTION_ID);
+                end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPU;
+          D_V_HOSP_HISTORIES;
+          D_V_PERSMEDCARD_BASE;
+          D_V_DIRECTIONS_BASE;
+          D_V_DIRECTIONS;
+          D_V_DIR_THERAPY_SCHEMES;
+          D_V_VMP;
+          D_V_OUTER_DIRECTIONS_BASE;
+          D_V_OUTER_DIRECTIONS;
+          D_V_HPK_PLAN_JOURNALS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [9] M2 Action: getOptionsData
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                :ADD_DIR_KIND_HOSP := coalesce(D_PKG_OPTION_SPECS.GET('ADDDIRKINDHOSP', :LPU, 0), 0);
+                :ALLOWSELECTALLLPU := coalesce(D_PKG_OPTION_SPECS.GET('AllowSelectAllLpu', :LPU, 0), 0);
+                :HH_LPU_DICT := coalesce(D_PKG_OPTION_SPECS.GET('HHLPUDICT', :LPU, 0), '0');
+                :ADD_DIR_BED_PROFILE := coalesce(D_PKG_OPTION_SPECS.GET('AddDirBedProfile', :LPU, 0), 0);
+                :ADD_DIR_HOSP_DEP := coalesce(D_PKG_OPTION_SPECS.GET('AddDirHospDep', :LPU, 0), 0);
+                :ADD_DIR_HOSP_DIAGNOSIS := coalesce(D_PKG_OPTION_SPECS.GET('AddDirHospDiagnosis', :LPU, 0), 0);
+                :AddDirHospPlanDate := coalesce(D_PKG_OPTION_SPECS.GET('AddDirHospPlanDate', :LPU, 0), 0);
+                :ADD_DIR_HOSPTALIZATION_KIND := coalesce(D_PKG_OPTION_SPECS.GET('AddDirHosptalizationKind', :LPU, 0), 0);
+                :BED_FUND_VIEW_FOR_DIRECTION := coalesce(D_PKG_OPTION_SPECS.GET('BedFundViewForDirection', :LPU, 0), 0);
+                :DAYS_DIR_REALISED_VIEW := coalesce(D_PKG_OPTION_SPECS.GET('DaysDirRealisedView', :LPU, 0), 0);
+                :VMPFFROMWAITINGLIST := coalesce(D_PKG_OPTION_SPECS.GET('VmpFromWaitingList', :LPU, 0), 0);
+                :ROLES_EDIT_DIRECTION_DATE := D_PKG_ROLES.CHECK_EMP_ROLES(:EMPLOYER, :LPU, D_PKG_OPTIONS.GET('RolesEditDirectionDate', :LPU), 1);
+                -- СО_Обязательность заполнения поля "Причина госпитализации" (0 - нет,1 -да)
+                :ADD_DIR_HOSP_REASON := coalesce(D_PKG_OPTION_SPECS.GET('AddDirectionHospReason', :LPU, 0), 0);
+                -- СО_Обязательность заполнения поля "Тип госпитализации" (0 - нет,1 -да)
+                :ADD_DIR_HOSP_TYPE := coalesce(D_PKG_OPTION_SPECS.GET('AddDirectionHospType', :LPU, 0), 0);
+                -- СО_Обязательность заполнения поля "Обоснование направления" (0 - нет,1 -да)
+                :ADD_DIR_HOSP_COMMENT := coalesce(D_PKG_OPTION_SPECS.GET('AddDirectionHospComment', :LPU, 0), 0);
+                -- СО_Отображение поля для внесения информации о схема лекарственного лечения
+                :SHOW_THERAPY_SCHEMES_FIELD := coalesce(D_PKG_OPTION_SPECS.GET('TherapySchemesField', :LPU, 0), 0);
+                :HOSP_DIR_PARAMETRS := coalesce(D_PKG_OPTION_SPECS.GET('HospDirParametrs', to_number(:LPU), 0), null);
+                if :CHECK_ADM_HOSP is not null then
+                  :ADMISSION_HOSP := coalesce(D_PKG_OPTION_SPECS.GET('ADMISSION_HOSP', :LPU, 0), 0);
+                end if;
+              end;
+              
+
+      Пакеты/функции:
+          D_PKG_ROLES.CHECK_EMP_ROLES;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [10] M2 Action: CheckRightsREC
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select count(*)
+                  into :CHECKREC
+                  from table(cast(D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS(:PNLPU, 'HOSP_PLAN_KINDS', '6', :CABLAB) AS D_C_ID )) t1;
+              end;
+              
+
+      Пакеты/функции:
+          D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [11] M2 Action: getMKB
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select p.ID,
+                       p.MKB_CODE
+                  into :MKB_ID,
+                       :MKB_CODE
+                  from D_V_MKB10_BASE p
+                 where p.ID = :MKB
+                   and p.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :PNLPU, 'MKB10')
+                                      from dual);
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_MKB10_BASE;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [12] M2 Action: GET_DEFAULT_LPU
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select t2.ID,
+                       t2.LPU_CODE
+                  into :DEFAULT_LPU_ID,
+                       :DEFAULT_LPU_CODE
+                  from D_V_LPUDICT_BASE t2
+                 where t2.LPU_CODE = :HH_LPU_DICT
+                @if (:ALLOWSELECTALLLPU == "0") {
+                   and exists(select null
+                                from D_V_LPU t
+                               where (t.LPUDICT_ID = t2.ID or t.LPUDICT_ID = t2.HID)
+                                 and (select D_PKG_CSE_ACCESSES.CHECK_EMPLOYER_RIGHT(:LPU, :EMPLOYER, 'LPU', t.ID, 7, :CABLAB ,0)
+                                        from dual) > 0
+                              )
+                @}
+                ;
+              exception when no_data_found then null;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPU;
+          D_V_LPUDICT_BASE;
+      Пакеты/функции:
+          D_PKG_CSE_ACCESSES.CHECK_EMPLOYER_RIGHT;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [13] M2 Action: getOuterDirectionData
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select od.DIRECTION_FORM_ID,
+                       od.TYPE_MED_HELP_ID,
+                       od.DIRECTION_CONDITION_ID,
+                       od.DIRECTION_REASON
+                  into :DIRECTION_FORM_ID,
+                       :TYPE_MED_HELP_ID,
+                       :DIRECTION_CONDITION_ID,
+                       :DIRECTION_REASON
+                  from D_V_OUTER_DIRECTIONS od
+                 where od.ID = to_number(:OUTER_DIRECTION_ID);
+                exception when no_data_found then
+                  :DIRECTION_FORM_ID := null;
+                  :TYPE_MED_HELP_ID := null;
+                  :DIRECTION_CONDITION_ID := null;
+                  :DIRECTION_REASON := null;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_OUTER_DIRECTIONS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [14] M2 Action: checkBeforeRegForHosp
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              /**
+               * проверяем использование направленния
+               * направление по связи с D_OUTER_DIRECTION.REPRESENT_DIRECTION
+               * или направление D_DIRECTIONS (в случае внутреннего направления)
+               * получаем из SelectAction
+               */
+              begin
+                :CURRENT_DIR_ID := to_number(coalesce(:OUTER_ID, :DIR_ID));
+                begin
+                  :SHC_REG_EXIST := 1;
+                  select (select count(*)
+                            from D_V_DIRECTION_SERVICES_BASE ds
+                           where ds.DISEASECASE = hpj.DISEASECASE
+                             and ds.SERV_STATUS != 0),
+                         (select count(*)
+                            from D_V_HOSP_HISTORIES_BASE hh
+                           where hh.HPK_PLAN_JOURNAL = hpj.ID),
+                         hpk.HP_NAME,
+                         to_char(sr.DATE_REC, 'DD.MM.YYYY HH24:MI')
+                    into :SERV_NO_HH,
+                         :HH_EXIST,
+                         :HP_NAME,
+                         :JOUR_REC_DATE
+                    from D_V_DIRECTIONS_BASE dir
+                         join D_V_HPK_SCHEDULE_REG sr on sr.DIRECTION = dir.ID
+                         join D_V_HPK_PLAN_JOURNALS_BASE hpj on hpj.DIRECTION = dir.ID
+                         join D_V_HOSP_PLAN_KINDS hpk on hpj.HPK = hpk.ID
+                   where dir.ID = :CURRENT_DIR_ID;
+                exception when no_data_found then
+                  :SHC_REG_EXIST := 0;
+                  :SERV_NO_HH := 0;
+                  :HH_EXIST := 0;
+                  :HP_NAME := null;
+                  :JOUR_REC_DATE := null;
+                end;
+                if :SERV_NO_HH = 0 and :HH_EXIST = 0 then
+                  :HPK_EXIST := 1;
+                  begin
+                    select hpk.HP_NAME,
+                           coalesce(:JOUR_REC_DATE, to_char(hp.PLAN_DATE, 'DD.MM.YYYY HH24:MI'))
+                      into :HP_NAME,
+                           :JOUR_REC_DATE
+                      from D_V_HPK_PLAN_JOURNALS_BASE hpj
+                           join D_V_HOSP_PLAN_KINDS hpk on hpj.HPK = hpk.ID
+                           join D_V_HPK_PLANS_BASE hp on hpj.HPK_PLAN = hp.ID
+                     where hpj.DIRECTION = :CURRENT_DIR_ID;
+                  exception when no_data_found then
+                    :HPK_EXIST := 0;
+                    :HP_NAME := null;
+                    :JOUR_REC_DATE := null;
+                  end;
+                end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_HOSP_PLAN_KINDS;
+          D_V_HPK_PLANS_BASE;
+          D_V_DIRECTIONS_BASE;
+          D_V_HPK_PLAN_JOURNALS_BASE;
+          D_V_HPK_SCHEDULE_REG;
+          D_V_HOSP_HISTORIES_BASE;
+          D_V_DIRECTION_SERVICES_BASE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [15] M2 DataSet: DS_HOSP_REASONS
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select t.ID,
+                     t.HR_NAME
+                from D_V_HOSP_REASONS t
+               where t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :PNLPU, 'HOSP_REASONS')
+                                    from dual)
+              @if (:REG_DATE_CTRL) {
+                 and :REG_DATE_CTRL >= t.BEGIN_DATE
+                 and (t.END_DATE is null or :REG_DATE_CTRL <= t.END_DATE)
+              @} else {
+                 and t.IS_ACTIVE = 1
+              @}
+              
+
+      Таблицы/вьюхи:
+          D_V_HOSP_REASONS;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [16] M2 DataSet: DS_HK
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select t.ID,
+                     t.HK_CODE,
+                     t.HK_NAME
+                from D_V_HOSPITALIZATIONKINDS t
+               where t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(1, :PNLPU, 'HOSPITALIZATIONKINDS')
+                                    from dual)
+               order by HK_CODE
+              
+
+      Таблицы/вьюхи:
+          D_V_HOSPITALIZATIONKINDS;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [17] M2 DataSet: DS_HOMELESS_REASON
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select dfd.ID,
+                     dfd.DD_NAME
+                from D_V_DIRECTORIES d
+                     join D_V_DIRECTORIES_FN_DATA dfd
+                       on dfd.DIR = d.D_CODE
+               where dfd.DATE_END is null
+                 and d.D_CODE = '82'
+                 and dfd.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'DIRECTORIES_FN_DATA')
+                                      from dual)
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTORIES;
+          D_V_DIRECTORIES_FN_DATA;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [18] M2 Action: getDefParams
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                :DIR_PREF := to_char(sysdate, 'yyyy');
+                :DIR_NUMB := D_PKG_DIRECTIONS.GEN_DIR_NUMB(:LPU, :DIR_PREF);
+                begin
+                  select h.ID
+                    into :HOSP_KIND
+                    from D_V_HOSPITALIZATIONKINDS h
+                   where h.HK_CODE = (select D_PKG_OPTIONS.GET('HH_HOSP_KIND_DEFAULT', :LPU)
+                                        from dual);
+                exception when others then
+                  :HOSP_KIND := null;
+                end;
+                begin
+                  select dk.ID
+                    into :DIR_KIND
+                    from D_V_DIRECTION_KINDS dk
+                   where dk.DK_CODE = (select D_PKG_OPTIONS.GET('HH_DIR_KIND_DEFAULT', :LPU)
+                                         from dual);
+                exception when others then
+                  :DIR_KIND := null;
+                end;
+      
+                begin
+                  select t.ID
+                    into :REASON
+                    from D_V_HOSP_REASONS t
+                   where t.HR_CODE = (select D_PKG_OPTIONS.GET('HH_HOSP_REASON_DEFAULT', :LPU)
+                                        from dual);
+                exception when others then
+                  :REASON := null;
+                end;
+      
+                begin
+                  select t.ID
+                    into :HOSP_TYPE
+                    from D_V_HOSPITALIZATION_TYPES t
+                   where t.HK_CODE = (select D_PKG_OPTIONS.GET('HH_HOSP_TYPE_DEFAULT', :LPU)
+                                        from dual)
+                     and t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'HOSPITALIZATION_TYPES')
+                                        from dual);
+                exception when OTHERS then
+                  :HOSP_TYPE := null;
+                end;
+      
+                if :VISIT_ID is not null then
+                  begin
+                    select ID,
+                           FIO
+                      into :REG_EMP,
+                           :REG_EMP_FIO
+                      from D_V_EMPLOYERS e
+                     where e.ID = :EMPLOYER;
+                  exception when no_data_found then null;
+                  end;
+                end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_EMPLOYERS;
+          D_V_HOSPITALIZATIONKINDS;
+          D_V_HOSP_REASONS;
+          D_V_DIRECTION_KINDS;
+          D_V_HOSPITALIZATION_TYPES;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+          D_PKG_DIRECTIONS.GEN_DIR_NUMB;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [19] M2 DataSet: DS_BEDS
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select t.ID,
+                     t.BT_NAME
+                from D_V_BED_TYPES t
+               where t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'BED_TYPES')
+                                    from dual)
+              @if (:DEP && :LLPPUU=='1' && !:HOSP_DEPDICT_ID) {
+                 and t.ID in (select t1.BED_TYPE_ID
+                                from D_V_BEDS_FUND t1
+                               where t1.PID = :DEP
+                                 and trunc(sysdate) >= t1.BEGIN_DATE
+                                 and (t1.END_DATE is null or trunc(sysdate) <= t1.END_DATE))
+              @} else {
+                 and t.IS_ACTIVE = 1
+              @}
+               order by t.BT_NAME
+              
+
+      Таблицы/вьюхи:
+          D_V_BEDS_FUND;
+          D_V_BED_TYPES;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [20] M2 DataSet: DS_DIR_KIND
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select *
+                from D_V_DIRECTION_KINDS t
+               where t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(1, :LPU, 'DIRECTION_KINDS')
+                                    from dual)
+                 and t.IS_ACTIVE = 1
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTION_KINDS;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [21] M2 Action: checkHospDirections
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select s.ID
+                  into :ID
+                  from (
+                     select t.ID
+                       from D_V_DIRECTIONS t
+                      where t.REG_VISIT_ID = :VISIT_ID
+                        and t.DIR_TYPE = 1
+                 order by t.REG_DATE desc
+                       ) s
+                 where rownum = 1;
+              exception when no_data_found then
+                :ID := null;
+                select to_char(sysdate, 'DD.MM.YYYY')
+                  into :REG_DATE
+                  from dual;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTIONS;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [22] M2 Action: getCurrentLPU
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                if :LLPPUU = 1 then
+                  begin
+                    select t.LPUDICT_NAME,
+                           t.LPUDICT_ID
+                      into :CUR_LPU_NAME,
+                           :CUR_LPU_DICT_ID
+                      from D_V_LPU t
+                     where t.ID = :LPU;
+                  exception when no_data_found then
+                    :CUR_LPU_NAME := null;
+                    :CUR_LPU_DICT_ID := null;
+                  end;
+                else
+                  begin
+                    select t.LPU_NAME
+                      into :CUR_LPU_NAME
+                      from D_V_LPUDICT_BASE t
+                     where t.ID = :LPUDICT;
+                  exception when no_data_found then
+                    :CUR_LPU_NAME := null;
+                  end;
+                end if;
+              end;
+      	    
+
+      Таблицы/вьюхи:
+          D_V_LPU;
+          D_V_LPUDICT_BASE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [23] M2 Action: getVmpUniqueNumb
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+      	    begin
+      	      :VMP_UNIQUE_NUMB := D_PKG_OPTIONS.GET('VmpUniqueNumb', :LPU);
+      	      :VMP_MASK_FIELD  := D_PKG_OPTIONS.GET('VmpMaskField', :LPU);
+      	    end;
+      	    
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [24] M2 Action: CheckForDuplicateVMP
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare
+                tmpID   NUMBER(17);
+              begin
+                 :DUPLICATE_NUMBER_OF_VMP := 0;
+                 if :VMP_UNIQUE_NUMB = '1' or :VMP_UNIQUE_NUMB = '2' then
+                   begin
+                     select tab.ID
+                       into tmpID
+                       from D_V_DIRECTIONS_BASE tab
+                      where tab.TALON_VMP_NUM = :TALON_VMP_NUM
+                        and rownum = 1;
+                   exception when no_data_found then
+                     :DUPLICATE_NUMBER_OF_VMP := 1;
+                   end;
+                 else
+                   :DUPLICATE_NUMBER_OF_VMP := 1;
+                 end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTIONS_BASE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [25] M2 Action: MKB_callback
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select t.ID,
+                       D_STRAGG(t1.POLYTR_ANATOM_AREA_ID),
+                       D_STRAGG(t.ALLOW_IN),
+                       D_STRAGG(t.MKB_CODE)
+                  into :MKB_ID,
+                       :POLYTR_ANATOM_AREA,
+                       :ALLOW_IN,
+                       :MKB_CODE_NAME
+                  from D_V_MKB10 t,
+                       D_V_MKB10_POLYTR t1
+                 where t.MKB_CODE like :MKB_CODE
+                   and t1.PID(+) = t.ID
+                @if (:MKB_IS_POLIT == 1) {
+                    @if (:MKB_TYPE == 0) {
+                        and t1.POLYTR_ANATOM_AREA_ID between 1 and 7
+                    @} else if (:MKB_TYPE == 2) {
+                        and t1.POLYTR_ANATOM_AREA_ID = 8
+                    @} else if (:MKB_TYPE == 1 || :MKB_TYPE == 6 || :MKB_TYPE == 11) {
+                        and t1.POLYTR_ANATOM_AREA_ID between 1 and 7
+                    @}
+                    @if (:MKB_NOT_AREA) {
+                        and instr(';' || :MKB_NOT_AREA || ';', ';' || t1.POLYTR_ANATOM_AREA_ID || ';') = 0
+                    @}
+                @}
+                   and t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'MKB10')
+                                      from dual)
+                 group by t.ID;
+              exception when no_data_found then
+                :MKB_ID := null;
+                :POLYTR_ANATOM_AREA := null;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_MKB10_POLYTR;
+          D_V_MKB10;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [26] M2 Action: setOuterLpu
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+                select t.ID
+                  into :LPUDICT_ID
+                  from D_V_LPUDICT t
+                 where t.LPU_CODE = :LPU_CODE
+                   and t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'LPUDICT')
+                                      from dual);
+              exception when no_data_found then
+                :LPUDICT_ID := null;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_LPUDICT;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [27] M2 Action: getOnlyOneBed
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+            begin
+              select t.ID
+                into :TEMP_BED_ID
+                from D_V_BED_TYPES t
+               where t.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'BED_TYPES')
+                                    from dual)
+                 and (t.ID in (select bed_type_id
+                                 from d_v_beds_fund
+                                where pid = :DEP_ID
+                                  and TRUNC(sysdate) >= begin_date
+                                  and (end_date is null or TRUNC(sysdate) <= end_date)));
+            exception when no_data_found then :TEMP_BED_ID := null;
+                      when too_many_rows then :TEMP_BED_ID := null;
+            end;
+            
+
+      Таблицы/вьюхи:
+          D_V_BEDS_FUND;
+          D_V_BED_TYPES;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [28] M2 Action: CheckHomeLess
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+             begin
+               select case when aoc.CATEGORY in (5,6) then 1 else 0 end
+                 into :IS_HOMELESS
+                 from D_V_AGENTS a
+                      left join D_V_AGENT_ORPH_CATEGORIES aoc
+                        on aoc.PID = a.ID
+                where a.ID = :ID
+                  and (aoc.END_DATE is null
+                   or aoc.END_DATE >= case when :REG_DATE is not null then  to_date(:REG_DATE, 'DD.MM.YYYY HH24:MI') else trunc(sysdate) end);
+             exception when no_data_found then
+               :IS_HOMELESS := 0;
+             end;
+             
+
+      Таблицы/вьюхи:
+          D_V_AGENTS;
+          D_V_AGENT_ORPH_CATEGORIES;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [29] M2 Action: GetAgentId
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+             begin
+               select pmc.AGENT,
+                      D_PKG_STR_TOOLS.FIO(agn.SURNAME, agn.FIRSTNAME, agn.LASTNAME)
+                 into :pnAGENT,
+                      :psAGENT_NAME
+                 from D_V_PERSMEDCARD_BASE pmc
+                      join D_V_AGENTS_BASE agn on agn.ID = pmc.AGENT
+                where pmc.ID = to_number(:pnPMC);
+               if :pnPMC is not null then
+                 select case when pmc.LPU = to_number(:pnLPU)
+                               then 1
+                             else 0
+                        end
+                   into :pnIS_OUR_PAT
+                   from D_V_PERSMEDCARD_BASE pmc
+                  where pmc.ID = to_number(:pnPMC);
+               end if;
+             exception when no_data_found then
+               :pnAGENT := null;
+             end;
+             
+
+      Таблицы/вьюхи:
+          D_V_PERSMEDCARD_BASE;
+          D_V_AGENTS_BASE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [30] M2 Action: UpgradeActionBeforeCheck
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              declare
+                nAGENT                   NUMBER;
+                dP_BEGIN                 DATE;
+                sMESSAGE                 VARCHAR2(200);
+                nCHECK_DIR_HOSPPLAN_DATE NUMBER(1);
+              begin
+                if coalesce(D_PKG_OPTIONS.GET('CheckPeriodTemporaryCertOMS', :LPU, 0), 0) = 1 then
+                  select max(p.AGENT)
+                    into nAGENT
+                    from D_V_PERSMEDCARD_BASE p
+                   where p.ID = :PATIENT;
+                  D_PKG_AGENT_POLIS.CHECKS_TEMPORARY_CERT_OMS(pnID      => D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE(nAGENT,sysdate,0),
+                                                              pdP_BEGIN => null,
+                                                              psRESULT  => :warnings);
+                end if;
+                if trunc(to_date(:HOSP_PLAN_DATE, D_PKG_STD.FRM_DT)) < trunc(to_date(:REG_DATE_CTRL, D_PKG_STD.FRM_DT))  then
+                  nCHECK_DIR_HOSPPLAN_DATE := D_PKG_OPTIONS.GET('CheckDirHospPlanDate', :LPU, 0);
+                  sMESSAGE := 'Плановая дата госпитализации не может быть больше даты создания направления.';
+                  if nCHECK_DIR_HOSPPLAN_DATE = 1 then
+                    :warnings := :warnings || ' ' || sMESSAGE;
+                  elsif nCHECK_DIR_HOSPPLAN_DATE = 2 then
+                    D_P_EXC(sMESSAGE);
+                  end if;
+                end if;
+              end;
+              
+
+      Таблицы/вьюхи:
+          D_V_PERSMEDCARD_BASE;
+      Пакеты/функции:
+          D_PKG_AGENT_POLIS.CHECKS_TEMPORARY_CERT_OMS;
+          D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [31] M2 Action: deleteHospJournal
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              begin
+      		  :CURRENT_DIR_ID := to_number(coalesce(:OUTER_ID, :DIR_ID));
+      		  for r in (
+      		    select sr.ID
+      			  from D_V_HPK_SCHEDULE_REG sr
+      			 where sr.DIRECTION = :CURRENT_DIR_ID
+      		  ) loop
+      		    D_PKG_HPK_SCHEDULE_REG.DEL(pnID  => r.ID,
+      			                           pnLPU => :LPU);
+      		  end loop;
+      		  for r in (
+      		    select hpj.ID
+      			  from D_V_HPK_PLAN_JOURNALS_BASE hpj
+      			 where hpj.DIRECTION = :CURRENT_DIR_ID
+      		  ) loop
+      		    D_PKG_HPK_PLAN_JOURNALS.DEL(pnID  => r.ID,
+      			                            pnLPU => :LPU);
+      		  end loop;
+      		end;
+              
+
+      Таблицы/вьюхи:
+          D_V_HPK_PLAN_JOURNALS_BASE;
+          D_V_HPK_SCHEDULE_REG;
+      Пакеты/функции:
+          D_PKG_HPK_SCHEDULE_REG.DEL;
+          D_PKG_HPK_PLAN_JOURNALS.DEL;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [32] M2 DataSet: dsDirectionForms
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select df.ID,
+                     df.DS_NAME
+                from D_V_DIRECTION_FORMS df
+               where df.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, to_number(:LPU), 'DIRECTION_FORMS') from dual)
+               order by df.DS_NAME
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTION_FORMS;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [33] M2 DataSet: dsTypeMedHelp
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select tmh.ID,
+                     tmh.NAME
+                from  D_V_TYPE_MED_HELP tmh
+               where tmh.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, to_number(:LPU), 'TYPE_MED_HELP') from dual)
+               order by tmh.NAME
+              
+
+      Таблицы/вьюхи:
+          D_V_TYPE_MED_HELP;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+  [34] M2 DataSet: dsDirectionCondition
+      Источник: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+      SQL:
+      
+              select dc.ID,
+                     dc.DC_NAME
+                from D_V_DIRECTION_CONDITIONS dc
+               where dc.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, to_number(:LPU), 'DIRECTION_CONDITIONS') from dual)
+               order by dc.DC_NAME
+              
+
+      Таблицы/вьюхи:
+          D_V_DIRECTION_CONDITIONS;
+      Пакеты/функции:
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_LPU
+  - D_V_LPU_BASE
+  - D_V_LPUDICT_BASE
+  - D_V_DIRECTIONS
+  - D_V_PERSMEDCARD
+  - D_V_DIRECTIONS_BASE
+  - D_V_HPK_PLAN_JOURNALS_BASE
+  - D_V_HOSP_HISTORIES_BASE
+  - D_V_VMP_LINKS
+  - D_V_OUTER_DIRECTIONS_BASE
+  - D_V_OUTER_DIRECTIONS
+  - D_V_HPK_PLAN_JOURNALS
+  - D_V_VMP_TALONS
+  - D_V_HOSP_HISTORIES
+  - D_V_PERSMEDCARD_BASE
+  - D_V_DIR_THERAPY_SCHEMES
+  - D_V_VMP
+  - D_V_MKB10_BASE
+  - D_V_HOSP_PLAN_KINDS
+  - D_V_HPK_PLANS_BASE
+  - D_V_HPK_SCHEDULE_REG
+  - D_V_DIRECTION_SERVICES_BASE
+  - D_V_HOSP_REASONS
+  - D_V_HOSPITALIZATIONKINDS
+  - D_V_DIRECTORIES
+  - D_V_DIRECTORIES_FN_DATA
+  - D_V_EMPLOYERS
+  - D_V_DIRECTION_KINDS
+  - D_V_HOSPITALIZATION_TYPES
+  - D_V_BEDS_FUND
+  - D_V_BED_TYPES
+  - D_V_MKB10_POLYTR
+  - D_V_MKB10
+  - D_V_LPUDICT
+  - D_V_AGENTS
+  - D_V_AGENT_ORPH_CATEGORIES
+  - D_V_AGENTS_BASE
+  - D_V_DIRECTION_FORMS
+  - D_V_TYPE_MED_HELP
+  - D_V_DIRECTION_CONDITIONS
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_DEP_REQUISITES.GET_ACTUAL
+  - D_PKG_DIRECTIONS.ADD
+  - D_PKG_DIRECTIONS.GEN_DIR_NUMB
+  - D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL
+  - D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD
+  - D_PKG_OUTER_DIRECTIONS.ADD
+  - D_PKG_DIR_NUMB_RESERV.DEL_BY_NUMB
+  - D_PKG_OUTER_DIRECTIONS.DEL
+  - D_PKG_OUTER_DIRECTIONS.UPD
+  - D_PKG_DIRECTIONS.UPD
+  - D_PKG_DIRECTIONS.DEL
+  - D_PKG_VMP_LINKS.UPD
+  - D_PKG_ROLES.CHECK_EMP_ROLES
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_CSE_ACCESSES.CHECK_EMPLOYER_RIGHT
+  - D_PKG_AGENT_POLIS.CHECKS_TEMPORARY_CERT_OMS
+  - D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
+  - D_PKG_HPK_SCHEDULE_REG.DEL
+  - D_PKG_HPK_PLAN_JOURNALS.DEL
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_OPTIONS.GET
+  - D_PKG_STD.FRM_D
+  - D_PKG_OPTION_SPECS.GET
+  - D_PKG_STR_TOOLS.FIO
+  - D_PKG_STD.FRM_DT
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+====================================================================================================
+=== ИТОГО ПО ПАКЕТУ ===
+Форм в пакете: 2
+SQL запросов: 46
+====================================================================================================

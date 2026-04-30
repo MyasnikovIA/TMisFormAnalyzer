@@ -1,0 +1,202 @@
+====================================================================================================
+=== ОТЧЕТ ПО ПАКЕТАМ И ФУНКЦИЯМ ===
+Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+Всего уникальных объектов: 27
+====================================================================================================
+
+=== ПАКЕТНЫЕ ФУНКЦИИ (27) ===
+
+- D_PKG_AGENT_POLIS.CHECKS_TEMPORARY_CERT_OMS
+    Пакет: D_PKG_AGENT_POLIS
+    Функция: CHECKS_TEMPORARY_CERT_OMS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
+    Пакет: D_PKG_AGENT_POLIS
+    Функция: GET_ACTUAL_ON_DATE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_CHIEFDOC.GET_DEP_BED_INF
+    Пакет: D_PKG_CHIEFDOC
+    Функция: GET_DEP_BED_INF
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_CHIEFDOC.GET_EMERGENCY_INFO
+    Пакет: D_PKG_CHIEFDOC
+    Функция: GET_EMERGENCY_INFO
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_CHIEFDOC.GET_OPERS_STATUS
+    Пакет: D_PKG_CHIEFDOC
+    Функция: GET_OPERS_STATUS
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_CHIEFDOC.GET_SERVICE_TYPES
+    Пакет: D_PKG_CHIEFDOC
+    Функция: GET_SERVICE_TYPES
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_CSE_ACCESSES.CHECK_EMPLOYER_RIGHT
+    Пакет: D_PKG_CSE_ACCESSES
+    Функция: CHECK_EMPLOYER_RIGHT
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS
+    Пакет: D_PKG_CSE_ACCESSES
+    Функция: GET_ID_WITH_EMP_RIGHTS
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+    Пакет: D_PKG_CSE_ACCESSES
+    Функция: GET_ID_WITH_RIGHTS
+    Используется в формах: 2
+    Формы:
+         ARMMainDoc/main_doc.frm;
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DEP_REQUISITES.GET_ACTUAL
+    Пакет: D_PKG_DEP_REQUISITES
+    Функция: GET_ACTUAL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIRECTIONS.ADD
+    Пакет: D_PKG_DIRECTIONS
+    Функция: ADD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIRECTIONS.DEL
+    Пакет: D_PKG_DIRECTIONS
+    Функция: DEL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIRECTIONS.GEN_DIR_NUMB
+    Пакет: D_PKG_DIRECTIONS
+    Функция: GEN_DIR_NUMB
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIRECTIONS.UPD
+    Пакет: D_PKG_DIRECTIONS
+    Функция: UPD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIR_NUMB_RESERV.DEL_BY_NUMB
+    Пакет: D_PKG_DIR_NUMB_RESERV
+    Функция: DEL_BY_NUMB
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL
+    Пакет: D_PKG_DIR_THERAPY_SCHEMES
+    Функция: UPG_ALL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_HPK_PLAN_JOURNALS.DEL
+    Пакет: D_PKG_HPK_PLAN_JOURNALS
+    Функция: DEL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_HPK_SCHEDULE_REG.DEL
+    Пакет: D_PKG_HPK_SCHEDULE_REG
+    Функция: DEL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE
+    Пакет: D_PKG_MP_PRESCRIBES
+    Функция: GET_NOMMODIF_EXPENSE
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC
+    Пакет: D_PKG_MP_PRESCRIBES
+    Функция: GET_NOMMODIF_EXPENSE_SPEC
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_PKG_OUTER_DIRECTIONS.ADD
+    Пакет: D_PKG_OUTER_DIRECTIONS
+    Функция: ADD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_OUTER_DIRECTIONS.DEL
+    Пакет: D_PKG_OUTER_DIRECTIONS
+    Функция: DEL
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_OUTER_DIRECTIONS.UPD
+    Пакет: D_PKG_OUTER_DIRECTIONS
+    Функция: UPD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD
+    Пакет: D_PKG_PERSMEDCARD
+    Функция: CREATE_REMOTE_CARD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_ROLES.CHECK_EMP_ROLES
+    Пакет: D_PKG_ROLES
+    Функция: CHECK_EMP_ROLES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_VERSIONS.GET_VERSION_BY_LPU
+    Пакет: D_PKG_VERSIONS
+    Функция: GET_VERSION_BY_LPU
+    Используется в формах: 2
+    Формы:
+         ARMMainDoc/main_doc.frm;
+         HospPlan/hp_directions_edit.frm;
+
+- D_PKG_VMP_LINKS.UPD
+    Пакет: D_PKG_VMP_LINKS
+    Функция: UPD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+=== САМОСТОЯТЕЛЬНЫЕ ФУНКЦИИ (0) ===
+
+====================================================================================================

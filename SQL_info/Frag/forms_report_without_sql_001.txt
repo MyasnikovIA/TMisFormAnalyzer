@@ -1,0 +1,209 @@
+====================================================================================================
+=== ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) (ПАКЕТ 1) ===
+Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+Количество форм в пакете: 2
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/main_doc.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d/main_doc.dfrm
+  - [UserFormsMagadan] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d/main_doc.dfrm
+
+ЮЗЕРФОРМЫ:
+     /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.dmain_doc.dfrm
+     /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d
+             /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.dmain_doc.dfrm
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+Список вызываемых форм в JS:
+     ARMMainDoc/stac_pat_in_hpk_plan.frm
+     ARMMainDoc/stac_pat_in_deps.frm
+     ARMMainDoc/stac_pat_in_oper.frm
+     ARMMainDoc/neotl_patients.frm
+     ARMMainDoc/polik_patients.frm
+
+SQL ЗАПРОСЫ (12):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_HPK_PLAN_CONTROL
+  - D_V_OPERATING_ROOMS
+  - D_V_SERVTYPES
+  - D_V_DEPS
+  - D_V_ACC_FARM_PROD
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_CHIEFDOC.GET_DEP_BED_INF
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS
+  - D_PKG_CHIEFDOC.GET_OPERS_STATUS
+  - D_PKG_CHIEFDOC.GET_EMERGENCY_INFO
+  - D_PKG_CHIEFDOC.GET_SERVICE_TYPES
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_OPTIONS.GET
+  - D_CL_DEP_BED_CONTROL
+  - D_CL_OPER_ROOMS_CONTROL
+  - D_CL_EMERGENCY_INFO
+  - D_CL_GET_SERVICE_TYPES
+  - D_CL_MP_PRESC_EXPENSE
+  - D_CL_MP_PRESC_EXPENSE_SPEC
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: HospPlan/hp_directions_edit.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/view.dfrm
+
+ЮЗЕРФОРМЫ:
+     /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dscript.dfrm
+             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dview.dfrm
+     /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.ddata.dfrm
+             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.dscript.dfrm
+     /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.ddata.dfrm
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dscript.dfrm
+             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dview.dfrm
+
+Список подключаемых форм subForm:
+     HospPlanJournal/DirectionHospDirectTypes
+
+Список вызываемых форм в JS:
+     OuterDirections/outerdirections_view.frm
+     HospPlan/select_mes_by_mkb.frm
+     ArmPatientsInDep/SubForms/select_mkb_exact.frm
+     Persmedcard/persmedcard_edit.frm
+     EHR/simple_ehrdocs_form.frm
+     HospPlan/hospplanperiod.frm
+     HospPlan/hospplan.frm
+     HospPlan/select_lpu_outer_hosp.frm
+     UniversalComposition/UniversalComposition.frm
+     NoticeDirect/doctor_notices_call.frm
+     Compositions/depdict_grid.frm
+     HospPlan/hp_bed_days_loads.frm
+     Vmp/subforms/vmp_patient_list.frm
+     HospPlan/hp_select_schedule.frm
+     System/messagedlg.frm
+     HospPlan/select_vmp.frm
+
+SQL ЗАПРОСЫ (34):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_LPU
+  - D_V_LPU_BASE
+  - D_V_LPUDICT_BASE
+  - D_V_DIRECTIONS
+  - D_V_PERSMEDCARD
+  - D_V_DIRECTIONS_BASE
+  - D_V_HPK_PLAN_JOURNALS_BASE
+  - D_V_HOSP_HISTORIES_BASE
+  - D_V_VMP_LINKS
+  - D_V_OUTER_DIRECTIONS_BASE
+  - D_V_OUTER_DIRECTIONS
+  - D_V_HPK_PLAN_JOURNALS
+  - D_V_VMP_TALONS
+  - D_V_HOSP_HISTORIES
+  - D_V_PERSMEDCARD_BASE
+  - D_V_DIR_THERAPY_SCHEMES
+  - D_V_VMP
+  - D_V_MKB10_BASE
+  - D_V_HOSP_PLAN_KINDS
+  - D_V_HPK_PLANS_BASE
+  - D_V_HPK_SCHEDULE_REG
+  - D_V_DIRECTION_SERVICES_BASE
+  - D_V_HOSP_REASONS
+  - D_V_HOSPITALIZATIONKINDS
+  - D_V_DIRECTORIES
+  - D_V_DIRECTORIES_FN_DATA
+  - D_V_EMPLOYERS
+  - D_V_DIRECTION_KINDS
+  - D_V_HOSPITALIZATION_TYPES
+  - D_V_BEDS_FUND
+  - D_V_BED_TYPES
+  - D_V_MKB10_POLYTR
+  - D_V_MKB10
+  - D_V_LPUDICT
+  - D_V_AGENTS
+  - D_V_AGENT_ORPH_CATEGORIES
+  - D_V_AGENTS_BASE
+  - D_V_DIRECTION_FORMS
+  - D_V_TYPE_MED_HELP
+  - D_V_DIRECTION_CONDITIONS
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_DEP_REQUISITES.GET_ACTUAL
+  - D_PKG_DIRECTIONS.ADD
+  - D_PKG_DIRECTIONS.GEN_DIR_NUMB
+  - D_PKG_DIR_THERAPY_SCHEMES.UPG_ALL
+  - D_PKG_PERSMEDCARD.CREATE_REMOTE_CARD
+  - D_PKG_OUTER_DIRECTIONS.ADD
+  - D_PKG_DIR_NUMB_RESERV.DEL_BY_NUMB
+  - D_PKG_OUTER_DIRECTIONS.DEL
+  - D_PKG_OUTER_DIRECTIONS.UPD
+  - D_PKG_DIRECTIONS.UPD
+  - D_PKG_DIRECTIONS.DEL
+  - D_PKG_VMP_LINKS.UPD
+  - D_PKG_ROLES.CHECK_EMP_ROLES
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_CSE_ACCESSES.CHECK_EMPLOYER_RIGHT
+  - D_PKG_AGENT_POLIS.CHECKS_TEMPORARY_CERT_OMS
+  - D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
+  - D_PKG_HPK_SCHEDULE_REG.DEL
+  - D_PKG_HPK_PLAN_JOURNALS.DEL
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - AllowSelectAllLpu
+  - TIME_UNIQUE_DIRHOSP
+  - UNIQUE_DIRHOSP
+  - RolesEditDirectionDate
+  - HH_HOSP_KIND_DEFAULT
+  - HH_DIR_KIND_DEFAULT
+  - HH_HOSP_REASON_DEFAULT
+  - HH_HOSP_TYPE_DEFAULT
+  - VmpUniqueNumb
+  - VmpMaskField
+  - CheckPeriodTemporaryCertOMS
+  - CheckDirHospPlanDate
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_OPTIONS.GET
+  - D_PKG_STD.FRM_D
+  - D_PKG_OPTION_SPECS.GET
+  - D_PKG_STR_TOOLS.FIO
+  - D_PKG_STD.FRM_DT
+
+====================================================================================================
+=== ИТОГО ПО ПАКЕТУ ===
+Форм в пакете: 2
+SQL запросов: 46
+====================================================================================================

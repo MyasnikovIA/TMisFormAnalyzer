@@ -1,0 +1,852 @@
+====================================================================================================
+=== ОТЧЕТ ПО ЗАВИСИМОСТЯМ ТАБЛИЦ ОТ ВЬЮХ ===
+Дата создания: Thu Apr 30 17:12:13 NOVT 2026
+Всего проанализировано вьюх: 45
+====================================================================================================
+
+- D_V_HPK_PLAN_CONTROL:
+    OracleSQL:
+        D_HPK_PLAN_JOURNALS
+        D_HOSP_HISTORIES
+        D_HPK_PLANS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HPK_PLAN_JOURNALS
+        D_HOSP_HISTORIES
+        D_HPK_PLANS
+        D_HOSP_PLAN_KINDS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_OPERATING_ROOMS:
+    OracleSQL:
+        D_OPERATING_ROOMS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_OPERATING_ROOMS
+        D_CABLAB
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_SERVTYPES:
+    OracleSQL:
+        D_SERVTYPES
+    PostgreSQL:
+        D_SERVTYPES
+    ---
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DEPS:
+    OracleSQL:
+        D_HEAD_DEP
+        D_EMPLOYERS
+        D_AGENTS
+        D_DEPS
+        D_DEPS_KINDS
+        D_DEPS_TYPES
+        D_DIVISIONS
+        D_MED_CARE_PROFILES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HEAD_DEP
+        D_EMPLOYERS
+        D_AGENTS
+        D_DEPS
+        D_DEPS_KINDS
+        D_DEPS_TYPES
+        D_DIVISIONS
+        D_MED_CARE_PROFILES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_ACC_FARM_PROD:
+    OracleSQL:
+        D_ACC_FARM_PROD
+        D_V_URPRIVS
+    PostgreSQL:
+        D_ACC_FARM_PROD
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_LPU:
+    OracleSQL:
+        D_LPU
+        D_LPUDICT
+        D_GEOGRAFY
+        D_V_URPRIVS
+    PostgreSQL:
+        D_LPU
+        D_LPUDICT
+        D_GEOGRAFY
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_LPU_BASE:
+    OracleSQL:
+        D_LPU
+        D_V_URPRIVS
+    PostgreSQL:
+        D_LPU
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_LPUDICT_BASE:
+    OracleSQL:
+        D_LPUDICT
+        D_V_URPRIVS
+    PostgreSQL:
+        D_LPUDICT
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTIONS:
+    OracleSQL:
+        D_VISITPLACES
+        D_VISITS
+        D_DIR_REG_TYPES
+        D_SPECIALITIES
+        D_HPK_PLAN_JOURNALS
+        D_MKB10
+        D_MESES
+        D_HOSP_HOURS
+        D_DIRECTIONS
+        D_PERSMEDCARD
+        D_AGENTS
+        D_OUTER_DIRECTIONS
+        D_LPUDICT
+        D_EMPLOYERS
+        D_DEPS
+        D_HOSPITALIZATIONKINDS
+        D_INJURE_KINDS
+        D_DIRECTION_KINDS
+        D_BED_TYPES
+        D_HOSP_REASONS
+        D_DIR_CANC_REASONS
+        D_DEPDICT
+        D_HOSPITALIZATION_TYPES
+        D_HOSP_DIRECT_TYPES
+        D_TRANSPORTATION_KINDS
+        D_MED_THERAPY_SCHEMES
+        D_DIRECTION_FORMS
+        D_TYPE_MED_HELP
+        D_DIRECTION_CONDITIONS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_VISITPLACES
+        D_VISITS
+        D_DIR_REG_TYPES
+        D_SPECIALITIES
+        D_HPK_PLAN_JOURNALS
+        D_HOSP_HISTORIES
+        D_MKB10
+        D_MESES
+        D_HOSP_HOURS
+        D_DIRECTIONS
+        D_PERSMEDCARD
+        D_AGENTS
+        D_OUTER_DIRECTIONS
+        D_LPUDICT
+        D_EMPLOYERS
+        D_DEPS
+        D_HOSPITALIZATIONKINDS
+        D_INJURE_KINDS
+        D_DIRECTION_KINDS
+        D_BED_TYPES
+        D_HOSP_REASONS
+        D_DIR_CANC_REASONS
+        D_DEPDICT
+        D_HOSPITALIZATION_TYPES
+        D_HOSP_DIRECT_TYPES
+        D_TRANSPORTATION_KINDS
+        D_MED_THERAPY_SCHEMES
+        D_DIRECTION_FORMS
+        D_TYPE_MED_HELP
+        D_DIRECTION_CONDITIONS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_PERSMEDCARD:
+    OracleSQL:
+        D_PERSMEDCARD
+        D_AGENTS
+        D_BLOODGROUPE
+        D_DIVISIONS
+        D_RHESUS
+        D_EMPLOYERS
+        D_CABLAB
+        D_V_URPRIVS
+    PostgreSQL:
+        D_PERSMEDCARD
+        D_AGENTS
+        D_BLOODGROUPE
+        D_DIVISIONS
+        D_RHESUS
+        D_EMPLOYERS
+        D_CABLAB
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTIONS_BASE:
+    OracleSQL:
+        D_DIRECTIONS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTIONS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HPK_PLAN_JOURNALS_BASE:
+    OracleSQL:
+        D_HPK_PLAN_JOURNALS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HPK_PLAN_JOURNALS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSP_HISTORIES_BASE:
+    OracleSQL:
+        D_HOSP_HISTORIES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HOSP_HISTORIES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_VMP_LINKS:
+    OracleSQL:
+        D_VMP_LINKS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_VMP_LINKS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_OUTER_DIRECTIONS_BASE:
+    OracleSQL:
+        D_OUTER_DIRECTIONS
+        D_LPUDICT
+        D_V_URPRIVS
+    PostgreSQL:
+        D_OUTER_DIRECTIONS
+        D_LPUDICT
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_OUTER_DIRECTIONS:
+    OracleSQL:
+        D_DIRECTIONS
+        D_OUTER_DIRECTIONS
+        D_PERSMEDCARD
+        D_AGENTS
+        D_MKB10
+        D_LPUDICT
+        D_SPECIALITIES
+        D_REASON_DIRECTION
+        D_EX_SYSTEMS
+        D_SERVICES
+        D_JOBTITLES
+        D_ER_PROFILES
+        D_DIRECTION_FORMS
+        D_TYPE_MED_HELP
+        D_DIRECTION_CONDITIONS
+        D_CABLAB
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTIONS
+        D_OUTER_DIRECTIONS
+        D_PERSMEDCARD
+        D_AGENTS
+        D_MKB10
+        D_LPUDICT
+        D_SPECIALITIES
+        D_REASON_DIRECTION
+        D_EX_SYSTEMS
+        D_SERVICES
+        D_JOBTITLES
+        D_ER_PROFILES
+        D_DIRECTION_FORMS
+        D_TYPE_MED_HELP
+        D_DIRECTION_CONDITIONS
+        D_CABLAB
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HPK_PLAN_JOURNALS:
+    OracleSQL:
+        D_HPK_PLAN_JOURNALS
+        D_HOSP_HISTORIES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HPK_PLAN_JOURNALS
+        D_HOSP_PLAN_KINDS
+        D_PERSMEDCARD
+        D_AGENTS
+        D_EMPLOYERS
+        D_HPKPJ_VMP_STATES
+        D_DIRECTIONS
+        D_HPK_PLANS
+        D_SERVICES
+        D_PAYMENT_KIND
+        D_HOSP_HISTORIES
+        D_DEPS
+        D_EMPLOYMENT_STATUS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_VMP_TALONS:
+    OracleSQL:
+        D_VMP_TALONS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_VMP_TALONS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSP_HISTORIES:
+    OracleSQL:
+        D_AGENT_RELATIVES
+        D_AGENTS
+        D_HOSP_HISTORIES
+        D_PERSMEDCARD
+        D_HOSP_REASONS
+        D_HOSPITALIZATION_TYPES
+        D_TRANSPORTATION_KINDS
+        D_LPUDICT
+        D_MKB10
+        D_HOSP_RESULTS
+        D_DEPS
+        D_HPK_PLAN_JOURNALS
+        D_HPKPJ_VMP_STATES
+        D_HOSP_OUTCOMES
+        D_HOSP_HOURS
+        D_HH_TRANSFER_REASONS
+        D_ABILITY_STATUS
+        D_DIRECTORIES_DATA_VER
+        D_HOSP_INCOMES
+        D_DIRECTION_HOSP
+        D_V_URPRIVS
+    PostgreSQL:
+        D_AGENT_RELATIVES
+        D_AGENTS
+        D_HOSP_HISTORIES
+        D_PERSMEDCARD
+        D_HOSP_REASONS
+        D_HOSPITALIZATION_TYPES
+        D_TRANSPORTATION_KINDS
+        D_LPUDICT
+        D_MKB10
+        D_HOSP_RESULTS
+        D_DEPS
+        D_HPK_PLAN_JOURNALS
+        D_HPKPJ_VMP_STATES
+        D_HOSP_OUTCOMES
+        D_HOSP_HOURS
+        D_HH_TRANSFER_REASONS
+        D_ABILITY_STATUS
+        D_DIRECTORIES_DATA_VER
+        D_HOSP_INCOMES
+        D_DIRECTION_HOSP
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_PERSMEDCARD_BASE:
+    OracleSQL:
+        D_EMPLOYERS
+        D_AGENTS
+        D_PERSMEDCARD
+        D_V_URPRIVS
+    PostgreSQL:
+        D_EMPLOYERS
+        D_AGENTS
+        D_PERSMEDCARD
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIR_THERAPY_SCHEMES:
+    OracleSQL:
+        D_DIR_THERAPY_SCHEMES
+        D_MED_THERAPY_SCHEMES_DESC
+        D_MED_THERAPY_SCHEMES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIR_THERAPY_SCHEMES
+        D_MED_THERAPY_SCHEMES_DESC
+        D_MED_THERAPY_SCHEMES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_VMP:
+    OracleSQL:
+        D_VMP
+        D_V_URPRIVS
+    PostgreSQL:
+        D_VMP
+        D_VMP_PROFILES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_MKB10_BASE:
+    OracleSQL:
+        D_MKB10
+    PostgreSQL:
+        D_MKB10
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSP_PLAN_KINDS:
+    OracleSQL:
+        D_HOSP_PLAN_KINDS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HOSP_PLAN_KINDS
+        D_HPK_JOURNAL_TYPES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HPK_PLANS_BASE:
+    OracleSQL:
+        D_HPK_PLANS
+        D_HOSP_PLAN_KINDS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HPK_PLANS
+        D_HOSP_PLAN_KINDS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HPK_SCHEDULE_REG:
+    OracleSQL:
+        D_HPK_SCHEDULE_REG
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HPK_SCHEDULE_REG
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTION_SERVICES_BASE:
+    OracleSQL:
+        D_DIRECTION_SERVICES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTION_SERVICES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSP_REASONS:
+    OracleSQL:
+        D_HOSP_REASONS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HOSP_REASONS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSPITALIZATIONKINDS:
+    OracleSQL:
+        D_HOSPITALIZATIONKINDS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HOSPITALIZATIONKINDS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTORIES:
+    OracleSQL:
+        D_DIRECTORIES
+    PostgreSQL:
+        D_DIRECTORIES
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTORIES_FN_DATA:
+    OracleSQL:
+        D_DIRECTORIES_FN_DATA
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTORIES_FN_DATA
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_EMPLOYERS:
+    OracleSQL:
+        D_EMPLOYERS
+        D_JOBTITLES
+        D_SPECIALITIES
+        D_SPECIALITIES_ED
+        D_DEPS
+        D_DEPS_KINDS
+        D_USERS
+        D_AGENTS
+        D_AGENT_ESIA
+        D_EMP_SKILL
+        D_SKILL_CATEGORIES
+        D_LPU
+        D_LPUDICT
+        D_V_URPRIVS
+    PostgreSQL:
+        D_EMPLOYERS
+        D_JOBTITLES
+        D_SPECIALITIES
+        D_SPECIALITIES_ED
+        D_DEPS
+        D_DEPS_KINDS
+        D_USERS
+        D_AGENTS
+        D_AGENT_ESIA
+        D_SKILL_CATEGORIES
+        D_LPU
+        D_LPUDICT
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTION_KINDS:
+    OracleSQL:
+        D_DIRECTION_KINDS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTION_KINDS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_HOSPITALIZATION_TYPES:
+    OracleSQL:
+        D_HOSPITALIZATION_TYPES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_HOSPITALIZATION_TYPES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_BEDS_FUND:
+    OracleSQL:
+        D_BEDS_FUND
+        D_V_URPRIVS
+    PostgreSQL:
+        D_BEDS_FUND
+        D_BED_TYPES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_BED_TYPES:
+    OracleSQL:
+        D_BED_TYPES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_BED_TYPES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_MKB10_POLYTR:
+    OracleSQL:
+        D_MKB10_POLYTR
+        D_V_URPRIVS
+    PostgreSQL:
+        D_MKB10_POLYTR
+        D_POLYTR_ANATOM_AREAS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_MKB10:
+    OracleSQL:
+        D_MKB10
+    PostgreSQL:
+        D_MKB10
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_LPUDICT:
+    OracleSQL:
+        D_LPUDICT
+        D_V_URPRIVS
+    PostgreSQL:
+        D_LPUDICT
+        D_LPUKINDS
+        D_AGENTS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_AGENTS:
+    OracleSQL:
+        D_GEOGRAFY
+        D_AGENTS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_GEOGRAFY
+        D_AGENTS
+        D_OKVED
+        D_EDUCATION_TYPES
+        D_DOC_TYPES
+        D_OKFS
+        D_FED_NATIONALITIES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_AGENT_ORPH_CATEGORIES:
+    OracleSQL:
+        D_AGENT_ORPH_CATEGORIES
+        D_V_URPRIVS
+    PostgreSQL:
+        D_AGENT_ORPH_CATEGORIES
+        D_ORPHAN_CATEGORIES
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_AGENTS_BASE:
+    OracleSQL:
+        D_AGENTS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_AGENTS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTION_FORMS:
+    OracleSQL:
+        D_DIRECTION_FORMS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTION_FORMS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_TYPE_MED_HELP:
+    OracleSQL:
+        D_TYPE_MED_HELP
+        D_V_URPRIVS
+    PostgreSQL:
+        D_TYPE_MED_HELP
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+--------------------------------------------------------------------------------
+
+- D_V_DIRECTION_CONDITIONS:
+    OracleSQL:
+        D_DIRECTION_CONDITIONS
+        D_V_URPRIVS
+    PostgreSQL:
+        D_DIRECTION_CONDITIONS
+        D_V_URPRIVS
+    ---
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+====================================================================================================
+=== КОНЕЦ ОТЧЕТА ПО ЗАВИСИМОСТЯМ ===
+====================================================================================================

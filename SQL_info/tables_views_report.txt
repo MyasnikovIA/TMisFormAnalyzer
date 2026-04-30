@@ -1,0 +1,236 @@
+====================================================================================================
+=== ОТЧЕТ ПО ТАБЛИЦАМ И ВЬЮХАМ ===
+Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+Всего уникальных объектов: 45
+====================================================================================================
+
+=== ТАБЛИЦЫ (0) ===
+
+=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (45) ===
+
+- D_V_ACC_FARM_PROD
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_V_AGENTS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_AGENTS_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_AGENT_ORPH_CATEGORIES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_BEDS_FUND
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_BED_TYPES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DEPS
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_V_DIRECTIONS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTIONS_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTION_CONDITIONS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTION_FORMS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTION_KINDS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTION_SERVICES_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTORIES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIRECTORIES_FN_DATA
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_DIR_THERAPY_SCHEMES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_EMPLOYERS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSPITALIZATIONKINDS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSPITALIZATION_TYPES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSP_HISTORIES
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSP_HISTORIES_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSP_PLAN_KINDS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HOSP_REASONS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HPK_PLANS_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HPK_PLAN_CONTROL
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_V_HPK_PLAN_JOURNALS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HPK_PLAN_JOURNALS_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_HPK_SCHEDULE_REG
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_LPU
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_LPUDICT
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_LPUDICT_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_LPU_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_MKB10
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_MKB10_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_MKB10_POLYTR
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_OPERATING_ROOMS
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_V_OUTER_DIRECTIONS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_OUTER_DIRECTIONS_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_PERSMEDCARD
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_PERSMEDCARD_BASE
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_SERVTYPES
+    Используется в формах: 1
+    Формы:
+         ARMMainDoc/main_doc.frm;
+
+- D_V_TYPE_MED_HELP
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_VMP
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_VMP_LINKS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+- D_V_VMP_TALONS
+    Используется в формах: 1
+    Формы:
+         HospPlan/hp_directions_edit.frm;
+
+====================================================================================================
