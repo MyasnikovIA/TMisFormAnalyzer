@@ -26,26 +26,19 @@ public class UserFormsResolver {
 
     /**
      * Разрешить все переопределения для указанной формы
-     * @param formPath Путь к форме (относительно Forms/)
-     * @return FormInfo с информацией о переопределениях
      */
     public FormInfo resolveOverrides(String formPath) {
         FormInfo formInfo = new FormInfo(formPath);
 
-        // Получаем корень проекта из scannerService
         Path projectRoot = scannerService.getProjectRoot();
-
-        // Получаем все регионы UserForms
         List<String> regions = scannerService.findAllUserFormsRegions();
-
-        // Сортируем регионы для предсказуемого порядка
         regions.sort(String::compareTo);
 
         for (String region : regions) {
-            // Формируем путь к файлу в регионе UserForms
-            Path regionFullOverride = projectRoot.resolve(region).resolve(formPath);
+            Path regionPath = projectRoot.resolve(region);
 
             // ПРОВЕРКА 1: Полное переопределение (.frm файл)
+            Path regionFullOverride = regionPath.resolve(formPath);
             if (Files.exists(regionFullOverride) && formPath.endsWith(".frm")) {
                 formInfo.setFullyReplaced(true);
                 formInfo.setReplacementPath(regionFullOverride.toString());
@@ -54,41 +47,41 @@ public class UserFormsResolver {
                         regionFullOverride.toString(),
                         FormInfo.OverrideInfo.OverrideType.FULL_OVERRIDE
                 ));
-                break;
             }
 
-            // ПРОВЕРКА 2: Частичное переопределение (.d каталог)
-            // Убираем .frm для поиска .d каталога
-            String formPathWithoutExt = formPath;
-            if (formPathWithoutExt.endsWith(".frm")) {
-                formPathWithoutExt = formPathWithoutExt.substring(0, formPathWithoutExt.length() - 4);
-            }
+            // ПРОВЕРКА 2: .d каталог
+            String formPathWithoutExt = formPath.replace(".frm", "");
+            Path dotDPath = regionPath.resolve(formPathWithoutExt + ".d");
 
-            Path dotDPath = projectRoot.resolve(region).resolve(formPathWithoutExt + ".d");
             if (Files.exists(dotDPath) && Files.isDirectory(dotDPath)) {
                 try (Stream<Path> walk = Files.walk(dotDPath)) {
                     walk.filter(Files::isRegularFile)
                             .filter(p -> p.toString().endsWith(".dfrm"))
                             .forEach(dfrmFile -> {
-                                String dfrmContent = scannerService.readFileContent(dfrmFile);
-                                if (dfrmContent != null && !dfrmContent.isEmpty()) {
-                                    List<DfmOverrideProcessor.OverrideOperation> operations =
-                                            dfmProcessor.parseDfrmFile(dfrmContent);
-
-                                    for (DfmOverrideProcessor.OverrideOperation op : operations) {
-                                        formInfo.addOverride(new FormInfo.OverrideInfo(
-                                                region,
-                                                dfrmFile.toString(),
-                                                FormInfo.OverrideInfo.OverrideType.DOT_D_OVERRIDE,
-                                                op.getTarget(),
-                                                op.getPosition()
-                                        ));
-                                    }
-                                }
+                                // Добавляем ОДИН override на файл, а не на каждую операцию
+                                formInfo.addOverride(new FormInfo.OverrideInfo(
+                                        region,
+                                        dfrmFile.toString(),
+                                        FormInfo.OverrideInfo.OverrideType.DOT_D_OVERRIDE,
+                                        null,  // baseTarget
+                                        null   // position
+                                ));
                             });
                 } catch (IOException e) {
                     System.err.println("Error scanning .d directory: " + e.getMessage());
                 }
+            }
+
+            // ПРОВЕРКА 3: .dfrm файл напрямую (не в .d каталоге)
+            Path directDfrm = regionPath.resolve(formPath.replace(".frm", ".dfrm"));
+            if (Files.exists(directDfrm) && Files.isRegularFile(directDfrm)) {
+                formInfo.addOverride(new FormInfo.OverrideInfo(
+                        region,
+                        directDfrm.toString(),
+                        FormInfo.OverrideInfo.OverrideType.PARTIAL_OVERRIDE,
+                        null,
+                        null
+                ));
             }
         }
 

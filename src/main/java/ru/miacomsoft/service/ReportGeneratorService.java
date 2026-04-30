@@ -484,58 +484,76 @@ public class ReportGeneratorService {
 
     /**
      * Запись информации о UserForms в отчет
+     * Показывает ВСЕ переопределения из FormInfo без дубликатов
      */
     private void writeUserFormsSection(PrintWriter writer, FormInfo formInfo) {
         writer.println("ЮЗЕРФОРМЫ:");
 
-        if (formInfo.isFullyReplaced()) {
-            // Полное переопределение .frm
-            String replacementPath = formInfo.getReplacementPath();
-            writer.println("     " + replacementPath + " (ПОЛНАЯ ЗАМЕНА)");
-        } else if (!formInfo.getOverrides().isEmpty()) {
-            // Группируем переопределения по регионам
-            Map<String, List<FormInfo.OverrideInfo>> overridesByRegion = new LinkedHashMap<>();
-            for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                overridesByRegion.computeIfAbsent(override.getRegionName(), k -> new ArrayList<>()).add(override);
-            }
+        if (formInfo.getOverrides().isEmpty() && !formInfo.isFullyReplaced()) {
+            writer.println("     (не найдено)");
+            writer.println();
+            return;
+        }
 
-            for (Map.Entry<String, List<FormInfo.OverrideInfo>> entry : overridesByRegion.entrySet()) {
-                String region = entry.getKey();
-                List<FormInfo.OverrideInfo> overrides = entry.getValue();
+        // Группируем по регионам
+        Map<String, List<FormInfo.OverrideInfo>> overridesByRegion = new LinkedHashMap<>();
+        for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
+            overridesByRegion.computeIfAbsent(override.getRegionName(), k -> new ArrayList<>()).add(override);
+        }
 
-                // Проверяем, есть ли .d каталог
-                boolean hasDotD = overrides.stream()
-                        .anyMatch(o -> o.getType() == FormInfo.OverrideInfo.OverrideType.DOT_D_OVERRIDE);
+        for (Map.Entry<String, List<FormInfo.OverrideInfo>> entry : overridesByRegion.entrySet()) {
+            String region = entry.getKey();
+            List<FormInfo.OverrideInfo> overrides = entry.getValue();
 
-                if (hasDotD) {
-                    // Находим путь к .d каталогу
-                    String dotDPath = null;
-                    List<String> dfrmFiles = new ArrayList<>();
+            writer.println("     ===== " + region + " =====");
 
-                    for (FormInfo.OverrideInfo override : overrides) {
-                        if (override.getType() == FormInfo.OverrideInfo.OverrideType.DOT_D_OVERRIDE) {
-                            String overridePath = override.getOverridePath();
-                            // Извлекаем путь к .d каталогу
-                            if (overridePath.contains(".d/")) {
-                                dotDPath = overridePath.substring(0, overridePath.indexOf(".d/") + 2);
-                                String fileName = overridePath.substring(overridePath.lastIndexOf("/") + 1);
-                                if (!dfrmFiles.contains(fileName)) {
-                                    dfrmFiles.add(fileName);
-                                }
-                            }
+            // Используем Set для уникальных путей и имен файлов
+            Set<String> fullReplacements = new LinkedHashSet<>();
+            Set<String> partialDfrm = new LinkedHashSet<>();
+            Map<String, Set<String>> dotDCatalogs = new LinkedHashMap<>(); // catalogPath -> Set<fileName>
+
+            for (FormInfo.OverrideInfo override : overrides) {
+                String path = override.getOverridePath();
+                String fileName = path.substring(path.lastIndexOf("/") + 1);
+
+                switch (override.getType()) {
+                    case FULL_OVERRIDE:
+                        fullReplacements.add(path);
+                        break;
+                    case PARTIAL_OVERRIDE:
+                        partialDfrm.add(path);
+                        break;
+                    case DOT_D_OVERRIDE:
+                        if (path.contains(".d/")) {
+                            String catalogPath = path.substring(0, path.indexOf(".d/") + 2);
+                            dotDCatalogs.computeIfAbsent(catalogPath, k -> new LinkedHashSet<>()).add(fileName);
+                        } else {
+                            partialDfrm.add(path);
                         }
-                    }
-
-                    if (dotDPath != null) {
-                        writer.println("     " + dotDPath);
-                        for (String dfrm : dfrmFiles) {
-                            writer.println("             " + dotDPath + dfrm);
-                        }
-                    }
+                        break;
                 }
             }
-        } else {
-            writer.println("     (не найдено)");
+
+            // 1. Полные замены (.frm)
+            for (String path : fullReplacements) {
+                writer.println("        ПОЛНАЯ ЗАМЕНА: " + path);
+            }
+
+            // 2. .d каталоги и их содержимое (уникальное)
+            for (Map.Entry<String, Set<String>> catalogEntry : dotDCatalogs.entrySet()) {
+                String catalogPath = catalogEntry.getKey();
+                writer.println("        КАТАЛОГ: " + catalogPath);
+                for (String fileName : catalogEntry.getValue()) {
+                    writer.println("            └── " + fileName);
+                }
+            }
+
+            // 3. Отдельные .dfrm файлы
+            for (String path : partialDfrm) {
+                writer.println("        ЧАСТИЧНОЕ ПЕРЕОПРЕДЕЛЕНИЕ: " + path);
+            }
+
+            writer.println();
         }
 
         writer.println();

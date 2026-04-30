@@ -4,6 +4,7 @@ import ru.miacomsoft.service.FileScannerService;
 import ru.miacomsoft.service.ReportGeneratorService;
 import ru.miacomsoft.service.TmisFormAnalyzerService;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Главный класс приложения для анализа форм T-MIS
@@ -30,6 +32,42 @@ public class Main {
         System.out.println("=".repeat(80));
         System.out.println("Корневой каталог проекта: " + PROJECT_ROOT);
         System.out.println();
+/*
+
+        String rootPath = PROJECT_ROOT;
+        Path root = Paths.get(rootPath);
+
+        List<String> relativePaths = null;
+        try {
+            relativePaths = Files.walk(root)
+                    .filter(Files::isRegularFile)
+                    .filter(p -> {
+                        String name = p.getFileName().toString().toLowerCase();
+                        return name.endsWith(".frm") || name.endsWith(".dfrm");
+                    })
+                    .map(root::relativize)
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Найдено файлов: " + relativePaths.size());
+
+// Выгружаем в файл
+        String outputFile = "forms_list_all.txt";
+        try {
+            Files.write(Paths.get(outputFile), relativePaths);
+            System.out.println("Список сохранён в файл: " + new File(outputFile).getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Ошибка при записи файла: " + e.getMessage());
+        }
+
+
+
+        if (1==1) return;
+*/
+
 
         try {
             // Создаем сервисы

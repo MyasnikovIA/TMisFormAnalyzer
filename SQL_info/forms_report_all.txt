@@ -1,6 +1,6 @@
 ====================================================================================================
 === ПОЛНЫЙ ОТЧЕТ ПО ФОРМАМ T-MIS ===
-Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+Дата создания: Thu Apr 30 18:15:26 NOVT 2026
 Всего форм: 2
 Всего SQL запросов: 46
 ====================================================================================================
@@ -15,10 +15,14 @@
   - [UserFormsMagadan] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d/main_doc.dfrm
 
 ЮЗЕРФОРМЫ:
-     /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d
-             /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.dmain_doc.dfrm
-     /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d
-             /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.dmain_doc.dfrm
+     ===== UserFormsKrasnodarOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d
+            └── main_doc.dfrm
+
+     ===== UserFormsMagadan =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d
+            └── main_doc.dfrm
+
 
 Список подключаемых форм subForm:
      (не найдено)
@@ -356,30 +360,49 @@ SQL ЗАПРОСЫ (12):
 Базовая форма: /var/www/t-mis/mis/Forms/HospPlan/hp_directions_edit.frm
 СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
 Переопределения:
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/ButtonPrint.dfrm
   - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/script.dfrm
   - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d/view.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
   - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/data.dfrm
   - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/script.dfrm
-  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d/view.dfrm
   - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/data.dfrm
   - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/script.dfrm
   - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d/view.dfrm
+  - [UserFormsRKB3] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKB3/HospPlan/hp_directions_edit.d/hp_directions_edit.dfrm
+  - [UserFormsRostov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRostov/HospPlan/hp_directions_edit.d/data.dfrm
+  - [UserFormsRostov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRostov/HospPlan/hp_directions_edit.d/script.dfrm
+  - [UserFormsRostov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRostov/HospPlan/hp_directions_edit.d/view.dfrm
 
 ЮЗЕРФОРМЫ:
-     /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d
-             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dscript.dfrm
-             /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.dview.dfrm
-     /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d
-             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.ddata.dfrm
-             /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.dscript.dfrm
-     /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d
-             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.ddata.dfrm
-             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dscript.dfrm
-             /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.dview.dfrm
+     ===== UserFormsEgis3Novosib =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hp_directions_edit.d
+            └── ButtonPrint.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsEgis3Tomsk =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hp_directions_edit.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsKrasnodarOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKrasnodarOD/HospPlan/hp_directions_edit.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsRKB3 =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/HospPlan/hp_directions_edit.d
+            └── hp_directions_edit.dfrm
+
+     ===== UserFormsRostov =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRostov/HospPlan/hp_directions_edit.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
 
 Список подключаемых форм subForm:
      HospPlanJournal/DirectionHospDirectTypes

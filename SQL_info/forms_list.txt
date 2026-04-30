@@ -1,5 +1,5 @@
 # Список всех проанализированных форм T-MIS
-# Дата создания: Thu Apr 30 17:11:31 NOVT 2026
+# Дата создания: Thu Apr 30 18:15:26 NOVT 2026
 # Всего форм: 2
 #
 # Формат: СТАТУС | ПУТЬ К ФОРМЕ | БАЗОВАЯ ФОРМА | ЗАМЕНА/ПЕРЕОПРЕДЕЛЕНИЯ
@@ -10,4 +10,4 @@
 #   [PARTIAL] - частично переопределена
 #
 [PARTIAL] ARMMainDoc/main_doc.frm (переопределения: UserFormsKrasnodarOD, UserFormsMagadan)
-[PARTIAL] HospPlan/hp_directions_edit.frm (переопределения: UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsKrasnodarOD)
+[PARTIAL] HospPlan/hp_directions_edit.frm (переопределения: UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsKrasnodarOD, UserFormsRKB3, UserFormsRostov, UserFormsRostov, UserFormsRostov)
