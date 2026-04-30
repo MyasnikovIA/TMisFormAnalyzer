@@ -1,264 +1,81 @@
 ====================================================================================================
 === ОТЧЕТ ПО ЗАВИСИМОСТЯМ ТАБЛИЦ ОТ ВЬЮХ ===
-Дата создания: Thu Apr 30 20:16:25 NOVT 2026
-Всего проанализировано вьюх: 13
+Дата создания: Thu Apr 30 22:31:16 NOVT 2026
+Всего проанализировано вьюх: 5
 ====================================================================================================
 
-- D_V_HOSP_HISTORY_DEPS_BASE:
+- D_V_AGENTS_BASE:
     OracleSQL:
-        D_HOSP_HISTORY_DEPS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HOSP_HISTORY_DEPS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HH_DEP_BEDS_BASE:
-    OracleSQL:
-        D_HH_DEP_BEDS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HH_DEP_BEDS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DEPS_TYPES:
-    OracleSQL:
-        D_DEPS_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DEPS_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DEPS_BASE:
-    OracleSQL:
-        D_DEPS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DEPS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENT_COMP_DISEASES_BASE:
-    OracleSQL:
-        D_AGENT_COMP_DISEASES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_COMP_DISEASES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_SERVICES_BASE:
-    OracleSQL:
-        D_SERVICES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_SERVICES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HOSP_HISTORIES_LAST:
-    OracleSQL:
-        D_HPKPJ_VMP_STATES
-        D_DEPS
-        D_HOSP_HISTORIES
-        D_PERSMEDCARD
         D_AGENTS
-        D_HOSP_HISTORY_DEPS
-        D_DEPS_TYPES
-        D_PAYMENT_KIND
-        D_HPK_PLAN_JOURNALS
-        D_VMP
-        D_KSGCODES
-        D_MKB10
-        D_HOSP_RESULTS
-        D_EMPLOYERS
-        D_BED_TYPES
         D_V_URPRIVS
     PostgreSQL:
-        D_HPKPJ_VMP_STATES
-        D_DEPS
-        D_HOSP_HISTORIES
-        D_PERSMEDCARD
         D_AGENTS
-        D_HOSP_HISTORY_DEPS
-        D_DEPS_TYPES
-        D_PAYMENT_KIND
-        D_HPK_PLAN_JOURNALS
-        D_VMP
-        D_KSGCODES
-        D_MKB10
-        D_HOSP_RESULTS
-        D_EMPLOYERS
-        D_BED_TYPES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         components_d3.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_HH_DEP_BEDS:
+- D_V_PREG_PARAM_SPECS:
     OracleSQL:
-        D_DEP_BEDS
-        D_HH_DEP_BEDS
-        D_HOSP_HISTORY_DEPS
-        D_HOSP_HISTORIES
-        D_DEPS
-        D_DEP_POSTS
+        D_PREG_PARAM_SPECS
         D_V_URPRIVS
     PostgreSQL:
-        D_DEP_BEDS
-        D_HH_DEP_BEDS
-        D_HOSP_HISTORY_DEPS
-        D_HOSP_HISTORIES
-        D_DEPS
-        D_DEP_POSTS
+        D_PREG_PARAM_SPECS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         components_d3.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_DIRECTION_SERVICES_BASE:
-    OracleSQL:
-        D_DIRECTION_SERVICES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DIRECTION_SERVICES
-        D_V_URPRIVS
+- D_V_OBJSTATUSES:
+    OracleSQL: (вьюха не найдена)
+        Ошибка: Вьюха не найдена в Oracle
+    PostgreSQL: (вьюха не найдена)
+        Ошибка: Вьюха не найдена в PostgreSQL
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_AGENT_ALLERG_ANAMNESIS_BAS:
+- D_V_AGENTS:
     OracleSQL:
-        D_AGENT_ALLERG_ANAMNESIS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_ALLERG_ANAMNESIS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HOSP_HISTORIES_RELATIVE:
-    OracleSQL:
-        D_AGENT_RELATIVES
+        D_GEOGRAFY
         D_AGENTS
-        D_HOSP_HISTORIES
-        D_PERSMEDCARD
-        D_HOSP_REASONS
-        D_HOSPITALIZATION_TYPES
-        D_TRANSPORTATION_KINDS
-        D_LPUDICT
-        D_MKB10
-        D_HOSP_RESULTS
-        D_HPK_PLAN_JOURNALS
-        D_DEPS
-        D_HPKPJ_VMP_STATES
-        D_HOSP_OUTCOMES
-        D_HOSP_HOURS
-        D_HH_TRANSFER_REASONS
-        D_ABILITY_STATUS
         D_V_URPRIVS
     PostgreSQL:
-        D_AGENT_RELATIVES
+        D_GEOGRAFY
         D_AGENTS
-        D_HOSP_HISTORIES
-        D_PERSMEDCARD
-        D_HOSP_REASONS
-        D_HOSPITALIZATION_TYPES
-        D_TRANSPORTATION_KINDS
-        D_LPUDICT
-        D_MKB10
-        D_HOSP_RESULTS
-        D_HPK_PLAN_JOURNALS
-        D_DEPS
-        D_HPKPJ_VMP_STATES
-        D_HOSP_OUTCOMES
-        D_HOSP_HOURS
-        D_HH_TRANSFER_REASONS
-        D_ABILITY_STATUS
+        D_OKVED
+        D_EDUCATION_TYPES
+        D_DOC_TYPES
+        D_OKFS
+        D_FED_NATIONALITIES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_HH_DIETARIES:
+- D_V_CATALOGS:
     OracleSQL:
-        D_HH_DIETARIES
-        D_DIETARY_TABLE
-        D_HOSP_REGIMES
-        D_PSYCH_REGIMES
         D_V_URPRIVS
+        D_CATALOGS
     PostgreSQL:
-        D_HH_DIETARIES
-        D_DIETARY_TABLE
-        D_HOSP_REGIMES
-        D_PSYCH_REGIMES
         D_V_URPRIVS
+        D_CATALOGS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HOSP_HISTORIES_BASE:
-    OracleSQL:
-        D_HOSP_HISTORIES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HOSP_HISTORIES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
 ====================================================================================================
 === КОНЕЦ ОТЧЕТА ПО ЗАВИСИМОСТЯМ ===

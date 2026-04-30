@@ -1,13 +1,13 @@
 ====================================================================================================
 === ОТЧЕТ ПО ФОРМАМ T-MIS (ПАКЕТ 1) ===
-Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+Дата создания: Thu Apr 30 22:31:11 NOVT 2026
 Количество форм в пакете: 2
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: ARMMainDoc/arm_director.frm
+ФОРМА: components_d3.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/arm_director.frm
+Базовая форма: /var/www/t-mis/mis/Forms/components_d3.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
@@ -17,895 +17,364 @@
      (не найдено)
 
 Список вызываемых форм в JS:
-     Reports/showReportHTML.frm
-     ArmPatientsInDep/hosp_history_new.frm
-     Deps/deps_by_division_only_action_d3.frm
-     Deps/deps_def_st_d3.frm
-     UniversalComposition/UniversalComposition.frm
-     DiseaseCase/diseasecase.frm
-     Persmedcard/persmedcard_edit.frm
-     HospPlan/setPrivilege.frm
-     ArmPatientsInDep/hosp_history_change_mkb.frm
-     ArmPatientsInDep/hosp_history_continues_treatment.frm
-     ArmPatientsInDep/SubForms/hh_deps_edit.frm
-     ArmPatientsInDep/hosp_history_end.frm
-     PersonalAccount/patient_contracts.frm
-     ArmPatientsInDep/healing_emp_load.frm
-     ArmPatientsInDep/healing_emp_history.frm
-     Registry/PmcSearch/amb_reports_list.frm
-     ArmPatientsInDep/pat_in_dep_head_dep_mkb_exact.frm
-     ArmPatientsInDep/pat_in_dep_head_dep_operations.frm
-     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
-     Reports/ArmPatientsInDep/plan_operations_call.frm
-     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
-     Reports/Stacionar/form315_call.frm
-     Reports/HospPlan/comission_vmp_protocol_call.frm
+     (не найдено)
 
-SQL ЗАПРОСЫ (0):
+SQL ЗАПРОСЫ (4):
 
-  (SQL запросы не найдены)
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: ArmPatientsInDep/pat_in_dep_head_nurse.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
-Переопределения:
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsHosp] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsKaliningrad] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRKB3] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRKOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRkob] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-
-ЮЗЕРФОРМЫ:
-     ===== UserFormsEgis3Novosib =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── data.dfrm
-            └── script.dfrm
-            └── view.dfrm
-
-     ===== UserFormsEgis3Tomsk =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── data.dfrm
-            └── script.dfrm
-            └── view.dfrm
-
-     ===== UserFormsHosp =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsKaliningrad =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRKB3 =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRKOD =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRkob =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsSaratov =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── script.dfrm
-            └── view.dfrm
-
-
-Список подключаемых форм subForm:
-     ArmPatientsInDep/SubForms/sep_calculation
-     ArmPatientsInDep/SubForms/list_deps
-     ArmPatientsInDep/SubForms/list_deps_post
-     ArmPatientsInDep/SubForms/info_by_dep
-     ArmPatientsInDep/SubForms/hh_dep_beds
-     ArmPatientsInDep/SubForms/hh_deps
-     ArmPatientsInDep/SubForms/bj_bulletin_contents
-     ArmPatientsInDep/SubForms/hpk_plan_journal_comment
-     ArmPatientsInDep/SubForms/hh_dir_servs_sop
-     ArmPatientsInDep/SubForms/mp_prescribes
-
-Список вызываемых форм в JS:
-     Persmedcard/persmedcard_edit.frm
-     DiseaseCase/diseasecase.frm
-     HospPlan/patient_analyze.frm
-     HospPlan/setPrivilege.frm
-     ArmPatientsInDep/patients_warnings.frm
-     PersonalAccount/patient_contracts.frm
-     ArmPatientsInDep/hosp_history_new.frm
-     ArmPatientsInDep/med_consumption_analysis.frm
-     ArmPatientsInDep/SubForms/hh_deps_edit.frm
-     ArmPatientsInDep/hosp_history_end.frm
-     Reports/PatientAgreement/agreement_blood_transfusion_call.frm
-     Reports/ArmPatientsInDep/patient_expense_call.frm
-     Reports/ArmPatientsInDep/portion_call.frm
-     Reports/ArmPatientsInDep/portion_1_84_call.frm
-     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
-     Reports/Statistic/movement_daily_beds_patients_call_new.frm
-     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
-     Reports/ArmPatientsInDep/directions_on_date_right_call.frm
-
-SQL ЗАПРОСЫ (7):
-
-  [1] M2 Script: MainScript
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
+  [1] D3 DataSet: DS_GRID
+      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
       SQL:
       
-                  Form.OnCreate = function() {
-                      setVar('HidePrevPatients', 0);
-                      setVar('windowHeadNurse', 1);
-                      setVar('DEP_RIGHT', 4);
-                      setVar('SHOW_CB_PREV_PATS', 1);
-                      executeAction('getDefaultParams', null, null, null, 0, 0);
-                  };
-                  Form.onChangeDeps = function() {
-                      executeAction('getDepDetails', function() {
-                          refreshDataSet('DS_HH');
-                      });
-                      setVar('POST_ID', null)
-                      refreshDataSet('DS_FILTER_DATA');
-                      setCaption('DEPS_POST', '');
-                      setControlProperty('DEPS_POST', 'enabled', !empty(getValue('DEPS')));
-                  };
-                  Form.onChangeDepsPost = function() {
-                      refreshDataSet('DS_HH');
-                  }
-                  Form.refreshMainData = function() {
-                      setVar('DEP_ID', getValue('DEPS'));
-                      refreshDataSet('DS_HH');
-                      refreshDataSet('DS_HH_DEP_BEDS');
-                  };
-                  Form.mainDataOnChange = function() {
-                      var _grd = getControlProperty('GRID_HH', 'data');
-      
-                      if (+getVar('HH_ID') === +_grd['ID']) return;
-      
-                      // Обновляем все что прицеплено SubForm'ами
-                      setVar('HH_DEP_ID', _grd['HHD']);
-                      setVar('DEP_ID', getValue('DEPS'));
-                      executeAction('CheckDepBed');
-                      setVar('HH_DEP', _grd['HHD']);
-                      setVar('HH_ID', _grd['ID']);
-                      setVar('PATIENT_ID', _grd['PATIENT_ID']);
-                      setVar('DISEASECASE', _grd['DISEASECASE']);
-                      setVar('HOSP_HISTORY_ID', _grd['ID']);
-                      startMultiDataSetsGroup();
-                          refreshDataSet('DS_HH_DEP_BEDS');
-                          refreshDataSet('DS_HH_DEPS');
-                          refreshDataSet('DS_BJ_BULLETIN_CONTENTS');
-                          refreshDataSet('DS_MP_PRESCRIBE_HH_DEPS');
-                          refreshDataSet('DS_SOP');
-                      endMultiDataSetsGroup();
-                      setVar('HPK_PLAN_JOURNAL', _grd['HPK_PLAN_JOURNAL']);
-      
-                      if (!empty(getValue('GRID_HH')) && (empty(_grd['HH_TYPE']) || (+_grd['HH_TYPE'] !== 2))) {
-                          executeAction('getHPKJComment');
-                      } else {
-                          setValue('HPKJ_COMMENT', '');
-                          setCaption('HPKJ_POLIS', '');
-                          setCaption('HPKJ_SOCIAL_ST', '');
-                          setCaption('HPKJ_DOC', '');
-                          setCaption('HPKJ_WORK_PLACE', '');
-                          setCaption('HPKJ_ADRESS', '');
-                          setCaption('HPKJ_HOSP_TYPE', '');
-                          setCaption('HPKJ_CHECK_OMS', '');
-                      }
-                      Form.toggleActiveGetFSSBull();
-                  };
-                  Form.toggleActiveGetFSSBull = function() {
-                      setEnabled('GetFSSBull', !!getValue('GRID_HH'));
-                  };
-                  Form.showPatientCard = function(_dom) {
-                      setVar('PERSMEDCARD', getControlValue(_dom));
-                      openWindow('Persmedcard/persmedcard_edit', true, 800, 580)
-                              .addListener('onafterclose', function() {
-                                  if (+getVar('ModalResult') === 1) {
-                                      Form.refreshMainData();
-                                  }
-                              });
-                  };
-                  Form.showPatientDisCaseHistory = function() {
-                      var pmc_array = getControlProperty('GRID_HH', 'data');
-                      setVar('PatientID', pmc_array['PATIENT_ID']);
-                      setVar('PatientFIO', pmc_array['PATIENT_FIO']);
-                      openWindow('DiseaseCase/diseasecase', true, 1000, 700);
-                  };
-                  Form.showPatientAnalyses = function() {
-                      var pmc_array = getControlProperty('GRID_HH', 'data');
-                      setVar('PERSMEDCARD', pmc_array['PATIENT_ID']);
-                      setVar('DISEASECASE_ID', pmc_array['DISEASECASE']);
-                      openWindow('HospPlan/patient_analyze', true);
-                  };
-                  Form.onPopupHospHistory = function() {
-                      var _grd = getControlProperty('GRID_HH', 'data');
-                      var popup = getControlByName('pHH');
-                      setVar('HH_DEP_ID', _grd['HHD']);
-                      setVar('AGENT', _grd['PATIENT_AGENT']);
-                      executeAction('CheckDepBed');
-      
-                      if (empty(_grd['HHD_DATE_OUT'])) {
-                          PopUpItem_SetHide(popup, 'pCancelSendAway', true);
-                          PopUpItem_SetHide(popup, 'pDischarge', false);
-                      } else {
-                          PopUpItem_SetHide(popup, 'pCancelSendAway', false);
-                          PopUpItem_SetHide(popup, 'pDischarge', true);
-                      }
-                      if (+_grd['SERV_EPIC_EXISTS'] === 1) {
-                          PopUpItem_SetDisable(popup,'pSendAway',false);
-                      }
-                      if (+_grd['SERV_EPIC_EXISTS'] === 0) {
-                          PopUpItem_SetDisable(popup,'pSendAway',true);
-                      }
-                  };
-                  Form.setVMP = function() {
-                      setVar('HPK_PLAN_JOURNAL', getControlProperty('GRID_HH', 'data')['HPK_PLAN_JOURNAL']);
-                      setVar('ModalResult', 0);
-                      openWindow('HospPlan/setPrivilege', true)
-                              .addListener('onafterclose',
-                                      function() {
-                                          if (+getVar('ModalResult') === 1) {
-                                              setControlProperty('GRID_HH', 'locate', getValue('GRID_HH'))
-                                              refreshDataSet('DS_HH');
-                                          }
-                                      });
-                  };
-                  Form.showPatientWarnings = function() {
-                      setVar('PERSMEDCARD', getControlProperty('GRID_HH', 'data')['PATIENT_ID']);
-                      setVar('AGENT', getControlProperty('GRID_HH', 'data')['PATIENT_AGENT']);
-                      openWindow('ArmPatientsInDep/patients_warnings', true);
-                  };
-                  Form.onCloneMainData = function(_dom, _dataArray) {
-                      if (_dataArray['EXISTS_COMP_DIS'] > 0 || _dataArray['EXIST_ALLERG'] > 0) {
-                          getControlByName('pat_warn').style.display = '';
-                      } else {
-                          getControlByName('pat_warn').style.display = 'none';
-                      }
-      
-                      //раскраска
-                      var _domCol = getControlByName('PATIENT_FIO_COL');
-                      var _domLab = getControlByName('PAT_LINK');
-      
-                      if (empty(_dataArray['BED_CODE']) && empty(_dataArray['RE_DATE']) && empty(_dataArray['HHD_DATE_OUT'])) {
-                          _domCol.style.backgroundColor = '#F2F4B5';
-                          _domLab.style.color = '';
-                      } else if (!empty(_dataArray['HHD_DATE_OUT']) && empty(_dataArray['RE_DATE'])) {
-                          _domCol.style.backgroundColor = '#ABDBC6';
-                          _domLab.style.color = '';
-                      } else if (empty(_dataArray['BED_CODE']) && empty(_dataArray['HHD_DATE_OUT']) && !empty(_dataArray['RE_DATE'])) {
-                          _domCol.style.backgroundColor = '#F2F4B5';
-                          _domLab.style.color = '#FF0000';
-                      } else if (!empty(_dataArray['HH_DATE_OUT']) && !empty(_dataArray['RE_DATE'])) {
-                          _domCol.style.backgroundColor = '#ABDBC6';
-                          _domLab.style.color = '#FF0000';
-                      } else if (!empty(_dataArray['BED_CODE']) && !empty(_dataArray['RE_DATE']) && empty(_dataArray['HH_DATE_OUT'])) {
-                          _domCol.style.backgroundColor = '';
-                          _domLab.style.color = '#FF0000';
-                      } else {
-                          _domCol.style.backgroundColor = '';
-                          _domLab.style.color = '';
-                      }
-                  };
-                  Form.showFaccAcc = function() {
-                      setVar('PERSMEDCARD', getControlProperty('GRID_HH', 'data')['PATIENT_ID']);
-                      setVar('AGENT', getControlProperty('GRID_HH', 'data')['PATIENT_AGENT']);
-                      openWindow('PersonalAccount/patient_contracts', true, 1222, 684);
-                  };
-                  Form.showHospHistory = function() {
-                      openWindow('ArmPatientsInDep/hosp_history_new', true)
-                              .addListener('onafterclose', function() {
-                                  if (+getVar('ModalResult') === 1) {
-                                      base().refreshMainData();
-                                  }
-                              });
-                  };
-                  Form.showConsMeds = function() {
-                      var pmc_array = getControlProperty('GRID_HH', 'data');
-                      setVar('PMC_ID', pmc_array['PATIENT_ID']);
-                      setVar('PMC_FIO', pmc_array['PATIENT_FIO']);
-                      openWindow('ArmPatientsInDep/med_consumption_analysis', true);
-                  };
-                  Form.dischargePatient = function() {
-                      if (+getVar('DEP_BED') === 0 && +getVar('SO_DEP_BED_HEAD_NURSE') > 0) {
-                          alert('У пациента не указана палата и койка');
-                          return;
-                      }
-      
-                      setVar('windowMode', 'discharge');
-                      openWindow({ name: 'ArmPatientsInDep/SubForms/hh_deps_edit',
-                                   vars: { IS_EXPERT: getVar('IS_EXPERT') }
-                                 }, true)
-                              .addListener('onafterclose', function() {
-                                  if (+getVar('ModalResult') === 1) {
-                                      base().refreshMainData();
-                                  }
-                              });
-                  };
-                  Form.sendAwayPatient = function() {
-                      var _grd = getControlProperty('GRID_HH', 'data');
-      
-                      if (empty(_grd['HHD_DATE_OUT']) && !empty(_grd['RE_DATE']) && +getVar('DEP_BED') === 0 && +getVar('SO_DEP_BED_HEAD_NURSE') > 0) {
-                          alert('У пациента не указана палата и койка');
-                          return;
-                      }
-      
-                      var pmc_array = getControlProperty('GRID_HH', 'data');
-                      setVar('PMC_ID', pmc_array['PATIENT_ID']);
-                      setVar('PMC_FIO', pmc_array['PATIENT_FIO']);
-                      openWindow({name: 'ArmPatientsInDep/hosp_history_end',
-                                  vars: { PMC_ID: pmc_array['PATIENT_ID'],
-                                          PMC_FIO: pmc_array['PATIENT_FIO'],
-                                          HH_ID: getVar('HH_ID') }
-                                 }, true)
-                          .addListener('onafterclose', function() {
-                              if (+getVar('ModalResult') === 1) {
-                                  Form.refreshMainData();
-                              }
-                          });
-                  };
-                  Form.cancelSendAway = function() {
-                      if (confirm('Отменить направление на выписку?')) {
-                          executeAction('cancelSendAway', function() {
-                              base().refreshMainData();
-                          });
-                      }
-                  };
-                  //отчеты
-                  Form.printPatAgreement = function() {
-                      openWindow('Reports/PatientAgreement/agreement_blood_transfusion_call', true);
-                  };
-                  Form.openWindowHint = function() {
-                      showLegend("Старшая медсестра",
-                              [{
-                                  backgroundColor: "#FFF",
-                                  caption: 'Пациенты в отделении'
-                              }, {
-                                  backgroundColor: "#ABDBC6",
-                                  caption: 'Направленные на выписку'
-                              }, {
-                                  backgroundColor: "#F2F4B5",
-                                  caption: 'Направленные в отделение'
-                              }, {
-                                  color: "#F00",
-                                  caption: 'Реанимация'
-                              }], 320, 190
-                      );
-                  };
-                  Form.PrintMeasuringList = function() {
-                      setVar('HH_ID', getValue('GRID_HH'));
-                      printReportByCode('list_measuring');
-                  }
-              
-
-
-  [2] M2 Action: CheckDepBed
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-      SQL:
-      
-              begin
-                select coalesce(max(case when hhd.IS_LAST = 1 and hdb.DATE_OUT <= trunc(sysdate)
-                                           then 0
-                                         else 1
-                                    end) keep(dense_rank first order by hdb.DATE_OUT desc nulls first),
-                                0)
-                  into :DEP_BED
-                  from D_V_HOSP_HISTORY_DEPS_BASE hhd
-                       join D_V_HH_DEP_BEDS_BASE hdb on hdb.PID = hhd.ID
-                 where hhd.ID = :HH_DEP_ID;
-              end;
-              
+                          select t.ID,
+                                 t.AGN_CODE,
+                                 t.AGN_NAME
+                            from D_V_AGENTS_BASE t
+                           where rownum < 201
+                          
 
       Таблицы/вьюхи:
-          D_V_HOSP_HISTORY_DEPS_BASE;
-          D_V_HH_DEP_BEDS_BASE;
+          D_V_AGENTS_BASE;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="SOCIALSTATES"  composition="GRID_SORT";
 
-  [3] M2 Action: cancelSendAway
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
+
+  [2] D3 DataSet: DS_TREE
+      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
       SQL:
       
-              begin
-                D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP(pnLPU   => to_number(:LPU),
-                                                         pnHH_ID => to_number(:HH_ID));
-              end;
-              
-
-      Пакеты/функции:
-          D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP;
-
-  [4] M2 Action: getDefaultParams
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-      SQL:
-      
-              declare
-                nT NUMBER(17);
-              begin
-                -- отделение
-                :DEP_ID := D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS(:LPU, 'DEPS', 2, :CABLAB);
-                -- отделения на которые есть права
-                select tb.COLUMN_VALUE
-                  bulk collect into :ACCESSIBLE_DEPS
-                  from table (D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS(pnLPU      => to_number(:LPU),
-                                                                    psUNITCODE => 'DEPS',
-                                                                    psRIGHT    => :DEP_RIGHT,
-                                                                    pnCABLAB   => to_number(:CABLAB))) tb
-                 union all
-                select -1
-                  from dual;
-      
-                -- Этот кусок нужно будет убрать, когда все ЮФ откажутся от RDEPS в пользу ACCESSIBLE_DEPS
-                select D_STRAGG(tb.COLUMN_VALUE)
-                  into :RDEPS
-                  from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tb;
-                :RDEPS := ';' || :RDEPS || ';';
-                select dp.ID
-                  bulk collect into :REANIMATION_DEPS
-                  from D_V_DEPS_TYPES dtt
-                       join D_V_DEPS_BASE dp on dp.DP_TYPE_ID = dtt.ID
-                 where dp.LPU = to_number(:LPU)
-                   and dtt.DT_CODE = '5'
-                   and dtt.VERSION = (select D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, to_number(:LPU), 'DEPS_TYPES')
-                                        from dual)
-                 union all
-                select -1
-                  from dual;
-      
-                -- права на HH_DEP для SubForm
-                D_PKG_URPRIVS.GET_STANDART_PRIVS(pnLPU      => :LPU,
-                                                 psUNITCODE => 'HOSP_HISTORY_DEPS',
-                                                 pnCID      => null,
-                                                 pnINSERT   => nT,
-                                                 pnUPDATE   => :RIGHT_HH_DEP_UPD,
-                                                 pnDELETE   => :RIGHT_HH_DEP_DEL,
-                                                 pnMOVE_OUT => nT);
-                :SHOW_FLG              := D_PKG_OPTION_SPECS.GET('ActualFLG', :LPU);
-                :HH_ShowPolisWrg       := D_PKG_OPTION_SPECS.GET('HH_ShowPolisWrg', :LPU);
-                :PKOMS                 := D_PKG_OPTION_SPECS.GET('PKOMS', :LPU);
-                :SO_DEP_BED_HEAD_NURSE := D_PKG_OPTIONS.GET('CheckDepBed_HeadNurse', :LPU);
-                :CHECK_SERV_EPIC       := D_PKG_OPTION_SPECS.GET('CheckServEpic', :LPU, 0);
-                :SHOW_MAIN_DEP_PAT_SO := D_PKG_OPTIONS.GET(psSO_CODE => 'ShowMainDepPat',
-                                                           pnLPU     => to_number(:LPU));
-              end;
-              
+                          select *
+                            from (select t.ID,
+                                         t.PID,
+                                         t.PPS_CODE,
+                                         t.PPS_NAME,
+                                         t.HID,
+                                         (select count(*)
+                                            from D_V_PREG_PARAM_SPECS t2
+                                           where t2.HID = t.ID) HAS_CHILDREN
+                                    from D_V_PREG_PARAM_SPECS t
+                                   where t.VERSION = D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'PREG_PARAM_SPECS')) t
+                           where (t.HAS_CHILDREN > 0 and t.HID is null) or t.HID is not null
+                          ]]>
+                          <cmpDataSetVar name="LPU" src="LPU" srctype="session"/>
+                      </cmpDataSet>
+                      <cmpTree
+                         caption="Заголовок дерева"
+                         name="TREE"
+                         dataset="DS_TREE"
+                         selectlist="ID"
+                         keyfield="ID"
+                         haschildrenfield="HAS_CHILDREN"
+                         parentfield="HID"
+                         excel="true"
+                         height="700px"
+                         fulldata="true"
+                         fulldata_expand="false"
+                         locatedataset="locatedataset"
+                      >
+                          <cmpTreeColumn caption="Код характеристики"          field="PPS_CODE" sort="PPS_CODE" filter="PPS_CODE" excelfield="PPS_CODE"/>
+                          <cmpTreeColumn caption="Наименование характеристики" field="PPS_NAME" sort="PPS_NAME" filter="PPS_NAME" excelfield="PPS_NAME"/>
+                          <cmpTreeFooter>
+                              <cmpRange dataset="DS_TREE" default_amount="20"/>
+                          </cmpTreeFooter>
+                      </cmpTree>
+                  </div>
+              </div>
+              <div class="no-bg">
+                  <div>StatGrid</div>
+                  <div>
+                      <cmpDataset name="DS_STAT_GRID" mode="Group">
+                          <![CDATA[
+                          select t.ID,
+                                 t.AGN_CODE,
+                                 t.AGN_NAME,
+                                 t.SEX,
+                                 t.BIRTHDATE,
+                                 '' TEST
+                            from D_V_AGENTS_BASE t
+                           where rownum < 21
+                          
 
       Таблицы/вьюхи:
-          D_V_DEPS_TYPES;
-          D_V_DEPS_BASE;
+          D_V_AGENTS_BASE;
+          D_V_PREG_PARAM_SPECS;
       Пакеты/функции:
           D_PKG_VERSIONS.GET_VERSION_BY_LPU;
-          D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS;
-          D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS;
-          D_PKG_URPRIVS.GET_STANDART_PRIVS;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="SOCIALSTATES"  composition="GRID_SORT";
 
-  [5] M2 DataSet: DS_HH
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
+
+  [3] D3 DataSet: DS_GRID
+      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
       SQL:
       
-              with
-                curr_rean_deps as
-                  (select /*+ cardinality(tb, 1)*/
-                          tb.COLUMN_VALUE DEP_ID
-                     from table(cast(:REANIMATION_DEPS as D_CL_ID)) tb
-                  @if (:DEP_ID) {
-                    where tb.COLUMN_VALUE <> to_number(:DEP_ID))
-                  @} else {
-                    where not exists (select /*+ cardinality(tbv, 1)*/
-                                             null
-                                        from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tbv
-                                       where tbv.COLUMN_VALUE = tb.COLUMN_VALUE))
-                  @}
-              select hh.ID,
-                     hh.HHD_ID HHD,
-                     hh.DISEASECASE,
-                     hh.PATIENT_ID,
-                     hh.PATIENT PATIENT_CARD,
-                     hh.HPK_PLAN_JOURNAL,
-                     hh.PATIENT_FIO,
-                     to_char(hh.PATIENT_BIRTHDATE, 'dd.mm.yyyy') PATIENT_BIRTHDATE,
-                     hh.PATIENT_BIRTHDATE BIRTHDATE_DATE,
-                     case hh.HAS_PRIVILEGES
-                          when 1 then 'Присутствует'
-                          when 0 then 'Отсутствует '
-                          when 2 then 'Требуется разрешение'
-                     end SHAS_PRIVILEGES,
-                     hh.HAS_PRIVILEGES HAS_PRIVILEGES_N,
-                     hh.PATIENT_AGENT,
-                     trunc(hh.HH_DATE_IN) HH_DATE_IN,
-                     trunc(hh.HHD_DATE_IN) HHD_DATE_IN,
-                     trunc(hh.HHD_DATE_OUT) HHD_DATE_OUT,
-                     D_PKG_DAT_TOOLS.AGE_TO_STR(fdBIRTHDATE        => hh.PATIENT_BIRTHDATE,
-                                                fdDATE             => sysdate,
-                                                fnYEAR_WITH_MONTHS => 1) PATIENT_AGE,
-                     D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE(fnAGENT => hh.PATIENT_AGENT,
-                                                             fdDATE  => sysdate,
-                                                             fsFIELD => 'PD_TYPE_NAME: PD_SER PD_NUMB') PERS_DOC,
-                     D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE(fnPATIENT => hh.PATIENT_AGENT,
-                                                          fdDATE    => sysdate,
-                                                          fnTYPE    => 0,
-                                                          fsFIELD   => 'P_SER P_NUM Выдан P_WHO_NAME') PERS_POLIS,
-                     D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE(fnAGENT => hh.PATIENT_AGENT,
-                                                          fdDATE  => sysdate,
-                                                          fnTYPE  => 1,
-                                                          fnFIELD => 'FULL') PERS_ADDRESS,
-                     D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE(pnAGENT => hh.PATIENT_AGENT,
-                                                                pdDATE  => sysdate,
-                                                                psFIELD => 'WORK_PLACE_NAME') PERS_WORK_PLACE,
-                     D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING(pnAGENT => hh.PATIENT_AGENT) PERS_COMP_DISEASES,
-                     (select listagg(s.SE_CODE, ',') within group(order by s.SE_CODE)
-                        from D_V_HOSP_HISTORY_DEPS_BASE hhd2
-                             join D_V_DIRECTION_SERVICES_BASE ds on ds.HH_DEP = hhd2.ID
-                             join D_V_SERVICES_BASE s on s.ID = ds.SERVICE
-                       where hhd2.PID = hh.ID
-                         and ds.SERV_STATUS = 1
-                         and exists(select null
-                                      from D_V_DIRECTION_SERVICES_BASE ds2
-                                           join D_V_SERVICES_BASE s2 on s2.ID = ds2.SERVICE
-                                     where ds2.PID = ds.PID
-                                       and ds2.LPU = :LPU
-                                       and ds2.SERV_STATUS in (0, 1, 3, 4)  -- вместо ds2.SERV_STATUS != 2
-                                       and s2.SE_TYPE = 2)) PERS_SERVICE,
-                     hh.HHD_PAYMENT_KIND_NAME,
-                     hh.HH_PREF_NUMB HH_NUMBER,
-                     hh.HEALING_EMP_FIO,
-                     hh.HHD_VMP VMP_CODE,
-                     hh.HHD_VMP_ID VMP_ID,
-                     (select count(1)
-                        from D_V_AGENT_COMP_DISEASES_BASE acd
-                       where acd.PID = hh.PATIENT_AGENT
-                         and acd.DATE_BEGIN <= sysdate
-                         and (acd.DATE_END >= sysdate or acd.DATE_END is null)
-                         and rownum = 1) EXISTS_COMP_DIS,
-                     (select count(1)
-                        from D_V_AGENT_ALLERG_ANAMNESIS_BAS aaa
-                       where aaa.PID = hh.PATIENT_AGENT
-                         and aaa.BEGIN_DATE <= sysdate
-                         and (aaa.END_DATE >= sysdate or aaa.END_DATE is null)
-                         and rownum = 1) EXIST_ALLERG,
-                     (select case when hhdb.BED_CODE is null then hhdb.CHAMBER_CODE
-                               else hhdb.CHAMBER_CODE || '/' || hhdb.BED_CODE end
-                        from D_V_HH_DEP_BEDS hhdb
-                       where hhdb.PID = hh.HHD_ID
-                         and hhdb.DATE_IN <= sysdate
-                         and (hhdb.DATE_OUT >= sysdate or hhdb.DATE_OUT is null)
-                         and rownum = 1) BED_CODE,
-                     case when hh.HHD_DEP_TYPE = '5' then to_char(hh.HHD_DATE_IN, 'dd.mm.yyyy')
-                          else null end RE_DATE,
-                     case when hh.HHD_DEP_TYPE = '5' then hh.HHD_DATE_IN
-                          else null end REAN_DATE,
-                     (select hd.DIETARY_TABLE_NAME
-                        from D_V_HH_DIETARIES hd
-                       where hd.PID = hh.ID
-                         and hd.DATE_BEGIN <= sysdate
-                         and (hd.DATE_END >= sysdate or hd.DATE_END is null)
-                         and rownum = 1) DIETARY_TABLE,
-                     case when hh.HHD_DEP_TYPE = '5' then (select max(dp.DP_NAME) keep(dense_rank last order by hhd1.date_in)
-                                                             from D_V_HOSP_HISTORY_DEPS_BASE hhd1
-                                                                  join D_V_DEPS_BASE dp on dp.ID = hhd1.dep_ID
-                                                                  join D_V_DEPS_TYPES dt on dt.ID = dp.DP_TYPE_ID
-                                                            where hhd1.PID = hh.ID
-                                                              and dt.DT_NAME = 'Основное отделение'
-                                                              and exists (select null
-                                                                            from D_V_HOSP_HISTORY_DEPS_BASE hhd
-                                                                           where hhd.ID = hh.HHD_ID
-                                                                             and hhd.hhd_level = hhd1.hhd_level))
-                     end DEP_NAME_OSN,
-                     hh.MKB || ' - ' || hh.MKB_NAME DIAGNOSES,
-                     D_PKG_HOSP_HISTORIES.GET_FACT_DAYS(pnID    => hh.ID,
-                                                        pnLPU   => hh.LPU,
-                                                        pnRAISE => 0) DAYS,
-                     hh.HH_TYPE,
-                     hh.HHD_BT_ID BED_TYPE_ID,
-                     hh.HHD_BT_NAME BED_TYPE_NAME,
-                     (select hhr.PATIENT_FIO
-                        from D_V_HOSP_HISTORIES_RELATIVE hhr
-                       where hhr.RELATIVE_HH = hh.ID
-                         and hhr.DATE_OUT is null) RELATIVE_PATIENT
-                   @if (:CHECK_SERV_EPIC) {
-                     ,
-                     case when exists (select null
-                                         from D_V_HOSP_HISTORY_DEPS_BASE hhd
-                                              join D_V_DIRECTION_SERVICES_BASE ds on ds.HH_DEP = hhd.ID
-                                              join D_V_SERVICES_BASE s on s.ID = ds.SERVICE
-                                        where s.SE_CODE = :CHECK_SERV_EPIC
-                                          and hhd.PID = hh.ID
-                                          and ds.SERV_STATUS = 1) then 1
-                          else 0
-                     end SERV_EPIC_EXISTS
-                   @}
-                from (select hh.ID,
-                             hh.LPU,
-                             hh.HHD_ID,
-                             hh.PATIENT_AGENT,
-                             hh.HPK_PLAN_JOURNAL,
-                             hh.DISEASECASE,
-                             hh.PATIENT_ID,
-                             hh.PATIENT,
-                             hh.PATIENT_FIO,
-                             hh.HH_PREF_NUMB,
-                             hh.PATIENT_BIRTHDATE,
-                             hh.HHD_DEP_ID,
-                             hh.HHD_DEP_TYPE,
-                             hh.HHD_DATE_IN,
-                             hh.HHD_DATE_OUT,
-                             hh.MKB,
-                             hh.MKB_NAME,
-                             hh.HEALING_EMP_FIO,
-                             hh.HHD_BT_ID,
-                             hh.HHD_BT_NAME,
-                             hh.HH_TYPE,
-                             hh.HHD_VMP_ID,
-                             hh.HHD_VMP,
-                             hh.HHD_PAYMENT_KIND_NAME,
-                             hh.HH_DATE_IN,
-                             hh.HAS_PRIVILEGES,
-                             hh.HHD_PAYMENT_KIND_ID
-                        from D_V_HOSP_HISTORIES_LAST hh
-                       where hh.LPU = to_number(:LPU)
-                         and sysdate between hh.HH_DATE_IN and coalesce(hh.HH_DATE_OUT, to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'))
-                       @if (:SHOW_MAIN_DEP_PAT_SO = '1' && :PARENT_AND_SUB_DEP) {
-                         and exists (select /*+ cardinality(tb, 1)*/
-                                            null
-                                       from table(cast(:PARENT_AND_SUB_DEP as D_CL_ID)) tb
-                                      where tb.COLUMN_VALUE = hh.HH_DEP_ID)
-                       @} else if (:DEP_ID) {
-                         and hh.HH_DEP_ID = to_number(:DEP_ID)
-                       @} else if (:ACCESSIBLE_DEPS) {
-                         and exists (select /*+ cardinality(tb, 1)*/
-                                            null
-                                       from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tb
-                                      where tb.COLUMN_VALUE = hh.HH_DEP_ID)
-                       @} else {
-                         and 1 = 2
-                       @}
-                       @if (:HIDEPREV != 0) {
-                         and trunc(sysdate) between trunc(hh.HHD_DATE_IN) and trunc(coalesce(hh.HHD_DATE_OUT, sysdate))
-                       @}
-                       @if (:DEP_ID && :POST_IDS) {
-                         and exists (select null
-                                       from D_V_HH_DEP_BEDS hhdb
-                                      where hhdb.POST_ID in (select /*+ cardinality(t, 1) */ t.COLUMN_VALUE
-                                                               from table(cast(:POST_IDS as D_CL_ID)) t)
-                                        and hhdb.PID = hh.HHD_ID
-                                        and trunc(sysdate) between trunc(hhdb.DATE_IN) and trunc(coalesce(hhdb.DATE_OUT, sysdate)))
-                       @}
-                   @if (:FILTER_VMP) {
-                     @if (:FILTER_VMP == 'NOT_NULL') {
-                         and hh.HHD_VMP_ID is not null
-                     @} else {
-                       @if (:FILTER_VMP == 'IS_NULL') {
-                         and hh.HHD_VMP_ID is null
-                       @} else {
-                         and hh.HHD_VMP_ID = to_number(:FILTER_VMP)
-                       @}
-                     @}
-                   @}
-                       union all
-                      select hh.ID,
-                             hh.LPU,
-                             hh.HHD_ID,
-                             hh.PATIENT_AGENT,
-                             hh.HPK_PLAN_JOURNAL,
-                             hh.DISEASECASE,
-                             hh.PATIENT_ID,
-                             hh.PATIENT,
-                             hh.PATIENT_FIO,
-                             hh.HH_PREF_NUMB,
-                             hh.PATIENT_BIRTHDATE,
-                             hh.HHD_DEP_ID,
-                             hh.HHD_DEP_TYPE,
-                             hh.HHD_DATE_IN,
-                             hh.HHD_DATE_OUT,
-                             hh.MKB,
-                             hh.MKB_NAME,
-                             hh.HEALING_EMP_FIO,
-                             hh.HHD_BT_ID,
-                             hh.HHD_BT_NAME,
-                             hh.HH_TYPE,
-                             hh.HHD_VMP_ID,
-                             hh.HHD_VMP,
-                             hh.HHD_PAYMENT_KIND_NAME,
-                             hh.HH_DATE_IN,
-                             hh.HAS_PRIVILEGES,
-                             hh.HHD_PAYMENT_KIND_ID
-                        from D_V_HOSP_HISTORIES_LAST hh
-                             join D_V_HOSP_HISTORY_DEPS_BASE hhdp on hhdp.ID = hh.HHD_PRVSID
-                       where hh.LPU = to_number(:LPU)
-                         and sysdate between hh.HH_DATE_IN and coalesce(hh.HH_DATE_OUT, to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS'))
-                       @if (:DEP_ID) {
-                         and hhdp.DEP_ID = to_number(:DEP_ID)
-                       @} else if (:ACCESSIBLE_DEPS) {
-                         and exists (select /*+ cardinality(tb, 1)*/
-                                            null
-                                       from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tb
-                                      where tb.COLUMN_VALUE = hhdp.DEP_ID)
-                       @} else {
-                         and 1 = 2
-                       @}
-                       @if (:HIDEPREV != 0) {
-                         and trunc(sysdate) between trunc(hh.HHD_DATE_IN) and trunc(coalesce(hh.HHD_DATE_OUT, sysdate))
-                       @}
-                       @if (:DEP_ID && :POST_IDS) {
-                         and exists (select null
-                                       from D_V_HH_DEP_BEDS hhdb
-                                      where hhdb.POST_ID in (select /*+ cardinality(t, 1) */ t.COLUMN_VALUE
-                                                               from table(cast(:POST_IDS as D_CL_ID)) t)
-                                        and hhdb.PID = hh.HHD_ID
-                                        and trunc(sysdate) between trunc(hhdb.DATE_IN) and trunc(coalesce(hhdb.DATE_OUT, sysdate)))
-                       @}
-                   @if (:FILTER_VMP) {
-                     @if (:FILTER_VMP == 'NOT_NULL') {
-                         and hh.HHD_VMP_ID is not null
-                     @} else {
-                       @if (:FILTER_VMP == 'IS_NULL') {
-                         and hh.HHD_VMP_ID is null
-                       @} else {
-                         and hh.HHD_VMP_ID = to_number(:FILTER_VMP)
-                       @}
-                     @}
-                   @}
-                         and exists (select null
-                                       from curr_rean_deps tb
-                                      where tb.DEP_ID = hh.HH_DEP_ID)) hh
-      
-              
+                          select t.ID,
+                                 t.AGN_CODE,
+                                 t.AGN_NAME
+                            from D_V_AGENTS_BASE t
+                           where rownum < 201
+                          
 
       Таблицы/вьюхи:
-          D_V_AGENT_COMP_DISEASES_BASE;
-          D_V_DEPS_TYPES;
-          D_V_SERVICES_BASE;
-          D_V_DEPS_BASE;
-          D_V_HOSP_HISTORY_DEPS_BASE;
-          D_V_HOSP_HISTORIES_LAST;
-          D_V_HH_DEP_BEDS;
-          D_V_DIRECTION_SERVICES_BASE;
-          D_V_AGENT_ALLERG_ANAMNESIS_BAS;
-          D_V_HOSP_HISTORIES_RELATIVE;
-          D_V_HH_DIETARIES;
+          D_V_AGENTS_BASE;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="SOCIALSTATES"  composition="GRID_SORT";
+
+
+  [4] D3 DataSet: DS_TREE
+      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
+      SQL:
+      
+                          select *
+                            from (select t.ID,
+                                         t.PID,
+                                         t.PPS_CODE,
+                                         t.PPS_NAME,
+                                         t.HID,
+                                         (select count(*)
+                                            from D_V_PREG_PARAM_SPECS t2
+                                           where t2.HID = t.ID) HAS_CHILDREN
+                                    from D_V_PREG_PARAM_SPECS t
+                                   where t.VERSION = D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'PREG_PARAM_SPECS')) t
+                           where (t.HAS_CHILDREN > 0 and t.HID is null) or t.HID is not null
+                          ]]>
+                          <cmpDataSetVar name="LPU" src="LPU" srctype="session"/>
+                      </cmpDataSet>
+                      <cmpTree
+                         caption="Заголовок дерева"
+                         name="TREE"
+                         dataset="DS_TREE"
+                         selectlist="ID"
+                         keyfield="ID"
+                         haschildrenfield="HAS_CHILDREN"
+                         parentfield="HID"
+                         excel="true"
+                         height="700px"
+                         fulldata="true"
+                         fulldata_expand="false"
+                         locatedataset="locatedataset"
+                      >
+                          <cmpTreeColumn caption="Код характеристики"          field="PPS_CODE" sort="PPS_CODE" filter="PPS_CODE" excelfield="PPS_CODE"/>
+                          <cmpTreeColumn caption="Наименование характеристики" field="PPS_NAME" sort="PPS_NAME" filter="PPS_NAME" excelfield="PPS_NAME"/>
+                          <cmpTreeFooter>
+                              <cmpRange dataset="DS_TREE" default_amount="20"/>
+                          </cmpTreeFooter>
+                      </cmpTree>
+                  </div>
+              </div>
+              <div class="no-bg">
+                  <div>StatGrid</div>
+                  <div>
+                      <cmpDataset name="DS_STAT_GRID" mode="Group">
+                          <![CDATA[
+                          select t.ID,
+                                 t.AGN_CODE,
+                                 t.AGN_NAME,
+                                 t.SEX,
+                                 t.BIRTHDATE,
+                                 '' TEST
+                            from D_V_AGENTS_BASE t
+                           where rownum < 21
+                          
+
+      Таблицы/вьюхи:
+          D_V_AGENTS_BASE;
+          D_V_PREG_PARAM_SPECS;
       Пакеты/функции:
-          D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE;
-          D_PKG_DAT_TOOLS.AGE_TO_STR;
-          D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING;
-          D_PKG_HOSP_HISTORIES.GET_FACT_DAYS;
-          D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE;
-          D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE;
-          D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE;
+          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="SOCIALSTATES"  composition="GRID_SORT";
 
-  [6] M2 DataSet: DS_FILTER_DATA
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-      SQL:
-      
-              with
-                curr_rean_deps as
-                  (select /*+ cardinality(tb, 1)*/
-                          tb.COLUMN_VALUE DEP_ID
-                     from table(cast(:REANIMATION_DEPS as D_CL_ID)) tb
-                  @if (:DEP_ID) {
-                    where tb.COLUMN_VALUE <> to_number(:DEP_ID))
-                  @} else {
-                    where not exists (select /*+ cardinality(tbv, 1)*/
-                                             null
-                                        from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tbv
-                                       where tbv.COLUMN_VALUE = tb.COLUMN_VALUE))
-                  @}
-              select hh.HHD_VMP_ID,
-                     hh.HHD_VMP
-                from D_V_HOSP_HISTORIES_LAST hh
-               where hh.LPU = to_number(:LPU)
-                 and hh.HHD_VMP_ID is not null
-                 and coalesce(hh.HH_DATE_OUT, to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS')) = to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS')
-               @if (:DEP_ID) {
-                 and (hh.HHD_DEP_ID = to_number(:DEP_ID)
-                      or (hh.HHD_DEP_MAIN = to_number(:DEP_ID)
-                          and :SHOW_MAIN_DEP_PAT_SO = '1'))
-               @} else if (:ACCESSIBLE_DEPS) {
-                 and exists (select /*+ cardinality(tb, 1)*/
-                                    null
-                               from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tb
-                              where tb.COLUMN_VALUE = hh.HH_DEP_ID)
-               @} else {
-                 and 1 = 2
-               @}
-                 and (trunc(hh.HHD_DATE_OUT) >= trunc(sysdate)
-                      or hh.HHD_DATE_OUT is null)
-               union all
-              select hh.HHD_VMP_ID,
-                     hh.HHD_VMP
-      
-                from D_V_HOSP_HISTORIES_LAST hh
-                     join D_V_HOSP_HISTORY_DEPS_BASE hhdp on hhdp.ID = hh.HHD_PRVSID
-               where hh.LPU = to_number(:LPU)
-                 and hh.HHD_VMP_ID is not null
-                 and coalesce(hh.HH_DATE_OUT, to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS')) = to_date(' 9999-12-31 00:00:00', 'SYYYY-MM-DD HH24:MI:SS')
-                 and exists (select null
-                               from curr_rean_deps tb
-                              where tb.DEP_ID = hh.HH_DEP_ID)
-               @if (:DEP_ID) {
-                 and hhdp.DEP_ID = to_number(:DEP_ID)
-               @} else if (:ACCESSIBLE_DEPS) {
-                 and exists (select /*+ cardinality(tb, 1)*/
-                                    null
-                               from table(cast(:ACCESSIBLE_DEPS as D_CL_ID)) tb
-                              where tb.COLUMN_VALUE = hhdp.DEP_ID)
-               @} else {
-                 and 1 = 2
-               @}
-                 and (trunc(hh.HHD_DATE_OUT) >= trunc(sysdate)
-                      or hh.HHD_DATE_OUT is null)
-              
-
-      Таблицы/вьюхи:
-          D_V_HOSP_HISTORIES_LAST;
-          D_V_HOSP_HISTORY_DEPS_BASE;
-
-  [7] M2 DataSet: DS_SI_ICONS
-      Источник: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-      SQL:
-      
-              select ds.ID,
-                     D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION(fnLPU                => to_number(:LPU),
-                                                                        fnSI_PLACE           => 7,
-                                                                        fnPATIENT            => ds.PATIENT,
-                                                                        fnDIRECTION_SERVICES => null,
-                                                                        fnDISEASECASE        => ds.DISEASECASE) SI_ICON
-                from D_V_HOSP_HISTORIES_BASE ds
-               where ds.ID in (select /*+ cardinality(t, 1) */
-                                      t.COLUMN_VALUE
-                                 from table(cast(:DS_IDS as D_CL_ID)) t)
-              
-
-      Таблицы/вьюхи:
-          D_V_HOSP_HISTORIES_BASE;
-      Пакеты/функции:
-          D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION;
 
 ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_HOSP_HISTORY_DEPS_BASE
-  - D_V_HH_DEP_BEDS_BASE
-  - D_V_DEPS_TYPES
-  - D_V_DEPS_BASE
-  - D_V_AGENT_COMP_DISEASES_BASE
-  - D_V_SERVICES_BASE
-  - D_V_HOSP_HISTORIES_LAST
-  - D_V_HH_DEP_BEDS
-  - D_V_DIRECTION_SERVICES_BASE
-  - D_V_AGENT_ALLERG_ANAMNESIS_BAS
-  - D_V_HOSP_HISTORIES_RELATIVE
-  - D_V_HH_DIETARIES
-  - D_V_HOSP_HISTORIES_BASE
+  - D_V_AGENTS_BASE
+  - D_V_PREG_PARAM_SPECS
 
 ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP
   - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-  - D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
-  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
-  - D_PKG_URPRIVS.GET_STANDART_PRIVS
-  - D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE
-  - D_PKG_DAT_TOOLS.AGE_TO_STR
-  - D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING
-  - D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
-  - D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
-  - D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE
-  - D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE
-  - D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION
 
-РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_PKG_OPTION_SPECS.GET
-  - D_PKG_OPTIONS.GET
+----------------------------------------------------------------------------------------------------
+ФОРМА: DBTest.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/DBTest.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
-СИСТЕМНЫЕ ОПЦИИ:
-  - CheckDepBed_HeadNurse
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+Список вызываемых форм в JS:
+     ADD_DIRECTORIES_DICT/ADD_DIRECTORIES_DICT.frm
+     ExtraDict/ExtraDict_Dictionary.frm
+     UniversalEditForm/UniversalEditForm.frm
+
+SQL ЗАПРОСЫ (8):
+
+  [1] Action: GetDefValuesAction
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      begin
+      		d_pkg_smc_defvalues.get_all_defvalues(
+      			psunitcode => 'AGENT_ADDRS',
+      			pnlpu => :lpu,
+      			paparams => :params,
+      			pavalues => :values);
+      	end;
+
+      Пакеты/функции:
+          D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [2] Button: ButtonAct
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      CITY
+      		STREET
+      		STREET CAPTION
+      		HOUSE
+      		HOUSELIT
+      		BLOCK
+      		FLAT
+      		FLATLIT
+      		ADDR_INDEX
+      		IS_MAIN
+      		IS_REAL
+      		IS_TEMPREG
+      		IS_REAL
+      		IS_JUR
+      		IS_POST
+      		IS_BIRTH
+      		IS_BIRTH
+      		RAION
+      		RAION_CAPTION
+      		BEGIN_DATE
+      		END_DATE
+      		MANUAL_INPUT
+      		IS_CITIZEN
+      		IS_REG
+      select * from(
+      select t.ID, '   '||lpad(' ',(level-1)*5)|| t.OS_NAME showf, t.OS_NAME rf from d_v_objstatuses t
+      connect by prior t.ID = t.PID start with t.PID is null
+      order by t.OS_ORDER desc
+      ) where rownum &lt;= 100 and ID &gt;= 12117
+
+      Таблицы/вьюхи:
+          D_V_OBJSTATUSES;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [3] UnitEdit: RG__1
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      select t.id rn, t.agn_code object_name, t.agn_name object_type, t.agn_type owner, t.birthdate timestamp from d_v_agents t
+
+      Таблицы/вьюхи:
+          D_V_AGENTS;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [4] ButtonEdit: BE_Color
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      BE_Directories
+      dirdict dirdict_getval 
+       Показать TabSheet
+       Скрыть TabSheet
+      			select id into :res from v_ddddd where caption = :cap
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [5] ButtonEdit: be_TestCat
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      select v.ID, v.PID, v.C_NAME, v.HASCHILDRENS from d_v_catalogs v where v.C_UNITCODE = 'EMPLOYERS' and v.LPU = :LPU and nvl(pid,0)=nvl(:id,0)
+
+      Таблицы/вьюхи:
+          D_V_CATALOGS;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [6] DataSet: ds_TestCatLoc
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      select ID from
+      		(select v.ID, v.PID, v.C_NAME, v.HASCHILDRENS from d_v_catalogs v where v.C_UNITCODE = 'EMPLOYERS' and v.LPU = :LPU)
+      		connect by id = prior PID start with ID = :pos
+
+      Таблицы/вьюхи:
+          D_V_CATALOGS;
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [7] DataSet: DS1
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      select * from nls_session_parameters
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+  [8] DataSet: DS2
+      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
+      SQL:
+      select * from sys.all_objects where rownum &lt; 10
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
+
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_OBJSTATUSES
+  - D_V_AGENTS
+  - D_V_CATALOGS
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES
 
 ====================================================================================================
 === ИТОГО ПО ПАКЕТУ ===
 Форм в пакете: 2
-SQL запросов: 7
+SQL запросов: 12
 ====================================================================================================

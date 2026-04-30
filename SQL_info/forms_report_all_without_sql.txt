@@ -1,14 +1,14 @@
 ====================================================================================================
 === ПОЛНЫЙ ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) ===
-Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+Дата создания: Thu Apr 30 22:31:11 NOVT 2026
 Всего форм: 2
-Всего SQL запросов: 7
+Всего SQL запросов: 12
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: ARMMainDoc/arm_director.frm
+ФОРМА: components_d3.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/arm_director.frm
+Базовая форма: /var/www/t-mis/mis/Forms/components_d3.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
@@ -18,163 +18,55 @@
      (не найдено)
 
 Список вызываемых форм в JS:
-     Reports/showReportHTML.frm
-     ArmPatientsInDep/hosp_history_new.frm
-     Deps/deps_by_division_only_action_d3.frm
-     Deps/deps_def_st_d3.frm
-     UniversalComposition/UniversalComposition.frm
-     DiseaseCase/diseasecase.frm
-     Persmedcard/persmedcard_edit.frm
-     HospPlan/setPrivilege.frm
-     ArmPatientsInDep/hosp_history_change_mkb.frm
-     ArmPatientsInDep/hosp_history_continues_treatment.frm
-     ArmPatientsInDep/SubForms/hh_deps_edit.frm
-     ArmPatientsInDep/hosp_history_end.frm
-     PersonalAccount/patient_contracts.frm
-     ArmPatientsInDep/healing_emp_load.frm
-     ArmPatientsInDep/healing_emp_history.frm
-     Registry/PmcSearch/amb_reports_list.frm
-     ArmPatientsInDep/pat_in_dep_head_dep_mkb_exact.frm
-     ArmPatientsInDep/pat_in_dep_head_dep_operations.frm
-     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
-     Reports/ArmPatientsInDep/plan_operations_call.frm
-     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
-     Reports/Stacionar/form315_call.frm
-     Reports/HospPlan/comission_vmp_protocol_call.frm
+     (не найдено)
 
-SQL ЗАПРОСЫ (0):
-     (содержимое SQL запросов исключено для краткости)
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: ArmPatientsInDep/pat_in_dep_head_nurse.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
-Переопределения:
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsHosp] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsKaliningrad] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRKB3] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRKOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsRkob] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
-  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
-
-ЮЗЕРФОРМЫ:
-     ===== UserFormsEgis3Novosib =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── data.dfrm
-            └── script.dfrm
-            └── view.dfrm
-
-     ===== UserFormsEgis3Tomsk =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── data.dfrm
-            └── script.dfrm
-            └── view.dfrm
-
-     ===== UserFormsHosp =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsKaliningrad =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRKB3 =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRKOD =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsRkob =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── view.dfrm
-
-     ===== UserFormsSaratov =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d
-            └── script.dfrm
-            └── view.dfrm
-
-
-Список подключаемых форм subForm:
-     ArmPatientsInDep/SubForms/sep_calculation
-     ArmPatientsInDep/SubForms/list_deps
-     ArmPatientsInDep/SubForms/list_deps_post
-     ArmPatientsInDep/SubForms/info_by_dep
-     ArmPatientsInDep/SubForms/hh_dep_beds
-     ArmPatientsInDep/SubForms/hh_deps
-     ArmPatientsInDep/SubForms/bj_bulletin_contents
-     ArmPatientsInDep/SubForms/hpk_plan_journal_comment
-     ArmPatientsInDep/SubForms/hh_dir_servs_sop
-     ArmPatientsInDep/SubForms/mp_prescribes
-
-Список вызываемых форм в JS:
-     Persmedcard/persmedcard_edit.frm
-     DiseaseCase/diseasecase.frm
-     HospPlan/patient_analyze.frm
-     HospPlan/setPrivilege.frm
-     ArmPatientsInDep/patients_warnings.frm
-     PersonalAccount/patient_contracts.frm
-     ArmPatientsInDep/hosp_history_new.frm
-     ArmPatientsInDep/med_consumption_analysis.frm
-     ArmPatientsInDep/SubForms/hh_deps_edit.frm
-     ArmPatientsInDep/hosp_history_end.frm
-     Reports/PatientAgreement/agreement_blood_transfusion_call.frm
-     Reports/ArmPatientsInDep/patient_expense_call.frm
-     Reports/ArmPatientsInDep/portion_call.frm
-     Reports/ArmPatientsInDep/portion_1_84_call.frm
-     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
-     Reports/Statistic/movement_daily_beds_patients_call_new.frm
-     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
-     Reports/ArmPatientsInDep/directions_on_date_right_call.frm
-
-SQL ЗАПРОСЫ (7):
+SQL ЗАПРОСЫ (4):
      (содержимое SQL запросов исключено для краткости)
 
 ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_HOSP_HISTORY_DEPS_BASE
-  - D_V_HH_DEP_BEDS_BASE
-  - D_V_DEPS_TYPES
-  - D_V_DEPS_BASE
-  - D_V_AGENT_COMP_DISEASES_BASE
-  - D_V_SERVICES_BASE
-  - D_V_HOSP_HISTORIES_LAST
-  - D_V_HH_DEP_BEDS
-  - D_V_DIRECTION_SERVICES_BASE
-  - D_V_AGENT_ALLERG_ANAMNESIS_BAS
-  - D_V_HOSP_HISTORIES_RELATIVE
-  - D_V_HH_DIETARIES
-  - D_V_HOSP_HISTORIES_BASE
+  - D_V_AGENTS_BASE
+  - D_V_PREG_PARAM_SPECS
 
 ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP
   - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-  - D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
-  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
-  - D_PKG_URPRIVS.GET_STANDART_PRIVS
-  - D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE
-  - D_PKG_DAT_TOOLS.AGE_TO_STR
-  - D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING
-  - D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
-  - D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
-  - D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE
-  - D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE
-  - D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION
 
-СИСТЕМНЫЕ ОПЦИИ:
-  - CheckDepBed_HeadNurse
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="SOCIALSTATES"  composition="GRID_SORT";
 
-РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_PKG_OPTION_SPECS.GET
-  - D_PKG_OPTIONS.GET
+----------------------------------------------------------------------------------------------------
+ФОРМА: DBTest.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/DBTest.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+Список вызываемых форм в JS:
+     ADD_DIRECTORIES_DICT/ADD_DIRECTORIES_DICT.frm
+     ExtraDict/ExtraDict_Dictionary.frm
+     UniversalEditForm/UniversalEditForm.frm
+
+SQL ЗАПРОСЫ (8):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_OBJSTATUSES
+  - D_V_AGENTS
+  - D_V_CATALOGS
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="VISITS"  composition="DEFAULT";
+        unit="AGENTS"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
+        unit="UNITLIST"  composition="DEFAULT";
+        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
 
 
 ====================================================================================================

@@ -334,6 +334,15 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
+        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+        if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
+            for (String composition : formInfo.getUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
 
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
@@ -443,7 +452,15 @@ public class ReportGeneratorService {
             writer.println();
         }
         // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
-
+        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+        if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
+            for (String composition : formInfo.getUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
         // Неизвестные объекты
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
@@ -607,6 +624,15 @@ public class ReportGeneratorService {
                     writer.println("          " + constant + ";");
                 }
             }
+// ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+            if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
+                writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
+                for (String composition : formInfo.getUnitCompositions()) {
+                    writer.println(composition + ";");
+                }
+                writer.println();
+            }
+// ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
 
             writer.println();
             sqlNum++;
@@ -1299,7 +1325,15 @@ public class ReportGeneratorService {
             writer.println();
         }
         // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
-
+        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+        if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
+            for (String composition : formInfo.getUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
         // Неизвестные объекты
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");

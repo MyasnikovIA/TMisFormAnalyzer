@@ -1,101 +1,24 @@
 ====================================================================================================
 === ОТЧЕТ ПО ПАКЕТАМ И ФУНКЦИЯМ ===
-Дата создания: Thu Apr 30 20:16:12 NOVT 2026
-Всего уникальных объектов: 13
+Дата создания: Thu Apr 30 22:31:11 NOVT 2026
+Всего уникальных объектов: 2
 ====================================================================================================
 
-=== ПАКЕТНЫЕ ФУНКЦИИ (13) ===
+=== ПАКЕТНЫЕ ФУНКЦИИ (2) ===
 
-- D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE
-    Пакет: D_PKG_AGENT_ADDRS
-    Функция: GET_ACTUAL_ON_DATE
+- D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES
+    Пакет: D_PKG_SMC_DEFVALUES
+    Функция: GET_ALL_DEFVALUES
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING
-    Пакет: D_PKG_AGENT_COMP_DISEASES
-    Функция: GET_BY_STRING
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE
-    Пакет: D_PKG_AGENT_PERSDOCS
-    Функция: GET_ACTUAL_ON_DATE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
-    Пакет: D_PKG_AGENT_POLIS
-    Функция: GET_ACTUAL_ON_DATE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE
-    Пакет: D_PKG_AGENT_WORK_PLACES
-    Функция: GET_ACTUAL_ON_DATE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
-    Пакет: D_PKG_CSE_ACCESSES
-    Функция: GET_ID_WITH_DEFAULT_RIGHTS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
-    Пакет: D_PKG_CSE_ACCESSES
-    Функция: GET_ID_WITH_RIGHTS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_DAT_TOOLS.AGE_TO_STR
-    Пакет: D_PKG_DAT_TOOLS
-    Функция: AGE_TO_STR
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
-    Пакет: D_PKG_HOSP_HISTORIES
-    Функция: GET_FACT_DAYS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP
-    Пакет: D_PKG_HOSP_HISTORY_DEPS
-    Функция: CANCEL_CLOSE_DEP
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION
-    Пакет: D_PKG_SIGNAL_INFO_SETS
-    Функция: GET_FULL_SIGNAL_INFORMATION
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_PKG_URPRIVS.GET_STANDART_PRIVS
-    Пакет: D_PKG_URPRIVS
-    Функция: GET_STANDART_PRIVS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
 - D_PKG_VERSIONS.GET_VERSION_BY_LPU
     Пакет: D_PKG_VERSIONS
     Функция: GET_VERSION_BY_LPU
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         components_d3.frm;
 
 === САМОСТОЯТЕЛЬНЫЕ ФУНКЦИИ (0) ===
 

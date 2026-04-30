@@ -21,12 +21,8 @@ public class SqlExtractorService {
     );
 
     private static final Pattern D3_DATASET_PATTERN = Pattern.compile(
-            "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>" +
-                    ".*?" +
-                    "<!\\[CDATA\\[(.*?)\\]\\]>" +
-                    ".*?" +
-                    "</cmpDataSet>",
-            Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+            "<cmp[dD]ata[Ss]et\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmp[dD]ata[Ss]et>",
+            Pattern.DOTALL
     );
 
 
@@ -117,9 +113,6 @@ public class SqlExtractorService {
             "D_PKG_OPTIONS\\.GET\\s*\\(\\s*'([^']+)'",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE
     );
-
-
-// В классе SqlExtractorService добавить новые паттерны:
 
     // Паттерн для всех D_ объектов (кроме D_PKG_ и D_V_)
     private static final Pattern UNKNOWN_D_PATTERN = Pattern.compile(
@@ -511,20 +504,16 @@ public class SqlExtractorService {
         String cleanedSql = removeAllComments(sqlContent);
 
         SqlInfo sqlInfo = new SqlInfo();
-        sqlInfo.setSourceType("M2 " + componentType);
+        sqlInfo.setSourceType(componentType);  // "D3 DataSet" или "M2 DataSet"
         sqlInfo.setSourcePath(sourcePath);
         sqlInfo.setBaseFormPath(baseFormPath);
         sqlInfo.setComponentName(componentName);
         sqlInfo.setSqlContent(sqlContent);
         sqlInfo.setCleanSql(cleanSql(cleanedSql));
 
-        // Извлекаем объекты (теперь включает и константы)
+        // Извлекаем все объекты
         extractAllObjectsDirectly(cleanedSql, sqlInfo);
-
-        // Извлекаем пользовательские процедуры
         extractUserProcedures(sqlInfo);
-
-        // Извлекаем системные опции
         extractSystemOptions(sqlInfo);
 
         // Список объектов для принудительного переноса в unknown
@@ -555,18 +544,10 @@ public class SqlExtractorService {
         // Очищаем пакетные функции от объектов из forced списка
         cleanPackageFunctionsByForcedList(sqlInfo, forcedToUnknown);
 
-
-
         queries.add(sqlInfo);
         System.out.println("  Извлечен компонент: " + componentType + " - " + componentName);
     }
 
-    /*
-
-
-
-
-     */
 
     /**
      * Извлечь константы из D_PKG_CONSTANTS.SEARCH_STR, SEARCH_NUM, SEARCH_DATE
@@ -669,6 +650,51 @@ public class SqlExtractorService {
     }
     private List<SqlInfo> extractAllComponents(String content, String sourcePath, String baseFormPath) {
         List<SqlInfo> queries = new ArrayList<>();
+
+        // 1. Паттерн для D3 компонентов с CDATA (cmpDataset - с маленькой d)
+        Pattern d3DatasetPattern = Pattern.compile(
+                "<cmpDataset\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataset>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3DatasetMatcher = d3DatasetPattern.matcher(content);
+        while (d3DatasetMatcher.find()) {
+            String componentName = d3DatasetMatcher.group(1);
+            String sqlContent = d3DatasetMatcher.group(2);
+            processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
+        }
+
+        // 2. Паттерн для D3 компонентов с CDATA (cmpDataSet - с большой D) - существующий
+        Pattern d3DataSetPattern = Pattern.compile(
+                "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataSet>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3DataSetMatcher = d3DataSetPattern.matcher(content);
+        while (d3DataSetMatcher.find()) {
+            String componentName = d3DataSetMatcher.group(1);
+            String sqlContent = d3DataSetMatcher.group(2);
+            processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
+        }
+        // 3. Паттерн для D3 компонентов БЕЗ CDATA (cmpDataset)
+        Pattern d3DatasetDirectPattern = Pattern.compile(
+                "<cmpDataset\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpDataset>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3DatasetDirectMatcher = d3DatasetDirectPattern.matcher(content);
+        while (d3DatasetDirectMatcher.find()) {
+            String componentName = d3DatasetDirectMatcher.group(1);
+            String body = d3DatasetDirectMatcher.group(2);
+
+            if (body != null && !body.contains("CDATA")) {
+                String sqlContent = cleanSqlBody(body);
+                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
+                    processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
+                }
+            }
+        }
+
 
         // 1. Паттерн для компонентов С CDATA
         Pattern withCDataPattern = Pattern.compile(

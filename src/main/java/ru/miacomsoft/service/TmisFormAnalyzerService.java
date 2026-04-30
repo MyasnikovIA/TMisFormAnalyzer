@@ -54,6 +54,7 @@ public class TmisFormAnalyzerService {
         // Извлекаем объекты из базовой формы
         extractSubForms(baseContent, formInfo);
         extractJsForms(baseContent, formInfo);
+        extractUnitCompositions(baseContent, formInfo);
 
         List<SqlInfo> sqlQueries = sqlExtractor.extractAllSqlQueries(
                 baseContent, baseFormPathObj.toString(), null
@@ -315,6 +316,55 @@ public class TmisFormAnalyzerService {
         }
 
         return forms;
+    }
+
+    /**
+     * Извлечь композиции из UnitEdit компонентов
+     * Форматы:
+     * - M2: <component cmptype="UnitEdit" name="..." unit="INJURE_KINDS" composition="DEFAULT" .../>
+     * - D3: <cmpUnitEdit name="..." unit="INJURE_KINDS" composition="DEFAULT" .../>
+     */
+    private void extractUnitCompositions(String content, FormInfo formInfo) {
+        if (content == null || content.isEmpty()) return;
+
+        Set<String> compositions = new LinkedHashSet<>();
+
+        // Паттерн для M2 синтаксиса
+        Pattern m2UnitEditPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']UnitEdit[\"'][^>]*?\\s+unit\\s*=\\s*[\"']([^\"']+)[\"'][^>]*?\\s+composition\\s*=\\s*[\"']([^\"']+)[\"'][^>]*/?>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для D3 синтаксиса
+        Pattern d3UnitEditPattern = Pattern.compile(
+                "<cmpUnitEdit[^>]*?\\s+unit\\s*=\\s*[\"']([^\"']+)[\"'][^>]*?\\s+composition\\s*=\\s*[\"']([^\"']+)[\"'][^>]*/?>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Обработка M2
+        Matcher m2Matcher = m2UnitEditPattern.matcher(content);
+        while (m2Matcher.find()) {
+            String unit = m2Matcher.group(1);
+            String composition = m2Matcher.group(2);
+            compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
+        }
+
+        // Обработка D3
+        Matcher d3Matcher = d3UnitEditPattern.matcher(content);
+        while (d3Matcher.find()) {
+            String unit = d3Matcher.group(1);
+            String composition = d3Matcher.group(2);
+            compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
+        }
+
+        // Добавляем в FormInfo
+        for (String comp : compositions) {
+            formInfo.addUnitComposition(comp);
+        }
+
+        if (!compositions.isEmpty()) {
+            System.out.println("  Найдено композиций UnitEdit: " + compositions.size());
+        }
     }
 
     /**

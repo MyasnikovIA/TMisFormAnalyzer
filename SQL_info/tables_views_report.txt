@@ -1,76 +1,36 @@
 ====================================================================================================
 === ОТЧЕТ ПО ТАБЛИЦАМ И ВЬЮХАМ ===
-Дата создания: Thu Apr 30 20:16:12 NOVT 2026
-Всего уникальных объектов: 13
+Дата создания: Thu Apr 30 22:31:11 NOVT 2026
+Всего уникальных объектов: 5
 ====================================================================================================
 
 === ТАБЛИЦЫ (0) ===
 
-=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (13) ===
+=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (5) ===
 
-- D_V_AGENT_ALLERG_ANAMNESIS_BAS
+- D_V_AGENTS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
-- D_V_AGENT_COMP_DISEASES_BASE
+- D_V_AGENTS_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         components_d3.frm;
 
-- D_V_DEPS_BASE
+- D_V_CATALOGS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
-- D_V_DEPS_TYPES
+- D_V_OBJSTATUSES
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         DBTest.frm;
 
-- D_V_DIRECTION_SERVICES_BASE
+- D_V_PREG_PARAM_SPECS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HH_DEP_BEDS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HH_DEP_BEDS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HH_DIETARIES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HOSP_HISTORIES_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HOSP_HISTORIES_LAST
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HOSP_HISTORIES_RELATIVE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_HOSP_HISTORY_DEPS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
-
-- D_V_SERVICES_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+         components_d3.frm;
 
 ====================================================================================================

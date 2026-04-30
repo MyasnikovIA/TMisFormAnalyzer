@@ -1,5 +1,5 @@
 # Список всех проанализированных форм T-MIS
-# Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+# Дата создания: Thu Apr 30 22:31:11 NOVT 2026
 # Всего форм: 2
 #
 # Формат: СТАТУС | ПУТЬ К ФОРМЕ | БАЗОВАЯ ФОРМА | ЗАМЕНА/ПЕРЕОПРЕДЕЛЕНИЯ
@@ -9,5 +9,5 @@
 #   [FULL]    - полностью заменена UserForms
 #   [PARTIAL] - частично переопределена
 #
-[BASE] ARMMainDoc/arm_director.frm
-[PARTIAL] ArmPatientsInDep/pat_in_dep_head_nurse.frm (переопределения: UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Novosib, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsEgis3Tomsk, UserFormsHosp, UserFormsKaliningrad, UserFormsRKB3, UserFormsRKOD, UserFormsRkob, UserFormsSaratov, UserFormsSaratov)
+[BASE] components_d3.frm
+[BASE] DBTest.frm

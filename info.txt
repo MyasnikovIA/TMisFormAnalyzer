@@ -21,6 +21,16 @@
 /Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
 
 
+5) вынести в отдельный блок получение композиций в UnitEdit  unit="INJURE_KINDS"  composition="DEFAULT"
+```
+<component cmptype="UnitEdit" name="INJURE_KIND" unit="INJURE_KINDS" composition="DEFAULT" width="100%"/>
+<component cmptype="UnitEdit" name="PERSMEDCARD" unit="PERSMEDCARD" composition="BUTTON_EDIT_DEFAULT" width="100%" enabled="false" emptyMask="true">
+<cmpUnitEdit" name="INJURE_KIND_D3" unit="INJURE_KINDS" composition="DEFAULT" width="100%"/>
+<cmpUnitEdit" name="PERSMEDCARD_D3" unit="PERSMEDCARD" composition="BUTTON_EDIT_DEFAULT" width="100%" enabled="false" emptyMask="true">
+```
+
+
+
 1) вытащить имя unit  и composition из JS если встречается 'UniversalComposition/UniversalComposition'
 ```
             openWindow({name: 'UniversalComposition/UniversalComposition',
@@ -37,12 +47,25 @@
 
 
 
+6)
+Получение SubForm через D3Api.showForm
+        D3Api.showForm('Lis/Citology/subforms/work_list/macro_desc', getControl('ctrlMACRO_DESC'), {
+            onshow: function() {
+                Form.MacroDescForm = D3Api.getDomBy(Form.MacroDescContainer, 'div').D3Form;
+                Form.MacroDescForm.addEvent('saveCompleted', WorkList.saveCompleted);
+            }
+        });
+            D3Api.showForm('Reports/sign_data',
+                           document.querySelector('.form-sign-roles-wrapper'),
+                           {
+                               vars: {
+                                   EDF_TYPE: getVar('EDF_TYPE'),
+                                   EHR_TYPE_ID: getVar('EHR_TYPE_ID'),
+                                   CERTS: getControl('CERTS'),
+                                   SIGN_DOC: getControl('ButtonSign'),
+                                   TRIGGER: getControl('TRIGGER')
+                               }
+                           });
 
-
-5) вынести в отдельный блок получение композиций в UnitEdit  unit="INJURE_KINDS"  composition="DEFAULT"
-```
-<component cmptype="UnitEdit" name="INJURE_KIND" unit="INJURE_KINDS" composition="DEFAULT" width="100%"/>
-<component cmptype="UnitEdit" name="PERSMEDCARD" unit="PERSMEDCARD" composition="BUTTON_EDIT_DEFAULT" width="100%" enabled="false" emptyMask="true">
-```
-
-
+Forms/Lis/Citology/work_list.frm
+Forms/EHR/multisign_cda_d3.frm
