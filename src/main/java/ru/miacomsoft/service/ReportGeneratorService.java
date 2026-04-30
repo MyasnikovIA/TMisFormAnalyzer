@@ -343,7 +343,15 @@ public class ReportGeneratorService {
             writer.println();
         }
         // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-
+// ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+        if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
+            for (String composition : formInfo.getJsUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+// ========== КОНЕЦ БЛОКА ==========
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
@@ -461,6 +469,15 @@ public class ReportGeneratorService {
             writer.println();
         }
         // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
+        // ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+        if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
+            for (String composition : formInfo.getJsUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+// ========== КОНЕЦ БЛОКА ==========
         // Неизвестные объекты
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
@@ -510,9 +527,6 @@ public class ReportGeneratorService {
 
         System.out.println("  Создан: constants_report.txt");
     }
-
-    // ДОБАВИТЬ БЛОК ВЫВОДА КОНСТАНТ В ОТЧЕТЫ ПО ФОРМАМ
-    // Найдите метод writeFormReport и добавьте туда этот блок:
 
     private void writeFormReport(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
@@ -633,7 +647,15 @@ public class ReportGeneratorService {
                 writer.println();
             }
 // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-
+// ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+            if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
+                writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
+                for (String composition : formInfo.getJsUnitCompositions()) {
+                    writer.println(composition + ";");
+                }
+                writer.println();
+            }
+// ========== КОНЕЦ БЛОКА ==========
             writer.println();
             sqlNum++;
         }
@@ -1333,6 +1355,15 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
+        // ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+        if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
+            for (String composition : formInfo.getJsUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+// ========== КОНЕЦ БЛОКА ==========
         // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
         // Неизвестные объекты
         if (!formInfo.getUnknownObjects().isEmpty()) {

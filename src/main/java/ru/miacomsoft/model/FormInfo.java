@@ -46,6 +46,7 @@ public class FormInfo {
     private Set<String> unknownObjects;  // Объекты для разбора аналитиком
     private Set<String> constants;  // КОНСТАНТЫ из D_PKG_CONSTANTS.SEARCH_*
     private Set<String> unitCompositions;  // Композиции из UnitEdit
+    private Set<String> jsUnitCompositions;  // Композиции из JS вызовов (UniversalComposition)
 
 
     public FormInfo(String formPath) {
@@ -59,8 +60,9 @@ public class FormInfo {
         this.subForms = new LinkedHashSet<>();
         this.jsForms = new LinkedHashSet<>();
         this.unknownObjects = new LinkedHashSet<>();
-        this.constants = new LinkedHashSet<>();  // ДОБАВИТЬ
+        this.constants = new LinkedHashSet<>();
         this.unitCompositions = new LinkedHashSet<>();
+        this.jsUnitCompositions = new LinkedHashSet<>();
         this.fullyReplaced = false;
     }
 
@@ -122,6 +124,16 @@ public class FormInfo {
 
     public Set<String> getUnitCompositions() { return unitCompositions; }
     public void addUnitComposition(String composition) { this.unitCompositions.add(composition); }
+
+
+    // Добавьте методы:
+    public Set<String> getJsUnitCompositions() {
+        return jsUnitCompositions;
+    }
+
+    public void addJsUnitComposition(String composition) {
+        this.jsUnitCompositions.add(composition);
+    }
 
     @Override
     public String toString() {

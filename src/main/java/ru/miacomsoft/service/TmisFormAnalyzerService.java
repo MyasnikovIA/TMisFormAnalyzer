@@ -56,6 +56,7 @@ public class TmisFormAnalyzerService {
         extractJsForms(baseContent, formInfo);
         extractD3ApiShowForms(baseContent, formInfo);
         extractUnitCompositions(baseContent, formInfo);
+        extractJsUnitCompositions(baseContent, formInfo);
 
         List<SqlInfo> sqlQueries = sqlExtractor.extractAllSqlQueries(
                 baseContent, baseFormPathObj.toString(), null
@@ -409,6 +410,78 @@ public class TmisFormAnalyzerService {
 
         if (!compositions.isEmpty()) {
             System.out.println("  Найдено композиций UnitEdit: " + compositions.size());
+        }
+    }
+
+    /**
+     * Извлечь композиции из JS вызовов UniversalComposition/UniversalComposition
+     * Ищет вызовы openWindow и openD3Form с name='UniversalComposition/UniversalComposition'
+     * и извлекает unit и composition
+     */
+    private void extractJsUnitCompositions(String content, FormInfo formInfo) {
+        if (content == null || content.isEmpty()) return;
+
+        Set<String> compositions = new LinkedHashSet<>();
+
+        // Паттерн для поиска openWindow с UniversalComposition
+        // Ищет: openWindow({ ... 'unit':'XXX', 'composition':'YYY' ... })
+        Pattern openWindowPattern = Pattern.compile(
+                "openWindow\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]UniversalComposition/UniversalComposition['\"][^}]*\\}",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для поиска openD3Form с UniversalComposition
+        Pattern openD3FormPattern = Pattern.compile(
+                "openD3Form\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]UniversalComposition/UniversalComposition['\"][^}]*\\}",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Извлекаем unit и composition из найденных объектов
+        Matcher openWindowMatcher = openWindowPattern.matcher(content);
+        while (openWindowMatcher.find()) {
+            String objectBlock = openWindowMatcher.group();
+            extractUnitAndComposition(objectBlock, compositions);
+        }
+
+        Matcher openD3FormMatcher = openD3FormPattern.matcher(content);
+        while (openD3FormMatcher.find()) {
+            String objectBlock = openD3FormMatcher.group();
+            extractUnitAndComposition(objectBlock, compositions);
+        }
+
+        // Добавляем в FormInfo
+        for (String comp : compositions) {
+            formInfo.addJsUnitComposition(comp);
+        }
+
+        if (!compositions.isEmpty()) {
+            System.out.println("  Найдено JS композиций UniversalComposition: " + compositions.size());
+        }
+    }
+
+    /**
+     * Извлечь unit и composition из блока объекта
+     */
+    private void extractUnitAndComposition(String objectBlock, Set<String> compositions) {
+        // Паттерн для unit (с одинарными или двойными кавычками)
+        Pattern unitPattern = Pattern.compile(
+                "unit\\s*:\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для composition (с одинарными или двойными кавычками)
+        Pattern compositionPattern = Pattern.compile(
+                "composition\\s*:\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher unitMatcher = unitPattern.matcher(objectBlock);
+        Matcher compositionMatcher = compositionPattern.matcher(objectBlock);
+
+        if (unitMatcher.find() && compositionMatcher.find()) {
+            String unit = unitMatcher.group(1);
+            String composition = compositionMatcher.group(1);
+            compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
         }
     }
 

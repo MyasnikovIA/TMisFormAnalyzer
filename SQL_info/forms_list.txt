@@ -1,6 +1,6 @@
 # Список всех проанализированных форм T-MIS
-# Дата создания: Thu Apr 30 22:51:03 NOVT 2026
-# Всего форм: 2
+# Дата создания: Thu Apr 30 23:13:35 NOVT 2026
+# Всего форм: 1
 #
 # Формат: СТАТУС | ПУТЬ К ФОРМЕ | БАЗОВАЯ ФОРМА | ЗАМЕНА/ПЕРЕОПРЕДЕЛЕНИЯ
 #
@@ -9,5 +9,4 @@
 #   [FULL]    - полностью заменена UserForms
 #   [PARTIAL] - частично переопределена
 #
-[PARTIAL] Lis/Citology/work_list.frm (переопределения: UserFormsMoscowNIIBlohina, UserFormsMoscowNIIBlohina, UserFormsMoscowNIIBlohina)
-[BASE] EHR/multisign_cda_d3.frm
+[PARTIAL] NR/subforms/patient_data.frm (переопределения: UserFormsEgis3Novosib)

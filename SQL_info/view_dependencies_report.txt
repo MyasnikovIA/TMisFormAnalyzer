@@ -1,56 +1,40 @@
 ====================================================================================================
 === ОТЧЕТ ПО ЗАВИСИМОСТЯМ ТАБЛИЦ ОТ ВЬЮХ ===
-Дата создания: Thu Apr 30 22:51:07 NOVT 2026
-Всего проанализировано вьюх: 3
+Дата создания: Thu Apr 30 23:13:38 NOVT 2026
+Всего проанализировано вьюх: 2
 ====================================================================================================
 
-- D_V_LABMED_WL_RSRCH_METHODS:
+- D_V_AGENT_CONTACTS_V2:
     OracleSQL:
-        D_LABMED_WL_RSRCH_METHODS
-        D_LABMED_RESEARCH_METHODS
+        D_AGENT_CONTACTS
+        D_CONTACT_TYPES
         D_V_URPRIVS
     PostgreSQL:
-        D_LABMED_WL_RSRCH_METHODS
-        D_LABMED_RESEARCH_METHODS
+        D_AGENT_CONTACTS
+        D_CONTACT_TYPES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         Lis/Citology/work_list.frm;
+         NR/subforms/patient_data.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_LBM_SAMPLE_STATUSES:
+- D_V_AGENT_COMP_DISEASES:
     OracleSQL:
-        D_LBM_SAMPLE_STATUSES
-    PostgreSQL:
-        D_LBM_SAMPLE_STATUSES
-    ---
-    Используется в формах: 1
-    Формы:
-         Lis/Citology/work_list.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_LABMED_RESEARCH:
-    OracleSQL:
-        D_LABMED_RESEARCH
-        D_LPU_SERVICES
-        D_LABMED_BIOMATERIAL
-        D_LBM_RESEARCH_STANDART
-        D_LABMED_RSRCH_GROUPS
+        D_AGENT_COMP_DISEASES
+        D_COMP_DISEASES
+        D_MKB10
         D_V_URPRIVS
     PostgreSQL:
-        D_LABMED_RESEARCH
-        D_LPU_SERVICES
-        D_LABMED_BIOMATERIAL
-        D_LBM_RESEARCH_STANDART
-        D_LABMED_RSRCH_GROUPS
+        D_AGENT_COMP_DISEASES
+        D_COMP_DISEASES
+        D_MKB10
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         Lis/Citology/work_list.frm;
+         NR/subforms/patient_data.frm;
 
 ====================================================================================================
 === КОНЕЦ ОТЧЕТА ПО ЗАВИСИМОСТЯМ ===
