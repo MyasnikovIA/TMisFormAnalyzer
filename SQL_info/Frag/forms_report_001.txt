@@ -1,380 +1,149 @@
 ====================================================================================================
 === ОТЧЕТ ПО ФОРМАМ T-MIS (ПАКЕТ 1) ===
-Дата создания: Thu Apr 30 22:31:11 NOVT 2026
+Дата создания: Thu Apr 30 22:51:03 NOVT 2026
 Количество форм в пакете: 2
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: components_d3.frm
+ФОРМА: Lis/Citology/work_list.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/components_d3.frm
+Базовая форма: /var/www/t-mis/mis/Forms/Lis/Citology/work_list.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/data.dfrm
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/script.dfrm
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/view.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsMoscowNIIBlohina =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+
+Список подключаемых форм subForm:
+     Lis/Styles/styles
+     Lis/Citology/subforms/work_list/general_info
+     Lis/Citology/subforms/work_list/attachments
+     Lis/Citology/subforms/work_list/samples
+     (D3Api.showForm) Lis/Citology/subforms/work_list/macro_desc.frm
+     (D3Api.showForm) Lis/Citology/subforms/work_list/conclusion.frm
+
+Список вызываемых форм в JS:
+     Lis/Citology/work_list.frm
+     Lis/Reports/Citology/quantity_cito_research_call.frm
+     EHR/simple_ehrdocs_form.frm
+
+SQL ЗАПРОСЫ (2):
+
+  [1] D3 DataSet: DsWorkLists
+      Источник: /var/www/t-mis/mis/Forms/Lis/Citology/work_list.frm
+      SQL:
+      
+          select t.STR1 ID,
+                 t.STR2 WL_NAME
+            from table(D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL(:LPU, :CABLAB, :EMPLOYER)) t
+           where exists (select null
+                           from D_V_LABMED_WL_RSRCH_METHODS wrm
+                                join D_V_LABMED_RESEARCH lr on lr.ID = wrm.RESEARCH_ID
+                                     and lr.IS_ACTIVE = 1
+                                     and lr.RTYPE = 4
+                          where wrm.PID = t.STR1)
+          ]]>
+          <cmpDataSetVar name="LPU"       src="LPU"       srctype="session"/>
+          <cmpDataSetVar name="CABLAB"    src="CABLAB"    srctype="session"/>
+          <cmpDataSetVar name="EMPLOYER"  src="EMPLOYER"  srctype="session"/>
+      </cmpDataSet>
+      
+          <!-- language=Oracle-->
+      <cmpDataSet name="DsStatusList">
+          <![CDATA[
+          select null ID, 'ВСЕ' ST_NAME
+            from dual d
+          union
+          select lss.ID, lss.ST_NAME
+            from D_V_LBM_SAMPLE_STATUSES lss
+           order by ID nulls first
+          
+
+      Таблицы/вьюхи:
+          D_V_LABMED_WL_RSRCH_METHODS;
+          D_V_LBM_SAMPLE_STATUSES;
+          D_V_LABMED_RESEARCH;
+      Пакеты/функции:
+          D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL;
+
+  [2] D3 DataSet: DsWorkLists
+      Источник: /var/www/t-mis/mis/Forms/Lis/Citology/work_list.frm
+      SQL:
+      
+          select t.STR1 ID,
+                 t.STR2 WL_NAME
+            from table(D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL(:LPU, :CABLAB, :EMPLOYER)) t
+           where exists (select null
+                           from D_V_LABMED_WL_RSRCH_METHODS wrm
+                                join D_V_LABMED_RESEARCH lr on lr.ID = wrm.RESEARCH_ID
+                                     and lr.IS_ACTIVE = 1
+                                     and lr.RTYPE = 4
+                          where wrm.PID = t.STR1)
+          ]]>
+          <cmpDataSetVar name="LPU"       src="LPU"       srctype="session"/>
+          <cmpDataSetVar name="CABLAB"    src="CABLAB"    srctype="session"/>
+          <cmpDataSetVar name="EMPLOYER"  src="EMPLOYER"  srctype="session"/>
+      </cmpDataSet>
+      
+          <!-- language=Oracle-->
+      <cmpDataSet name="DsStatusList">
+          <![CDATA[
+          select null ID, 'ВСЕ' ST_NAME
+            from dual d
+          union
+          select lss.ID, lss.ST_NAME
+            from D_V_LBM_SAMPLE_STATUSES lss
+           order by ID nulls first
+          
+
+      Таблицы/вьюхи:
+          D_V_LABMED_WL_RSRCH_METHODS;
+          D_V_LBM_SAMPLE_STATUSES;
+          D_V_LABMED_RESEARCH;
+      Пакеты/функции:
+          D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL;
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_LABMED_WL_RSRCH_METHODS
+  - D_V_LBM_SAMPLE_STATUSES
+  - D_V_LABMED_RESEARCH
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: EHR/multisign_cda_d3.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/EHR/multisign_cda_d3.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
      (не найдено)
 
 Список подключаемых форм subForm:
-     (не найдено)
+     EHR/subforms/checkDocSubform
+     EHR/sign_subform_d3
+     EHR/subforms/sign_subform_d3_view
+     Lis/Styles/styles
+     (D3Api.showForm) Reports/sign_data.frm
 
 Список вызываемых форм в JS:
      (не найдено)
 
-SQL ЗАПРОСЫ (4):
+SQL ЗАПРОСЫ (0):
 
-  [1] D3 DataSet: DS_GRID
-      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
-      SQL:
-      
-                          select t.ID,
-                                 t.AGN_CODE,
-                                 t.AGN_NAME
-                            from D_V_AGENTS_BASE t
-                           where rownum < 201
-                          
-
-      Таблицы/вьюхи:
-          D_V_AGENTS_BASE;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="SOCIALSTATES"  composition="GRID_SORT";
-
-
-  [2] D3 DataSet: DS_TREE
-      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
-      SQL:
-      
-                          select *
-                            from (select t.ID,
-                                         t.PID,
-                                         t.PPS_CODE,
-                                         t.PPS_NAME,
-                                         t.HID,
-                                         (select count(*)
-                                            from D_V_PREG_PARAM_SPECS t2
-                                           where t2.HID = t.ID) HAS_CHILDREN
-                                    from D_V_PREG_PARAM_SPECS t
-                                   where t.VERSION = D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'PREG_PARAM_SPECS')) t
-                           where (t.HAS_CHILDREN > 0 and t.HID is null) or t.HID is not null
-                          ]]>
-                          <cmpDataSetVar name="LPU" src="LPU" srctype="session"/>
-                      </cmpDataSet>
-                      <cmpTree
-                         caption="Заголовок дерева"
-                         name="TREE"
-                         dataset="DS_TREE"
-                         selectlist="ID"
-                         keyfield="ID"
-                         haschildrenfield="HAS_CHILDREN"
-                         parentfield="HID"
-                         excel="true"
-                         height="700px"
-                         fulldata="true"
-                         fulldata_expand="false"
-                         locatedataset="locatedataset"
-                      >
-                          <cmpTreeColumn caption="Код характеристики"          field="PPS_CODE" sort="PPS_CODE" filter="PPS_CODE" excelfield="PPS_CODE"/>
-                          <cmpTreeColumn caption="Наименование характеристики" field="PPS_NAME" sort="PPS_NAME" filter="PPS_NAME" excelfield="PPS_NAME"/>
-                          <cmpTreeFooter>
-                              <cmpRange dataset="DS_TREE" default_amount="20"/>
-                          </cmpTreeFooter>
-                      </cmpTree>
-                  </div>
-              </div>
-              <div class="no-bg">
-                  <div>StatGrid</div>
-                  <div>
-                      <cmpDataset name="DS_STAT_GRID" mode="Group">
-                          <![CDATA[
-                          select t.ID,
-                                 t.AGN_CODE,
-                                 t.AGN_NAME,
-                                 t.SEX,
-                                 t.BIRTHDATE,
-                                 '' TEST
-                            from D_V_AGENTS_BASE t
-                           where rownum < 21
-                          
-
-      Таблицы/вьюхи:
-          D_V_AGENTS_BASE;
-          D_V_PREG_PARAM_SPECS;
-      Пакеты/функции:
-          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="SOCIALSTATES"  composition="GRID_SORT";
-
-
-  [3] D3 DataSet: DS_GRID
-      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
-      SQL:
-      
-                          select t.ID,
-                                 t.AGN_CODE,
-                                 t.AGN_NAME
-                            from D_V_AGENTS_BASE t
-                           where rownum < 201
-                          
-
-      Таблицы/вьюхи:
-          D_V_AGENTS_BASE;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="SOCIALSTATES"  composition="GRID_SORT";
-
-
-  [4] D3 DataSet: DS_TREE
-      Источник: /var/www/t-mis/mis/Forms/components_d3.frm
-      SQL:
-      
-                          select *
-                            from (select t.ID,
-                                         t.PID,
-                                         t.PPS_CODE,
-                                         t.PPS_NAME,
-                                         t.HID,
-                                         (select count(*)
-                                            from D_V_PREG_PARAM_SPECS t2
-                                           where t2.HID = t.ID) HAS_CHILDREN
-                                    from D_V_PREG_PARAM_SPECS t
-                                   where t.VERSION = D_PKG_VERSIONS.GET_VERSION_BY_LPU(0, :LPU, 'PREG_PARAM_SPECS')) t
-                           where (t.HAS_CHILDREN > 0 and t.HID is null) or t.HID is not null
-                          ]]>
-                          <cmpDataSetVar name="LPU" src="LPU" srctype="session"/>
-                      </cmpDataSet>
-                      <cmpTree
-                         caption="Заголовок дерева"
-                         name="TREE"
-                         dataset="DS_TREE"
-                         selectlist="ID"
-                         keyfield="ID"
-                         haschildrenfield="HAS_CHILDREN"
-                         parentfield="HID"
-                         excel="true"
-                         height="700px"
-                         fulldata="true"
-                         fulldata_expand="false"
-                         locatedataset="locatedataset"
-                      >
-                          <cmpTreeColumn caption="Код характеристики"          field="PPS_CODE" sort="PPS_CODE" filter="PPS_CODE" excelfield="PPS_CODE"/>
-                          <cmpTreeColumn caption="Наименование характеристики" field="PPS_NAME" sort="PPS_NAME" filter="PPS_NAME" excelfield="PPS_NAME"/>
-                          <cmpTreeFooter>
-                              <cmpRange dataset="DS_TREE" default_amount="20"/>
-                          </cmpTreeFooter>
-                      </cmpTree>
-                  </div>
-              </div>
-              <div class="no-bg">
-                  <div>StatGrid</div>
-                  <div>
-                      <cmpDataset name="DS_STAT_GRID" mode="Group">
-                          <![CDATA[
-                          select t.ID,
-                                 t.AGN_CODE,
-                                 t.AGN_NAME,
-                                 t.SEX,
-                                 t.BIRTHDATE,
-                                 '' TEST
-                            from D_V_AGENTS_BASE t
-                           where rownum < 21
-                          
-
-      Таблицы/вьюхи:
-          D_V_AGENTS_BASE;
-          D_V_PREG_PARAM_SPECS;
-      Пакеты/функции:
-          D_PKG_VERSIONS.GET_VERSION_BY_LPU;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="SOCIALSTATES"  composition="GRID_SORT";
-
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_AGENTS_BASE
-  - D_V_PREG_PARAM_SPECS
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: DBTest.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/DBTest.frm
-СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
-
-ЮЗЕРФОРМЫ:
-     (не найдено)
-
-Список подключаемых форм subForm:
-     (не найдено)
-
-Список вызываемых форм в JS:
-     ADD_DIRECTORIES_DICT/ADD_DIRECTORIES_DICT.frm
-     ExtraDict/ExtraDict_Dictionary.frm
-     UniversalEditForm/UniversalEditForm.frm
-
-SQL ЗАПРОСЫ (8):
-
-  [1] Action: GetDefValuesAction
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      begin
-      		d_pkg_smc_defvalues.get_all_defvalues(
-      			psunitcode => 'AGENT_ADDRS',
-      			pnlpu => :lpu,
-      			paparams => :params,
-      			pavalues => :values);
-      	end;
-
-      Пакеты/функции:
-          D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [2] Button: ButtonAct
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      CITY
-      		STREET
-      		STREET CAPTION
-      		HOUSE
-      		HOUSELIT
-      		BLOCK
-      		FLAT
-      		FLATLIT
-      		ADDR_INDEX
-      		IS_MAIN
-      		IS_REAL
-      		IS_TEMPREG
-      		IS_REAL
-      		IS_JUR
-      		IS_POST
-      		IS_BIRTH
-      		IS_BIRTH
-      		RAION
-      		RAION_CAPTION
-      		BEGIN_DATE
-      		END_DATE
-      		MANUAL_INPUT
-      		IS_CITIZEN
-      		IS_REG
-      select * from(
-      select t.ID, '   '||lpad(' ',(level-1)*5)|| t.OS_NAME showf, t.OS_NAME rf from d_v_objstatuses t
-      connect by prior t.ID = t.PID start with t.PID is null
-      order by t.OS_ORDER desc
-      ) where rownum &lt;= 100 and ID &gt;= 12117
-
-      Таблицы/вьюхи:
-          D_V_OBJSTATUSES;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [3] UnitEdit: RG__1
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      select t.id rn, t.agn_code object_name, t.agn_name object_type, t.agn_type owner, t.birthdate timestamp from d_v_agents t
-
-      Таблицы/вьюхи:
-          D_V_AGENTS;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [4] ButtonEdit: BE_Color
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      BE_Directories
-      dirdict dirdict_getval 
-       Показать TabSheet
-       Скрыть TabSheet
-      			select id into :res from v_ddddd where caption = :cap
-
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [5] ButtonEdit: be_TestCat
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      select v.ID, v.PID, v.C_NAME, v.HASCHILDRENS from d_v_catalogs v where v.C_UNITCODE = 'EMPLOYERS' and v.LPU = :LPU and nvl(pid,0)=nvl(:id,0)
-
-      Таблицы/вьюхи:
-          D_V_CATALOGS;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [6] DataSet: ds_TestCatLoc
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      select ID from
-      		(select v.ID, v.PID, v.C_NAME, v.HASCHILDRENS from d_v_catalogs v where v.C_UNITCODE = 'EMPLOYERS' and v.LPU = :LPU)
-      		connect by id = prior PID start with ID = :pos
-
-      Таблицы/вьюхи:
-          D_V_CATALOGS;
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [7] DataSet: DS1
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      select * from nls_session_parameters
-
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-  [8] DataSet: DS2
-      Источник: /var/www/t-mis/mis/Forms/DBTest.frm
-      SQL:
-      select * from sys.all_objects where rownum &lt; 10
-
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
-
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_OBJSTATUSES
-  - D_V_AGENTS
-  - D_V_CATALOGS
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES
+  (SQL запросы не найдены)
 
 ====================================================================================================
 === ИТОГО ПО ПАКЕТУ ===
 Форм в пакете: 2
-SQL запросов: 12
+SQL запросов: 2
 ====================================================================================================

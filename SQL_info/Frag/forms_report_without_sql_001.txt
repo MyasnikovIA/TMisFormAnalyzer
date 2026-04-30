@@ -1,74 +1,75 @@
 ====================================================================================================
 === ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) (ПАКЕТ 1) ===
-Дата создания: Thu Apr 30 22:31:11 NOVT 2026
+Дата создания: Thu Apr 30 22:51:03 NOVT 2026
 Количество форм в пакете: 2
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: components_d3.frm
+ФОРМА: Lis/Citology/work_list.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/components_d3.frm
+Базовая форма: /var/www/t-mis/mis/Forms/Lis/Citology/work_list.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/data.dfrm
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/script.dfrm
+  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d/view.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsMoscowNIIBlohina =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/Lis/Citology/work_list.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+
+Список подключаемых форм subForm:
+     Lis/Styles/styles
+     Lis/Citology/subforms/work_list/general_info
+     Lis/Citology/subforms/work_list/attachments
+     Lis/Citology/subforms/work_list/samples
+     (D3Api.showForm) Lis/Citology/subforms/work_list/macro_desc.frm
+     (D3Api.showForm) Lis/Citology/subforms/work_list/conclusion.frm
+
+Список вызываемых форм в JS:
+     Lis/Citology/work_list.frm
+     Lis/Reports/Citology/quantity_cito_research_call.frm
+     EHR/simple_ehrdocs_form.frm
+
+SQL ЗАПРОСЫ (2):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
+  - D_V_LABMED_WL_RSRCH_METHODS
+  - D_V_LBM_SAMPLE_STATUSES
+  - D_V_LABMED_RESEARCH
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_LABMED_WORKLIST.GET_ACTIVE_WL
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: EHR/multisign_cda_d3.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/EHR/multisign_cda_d3.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
      (не найдено)
 
 Список подключаемых форм subForm:
-     (не найдено)
+     EHR/subforms/checkDocSubform
+     EHR/sign_subform_d3
+     EHR/subforms/sign_subform_d3_view
+     Lis/Styles/styles
+     (D3Api.showForm) Reports/sign_data.frm
 
 Список вызываемых форм в JS:
      (не найдено)
 
-SQL ЗАПРОСЫ (4):
+SQL ЗАПРОСЫ (0):
      (содержимое SQL запросов исключено для краткости)
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_AGENTS_BASE
-  - D_V_PREG_PARAM_SPECS
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="SOCIALSTATES"  composition="GRID_SORT";
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: DBTest.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/DBTest.frm
-СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
-
-ЮЗЕРФОРМЫ:
-     (не найдено)
-
-Список подключаемых форм subForm:
-     (не найдено)
-
-Список вызываемых форм в JS:
-     ADD_DIRECTORIES_DICT/ADD_DIRECTORIES_DICT.frm
-     ExtraDict/ExtraDict_Dictionary.frm
-     UniversalEditForm/UniversalEditForm.frm
-
-SQL ЗАПРОСЫ (8):
-     (содержимое SQL запросов исключено для краткости)
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_OBJSTATUSES
-  - D_V_AGENTS
-  - D_V_CATALOGS
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_SMC_DEFVALUES.GET_ALL_DEFVALUES
-
-КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
-        unit="VISITS"  composition="DEFAULT";
-        unit="AGENTS"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="SHOW_METHOD_UL_TREE";
-        unit="UNITLIST"  composition="DEFAULT";
-        unit="SHOW_METHOD"  composition="Show_method_wtht_ul";
 
 ====================================================================================================
 === ИТОГО ПО ПАКЕТУ ===
 Форм в пакете: 2
-SQL запросов: 12
+SQL запросов: 2
 ====================================================================================================

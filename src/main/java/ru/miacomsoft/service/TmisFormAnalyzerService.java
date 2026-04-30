@@ -54,6 +54,7 @@ public class TmisFormAnalyzerService {
         // Извлекаем объекты из базовой формы
         extractSubForms(baseContent, formInfo);
         extractJsForms(baseContent, formInfo);
+        extractD3ApiShowForms(baseContent, formInfo);
         extractUnitCompositions(baseContent, formInfo);
 
         List<SqlInfo> sqlQueries = sqlExtractor.extractAllSqlQueries(
@@ -121,6 +122,50 @@ public class TmisFormAnalyzerService {
 
 
         return formInfo;
+    }
+
+    /**
+     * Извлечь формы из D3Api.showForm вызовов
+     * Форматы:
+     * - D3Api.showForm('Reports/sign_data', ...)
+     * - D3Api.showForm('help_view', null, ...)
+     * - D3Api.showForm('System/change_password')
+     */
+    private void extractD3ApiShowForms(String content, FormInfo formInfo) {
+        if (content == null || content.isEmpty()) return;
+
+        Set<String> foundForms = new LinkedHashSet<>();
+
+        // Универсальный паттерн для D3Api.showForm
+        // Ищет: D3Api.showForm('путь/к/форме', ...)
+        Pattern d3ApiPattern = Pattern.compile(
+                "D3Api\\.showForm\\s*\\(\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher matcher = d3ApiPattern.matcher(content);
+        while (matcher.find()) {
+            String formPath = matcher.group(1);
+            // Добавляем .frm если нет расширения
+            // if (!formPath.endsWith(".frm") && !formPath.endsWith(".dfrm")) {
+            //     formPath = formPath + ".frm";
+            // }
+            formPath = "(D3Api.showForm) "+formPath ;
+
+            String normalized = normalizeFormPathFromJs(formPath);
+            if (normalized != null && isValidFormPath(normalized)) {
+                foundForms.add(normalized);
+            }
+        }
+
+        // Добавляем найденные формы в subForm (или можно создать отдельный блок)
+        for (String form : foundForms) {
+            formInfo.addSubForm(form);
+        }
+
+        if (!foundForms.isEmpty()) {
+            System.out.println("  Найдено D3Api.showForm: " + foundForms.size());
+        }
     }
 
     /**
