@@ -1,19 +1,24 @@
 +4) починить получения списка юзерформ
 
 
-3) дописать вынос в отдельный блок констант:
++3) дописать вынос в отдельный блок констант:
  Извлечь константы из D_PKG_CONSTANTS.SEARCH_STR и SEARCH_NUM
     D_PKG_CONSTANTS.SEARCH_DATE
     D_PKG_CONSTANTS.SEARCH_STR
     D_PKG_CONSTANTS.SEARCH_NUM
-/Forms/Agents/agent_regional_privs/regional_priv_edit.frm
-/Forms/Agents/agent_social_states/agent_social_states_edit.frm
-/Forms/Agents/subforms_fields/death.frm
-/Forms/ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm
+/var/www/t-mis/mis/Forms/Agents/agent_regional_privs/regional_priv_edit.frm
+/var/www/t-mis/mis/Forms/Agents/agent_social_states/agent_social_states_edit.frm
+/var/www/t-mis/mis/Forms/Agents/subforms_fields/death.frm
+/var/www/t-mis/mis/Forms/ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm
 
 
 
 
++2) искать openWindow по всему документу, а не только в скрипте
+ <component cmptype="ButtonEdit" name="REG_EMPLOYER" unit="EMPLOYERS" buttononclick="openWindow({name:'UniversalComposition/UniversalComposition', unit:'EMPLOYERS', composition:'EMP_MEDIC2'}, true)
+ <cmpPopupItem name="pTEMP_LIST" caption="Температурный лист (форма №004/у)" icon="~CmpPopupMenu/Icons/print" onclick="openWindow({name:'Reports/ArmPatientsInDep/temperature_list_004u_call',vars:{HH_ID:getValue('GRID_HH')}}, true);"/>
+/Forms/ARMMainDoc/arm_director.frm
+/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
 
 
 1) вытащить имя unit  и composition из JS если встречается 'UniversalComposition/UniversalComposition'
@@ -29,9 +34,6 @@
                     }, null, false);
 
 ```
-
-2) искать openWindow по всему документу, а не только в скрипте
- <component cmptype="ButtonEdit" name="REG_EMPLOYER" unit="EMPLOYERS" buttononclick="openWindow({name:'UniversalComposition/UniversalComposition', unit:'EMPLOYERS', composition:'EMP_MEDIC2'}, true)
 
 
 

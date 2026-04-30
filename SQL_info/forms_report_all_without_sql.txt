@@ -1,314 +1,180 @@
 ====================================================================================================
 === ПОЛНЫЙ ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) ===
-Дата создания: Thu Apr 30 20:04:09 NOVT 2026
-Всего форм: 4
-Всего SQL запросов: 87
+Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+Всего форм: 2
+Всего SQL запросов: 7
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: Agents/agent_regional_privs/regional_priv_edit.frm
+ФОРМА: ARMMainDoc/arm_director.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/Agents/agent_regional_privs/regional_priv_edit.frm
-СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА
-Файл замены: /var/www/t-mis/mis/UserFormsEgis3Tomsk/Agents/agent_regional_privs/regional_priv_edit.frm
-
-ЮЗЕРФОРМЫ:
-     ===== UserFormsEgis3Novosib =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/Agents/agent_regional_privs/regional_priv_edit.d
-            └── data.dfrm
-            └── script.dfrm
-            └── view.dfrm
-
-     ===== UserFormsEgis3Tomsk =====
-        ПОЛНАЯ ЗАМЕНА: /var/www/t-mis/mis/UserFormsEgis3Tomsk/Agents/agent_regional_privs/regional_priv_edit.frm
-
-     ===== UserFormsRKB3 =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/Agents/agent_regional_privs/regional_priv_edit.d
-            └── regional_priv_edit.dfrm
-
-
-Список подключаемых форм subForm:
-     Agents/subscript/agent_priv_common
-     Int/efarma/api
-     Agents/subscript/lpu
-     Agents/subforms_view/regional_priv_ssz
-
-Список вызываемых форм в JS:
-     Agents/agent_regional_privs/regional_priv_list.frm
-     UniversalComposition/UniversalComposition.frm
-
-SQL ЗАПРОСЫ (25):
-     (содержимое SQL запросов исключено для краткости)
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_PRIV_DIS_GROUPS
-  - D_V_AGENT_REGIONAL_PRIVS
-  - D_V_AGENT_REGIONAL_PRIVS_BASE
-  - D_V_PRIV_TYPES
-  - D_V_AGENTS_BASE
-  - D_V_CONTINGENTS_BASE
-  - D_V_EMPLOYERS_BASE
-  - D_V_TARGET_PROGRAM_BASE
-  - D_V_LPU
-  - D_V_CONTINGENTS
-  - D_V_RECIPS
-  - D_V_PRIV_DIS_DIAPASONES
-  - D_V_MKB10_BASE
-  - D_V_MKB10
-  - D_V_LPUDICT
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_AGENT_REGIONAL_PRIVS.UPD
-  - D_PKG_TOOLS.STR_SEPARATE
-  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-  - D_PKG_RLR.GET_REG_PRIVS
-  - D_PKG_UNITPROPS.GET_SVAL
-  - D_PKG_MKB10.CHECK_RANGE
-  - D_PKG_CSE_ACCESSES.CHECK_RIGHT
-  - D_PKG_DAT_TOOLS.DATE_RANGES_ERROR
-
-СИСТЕМНЫЕ ОПЦИИ:
-  - CodesMoForPrivs
-  - PrivCodeChildThreeYear
-  - PrivCodeLargeFamilyChild
-  - PrivCodeMyocardialInfarction
-  - RegistrSszGroupCodes
-
-КОНСТАНТЫ:
-  - PALLIATIVE_MKB
-
-РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_PKG_OPTION_SPECS.GET
-  - D_PKG_OPTIONS.GET
-  - D_CL_STR
-  - D_CL_REG_PRIVS
-  - D_P_ADD_AGN_PRIV_ASULON
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: Agents/agent_social_states/agent_social_states_edit.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/Agents/agent_social_states/agent_social_states_edit.frm
-СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
-Переопределения:
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/Agents/agent_social_states/agent_social_states_edit.d/data.dfrm
-  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/Agents/agent_social_states/agent_social_states_edit.d/view.dfrm
-
-ЮЗЕРФОРМЫ:
-     ===== UserFormsEgis3Novosib =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/Agents/agent_social_states/agent_social_states_edit.d
-            └── data.dfrm
-            └── view.dfrm
-
-
-Список подключаемых форм subForm:
-     (не найдено)
-
-Список вызываемых форм в JS:
-     UniversalComposition/UniversalComposition.frm
-
-SQL ЗАПРОСЫ (7):
-     (содержимое SQL запросов исключено для краткости)
-
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_SOCIALSTATES_SORT
-  - D_V_AGENT_SOCIAL_STATES
-  - D_V_SOCIALSTATES
-  - D_V_SOCIALSTATES_BASE
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-
-КОНСТАНТЫ:
-  - SocStatePensioner
-
-РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_PKG_OPTION_SPECS.GET
-
-----------------------------------------------------------------------------------------------------
-ФОРМА: Agents/subforms_fields/death.frm
-----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/Agents/subforms_fields/death.frm
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/arm_director.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
      (не найдено)
 
 Список подключаемых форм subForm:
-     Agents/subscript/deathdate
+     (не найдено)
 
 Список вызываемых форм в JS:
-     Certificate/journal/issued_certificates.frm
+     Reports/showReportHTML.frm
+     ArmPatientsInDep/hosp_history_new.frm
+     Deps/deps_by_division_only_action_d3.frm
+     Deps/deps_def_st_d3.frm
+     UniversalComposition/UniversalComposition.frm
+     DiseaseCase/diseasecase.frm
+     Persmedcard/persmedcard_edit.frm
+     HospPlan/setPrivilege.frm
+     ArmPatientsInDep/hosp_history_change_mkb.frm
+     ArmPatientsInDep/hosp_history_continues_treatment.frm
+     ArmPatientsInDep/SubForms/hh_deps_edit.frm
+     ArmPatientsInDep/hosp_history_end.frm
+     PersonalAccount/patient_contracts.frm
+     ArmPatientsInDep/healing_emp_load.frm
+     ArmPatientsInDep/healing_emp_history.frm
+     Registry/PmcSearch/amb_reports_list.frm
+     ArmPatientsInDep/pat_in_dep_head_dep_mkb_exact.frm
+     ArmPatientsInDep/pat_in_dep_head_dep_operations.frm
+     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
+     Reports/ArmPatientsInDep/plan_operations_call.frm
+     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
+     Reports/Stacionar/form315_call.frm
+     Reports/HospPlan/comission_vmp_protocol_call.frm
 
-SQL ЗАПРОСЫ (2):
+SQL ЗАПРОСЫ (0):
      (содержимое SQL запросов исключено для краткости)
 
-ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_CERTIFICATE_FORMS_BASE
-  - D_V_GEOGRAFY
-  - D_V_CF_DEATH_CONTENTS
-  - D_V_CF_PERDEATH_CONTENTS
-  - D_V_DOC_TYPES
-  - D_V_DOC_ACCESSORIES
-
-ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
-  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-  - D_PKG_CERTIFICATE_FORMS.GET_C_NUM
-
-РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_PKG_STD.FRM_D
-
 ----------------------------------------------------------------------------------------------------
-ФОРМА: ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm
+ФОРМА: ArmPatientsInDep/pat_in_dep_head_nurse.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm
+Базовая форма: /var/www/t-mis/mis/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
 СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
 Переопределения:
-  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/ArmPatientsInDep/SubForms/mp_prescribes_process_store.d/data.dfrm
-  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/ArmPatientsInDep/SubForms/mp_prescribes_process_store.d/script.dfrm
-  - [UserFormsMoscowNIIBlohina] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/ArmPatientsInDep/SubForms/mp_prescribes_process_store.d/view.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/data.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsHosp] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsKaliningrad] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsRKB3] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsRKOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsRkob] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
+  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/script.dfrm
+  - [UserFormsSaratov] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d/view.dfrm
 
 ЮЗЕРФОРМЫ:
-     ===== UserFormsMoscowNIIBlohina =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/ArmPatientsInDep/SubForms/mp_prescribes_process_store.d
+     ===== UserFormsEgis3Novosib =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/ArmPatientsInDep/pat_in_dep_head_nurse.d
             └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsEgis3Tomsk =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsHosp =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsHosp/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── view.dfrm
+
+     ===== UserFormsKaliningrad =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKaliningrad/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── view.dfrm
+
+     ===== UserFormsRKB3 =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── view.dfrm
+
+     ===== UserFormsRKOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKOD/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── view.dfrm
+
+     ===== UserFormsRkob =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRkob/ArmPatientsInDep/pat_in_dep_head_nurse.d
+            └── view.dfrm
+
+     ===== UserFormsSaratov =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsSaratov/ArmPatientsInDep/pat_in_dep_head_nurse.d
             └── script.dfrm
             └── view.dfrm
 
 
 Список подключаемых форм subForm:
-     ArmPatientsInDep/SubForms/ecp_send_request
-     ArmPatientsInDep/SubForms/change_med_forms_and_dose_measure
-     ArmPatientsInDep/SubForms/TimeHandSubform
+     ArmPatientsInDep/SubForms/sep_calculation
+     ArmPatientsInDep/SubForms/list_deps
+     ArmPatientsInDep/SubForms/list_deps_post
+     ArmPatientsInDep/SubForms/info_by_dep
+     ArmPatientsInDep/SubForms/hh_dep_beds
+     ArmPatientsInDep/SubForms/hh_deps
+     ArmPatientsInDep/SubForms/bj_bulletin_contents
+     ArmPatientsInDep/SubForms/hpk_plan_journal_comment
+     ArmPatientsInDep/SubForms/hh_dir_servs_sop
+     ArmPatientsInDep/SubForms/mp_prescribes
 
 Список вызываемых форм в JS:
-     UniversalTemplate/UniversalTemplate.frm
-     ArmPatientsInDep/SubForms/goodsupply_select.frm
-     ArmPatientsInDep/SubForms/nommodif_select.frm
-     Compositions/med_therapy_schemes_desc.frm
-     ArmPatientsInDep/SubForms/mp_prescribes_calc_dose_drug.frm
+     Persmedcard/persmedcard_edit.frm
+     DiseaseCase/diseasecase.frm
+     HospPlan/patient_analyze.frm
+     HospPlan/setPrivilege.frm
+     ArmPatientsInDep/patients_warnings.frm
+     PersonalAccount/patient_contracts.frm
+     ArmPatientsInDep/hosp_history_new.frm
+     ArmPatientsInDep/med_consumption_analysis.frm
+     ArmPatientsInDep/SubForms/hh_deps_edit.frm
+     ArmPatientsInDep/hosp_history_end.frm
+     Reports/PatientAgreement/agreement_blood_transfusion_call.frm
+     Reports/ArmPatientsInDep/patient_expense_call.frm
+     Reports/ArmPatientsInDep/portion_call.frm
+     Reports/ArmPatientsInDep/portion_1_84_call.frm
+     Reports/ArmPatientsInDep/temperature_list_004u_call.frm
+     Reports/Statistic/movement_daily_beds_patients_call_new.frm
+     Reports/ArmPatientsInDep/patient_indept_sysdate_call.frm
+     Reports/ArmPatientsInDep/directions_on_date_right_call.frm
 
-SQL ЗАПРОСЫ (53):
+SQL ЗАПРОСЫ (7):
      (содержимое SQL запросов исключено для краткости)
 
 ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:
-  - D_V_DOSE_MEASURES
-  - D_V_MEASURES
-  - D_V_CATALOGS
-  - D_V_MED_THERAPY_SCHEMES_DESC
-  - D_V_MP_PRESCRIBES
-  - D_V_PRESCRIBE_ONK_SCH_SP_BASE
-  - D_V_PERSMEDCARD_BASE
-  - D_V_PRESCRIBE_ONK_SCH_BASE
-  - D_V_HPK_PLAN_JOURNALS_BASE
   - D_V_HOSP_HISTORY_DEPS_BASE
-  - D_V_DIR_THERAPY_SCHEMES
-  - D_V_NOMMODIF_ACM_BASE
-  - D_V_HOSP_HISTORIES_BASE
-  - D_V_NOMBASE_BASE
-  - D_V_MP_PRESC_SP_PRICES_BASE
-  - D_V_MP_DESCRIBES_ACTIVE
-  - D_V_MED_USE_METHODS
-  - D_V_MP_DESC_TIMES
-  - D_V_NOMBASE_MNN
-  - D_V_NOMMODIF
-  - D_V_NOMMODIF_BASE
-  - D_V_MP_PRESCRIBE_SPECS_BASE
-  - D_V_DIRECTIONS_BASE
-  - D_V_VISITS_BASE
+  - D_V_HH_DEP_BEDS_BASE
+  - D_V_DEPS_TYPES
+  - D_V_DEPS_BASE
+  - D_V_AGENT_COMP_DISEASES_BASE
+  - D_V_SERVICES_BASE
+  - D_V_HOSP_HISTORIES_LAST
+  - D_V_HH_DEP_BEDS
   - D_V_DIRECTION_SERVICES_BASE
-  - D_V_MP_DESCRIBES
-  - D_V_NOMBASE
-  - D_V_MP_PRESCRIBE_SPECS
-  - D_V_AGENT_PREGNANCY
-  - D_V_LPU
-  - D_V_DIRECTORIES_DATA_VER
-  - D_V_HOSP_HISTORY_DIAGNS
-  - D_V_DIRECTION_SERVICES
-  - D_V_NOMBASE_MNN_ACTIVE_BASE
-  - D_V_HOSP_HISTORY_DEPS
-  - D_V_DISEASECASES
-  - D_V_MED_ZHNVLP
-  - D_V_NOMBASE_MKBS
-  - D_V_PERSMEDCARD_FIO
-  - D_V_VIS_DIAGNOSISES_BASE
-  - D_V_VISIT_CON_FIELDS
-  - D_V_AGENTS_BASE
-  - D_V_MKB10_BASE
-  - D_V_MP_ADD_ATTRIBUTES
-  - D_V_MP_TYPES
-  - D_V_MED_FORM_USE_METHODS
-  - D_V_GOODSSUPPLIES
-  - D_V_NOMMODIF_COMPLEX
-  - D_V_MED_FORMS
-  - D_V_NOMBASE_NOMMODIF_COMB
-  - D_V_DEPS
-  - D_V_DEP_REQUISITES
-  - D_V_NOMBASE_MNN_ACTIVE
-  - D_V_NOMMODIF_ACM
+  - D_V_AGENT_ALLERG_ANAMNESIS_BAS
+  - D_V_HOSP_HISTORIES_RELATIVE
+  - D_V_HH_DIETARIES
+  - D_V_HOSP_HISTORIES_BASE
 
 ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP
   - D_PKG_VERSIONS.GET_VERSION_BY_LPU
-  - D_PKG_FED_NSI_LINKS.GET_CURRENT_VAL
-  - D_PKG_MP_PRESCRIBES.CHECK_PRIORITY
-  - D_PKG_MP_MODEL_PRESC_SP.GET_MAX_PRIORITY
-  - D_PKG_MP_MODEL_PRESC_SP.GET_MIN_PRIORITY
-  - D_PKG_VISITS.GET_TEMPLATE_INFO
-  - D_PKG_NUM_TOOLS.STR_TO_NUM
-  - D_PKG_NUM_TOOLS.TO_STR_WITH_DELIMETER
-  - D_PKG_NUM_TOOLS.TO_STR
-  - D_PKG_DIRECTION_SERVICES.GET_PAYMENT_KIND
-  - D_PKG_MP_PRESCRIBES.MOVE_NEXT
-  - D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_EXTEMPO_SET
-  - D_PKG_STD.FRM_DTS
-  - D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_DATETIME_SET
-  - D_PKG_STD.FRM_TS
-  - D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_SCHEDULE_SET
-  - D_PKG_MP_PRESCRIBE_SPECS.UPD
-  - D_PKG_MP_PRESCRIBES.UPD
-  - D_PKG_MP_PRESCRIBES.GET_ERRORS
-  - D_PKG_TOOLS.STR_SEPARATE_TO_IDS
-  - D_PKG_MP_PRESCRIBES.GET_LIMIT_ERRORS
-  - D_PKG_DAT_TOOLS.DATE_RANGES_ERROR
-  - D_PKG_SERVICES.GET_ID_BY_CODE
-  - D_PKG_DAT_TOOLS.FULL_UNITS
-  - D_PKG_DIRECTIONS.ADD
-  - D_PKG_DIRECTION_SERVICES.ADD
-  - D_PKG_MP_PRESCRIBES.ADD
-  - D_PKG_MP_PRESCRIBES.DEL
-  - D_PKG_MP_PRESCRIBE_SPECS.DEL
-  - D_PKG_MP_PRESCRIBE_SPECS.PRESCRIBE_CANCEL_EXECUTION
-  - D_PKG_MP_PRESCRIBE_SPECS.PRESCRIBE_EXECUTION
-  - D_PKG_MP_PRESCRIBE_SPECS.GNMASS_RESTRICT_AUTO_EXECUTION
-  - D_PKG_MP_PRESCRIBE_SPECS.PROCESS_STORE
-  - D_PKG_AGENT_COMP_DISEASES.CHECK_MED
-  - D_PKG_AGENT_ALLERG_ANAMNESIS.IS_ALLERGY
-  - D_PKG_DAT_TOOLS.FULL_YEARS
-  - D_PKG_MKB10.CHECK_CODE_IN_RANGE
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_URPRIVS.GET_STANDART_PRIVS
+  - D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE
+  - D_PKG_DAT_TOOLS.AGE_TO_STR
+  - D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING
+  - D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
+  - D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
+  - D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE
+  - D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE
+  - D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION
 
 СИСТЕМНЫЕ ОПЦИИ:
-  - MpPrescribesPriority
-  - CheckHospOnkoPrescribesEdit
-  - MpPrescribesZHNVLPnotice
-  - UsePregnancyNommodif
-  - UseMKBNomBase
-  - CheckShInHHDep
-  - Acm_dose_visible
-
-КОНСТАНТЫ:
-  - ST_AGREE_MP_SERVICE
-  - PK_EXCLUDE_VK_AGREE_MP
-  - ST_VK_AGREE_MP_SERVICE
+  - CheckDepBed_HeadNurse
 
 РАЗОБРАТЬ АНАЛИТИКОМ:
-  - D_TIME_STR
-  - D_TYPE_OLD
-  - D_TYPE
   - D_PKG_OPTION_SPECS.GET
   - D_PKG_OPTIONS.GET
-  - D_PKG_STD.FRM_D
-  - D_PKG_STD.FRM_T
-  - D_PKG_STD.FRM_DT
-  - D_NAME
 
 
 ====================================================================================================

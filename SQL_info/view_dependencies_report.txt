@@ -1,601 +1,8 @@
 ====================================================================================================
 === ОТЧЕТ ПО ЗАВИСИМОСТЯМ ТАБЛИЦ ОТ ВЬЮХ ===
-Дата создания: Thu Apr 30 19:57:39 NOVT 2026
-Всего проанализировано вьюх: 76
+Дата создания: Thu Apr 30 20:16:25 NOVT 2026
+Всего проанализировано вьюх: 13
 ====================================================================================================
-
-- D_V_PRIV_DIS_GROUPS:
-    OracleSQL:
-        D_PRIV_DIS_GROUPS
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_PRIV_DIS_GROUPS
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENT_REGIONAL_PRIVS:
-    OracleSQL:
-        D_AGENT_REGIONAL_PRIVS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_REGIONAL_PRIVS
-        D_CONTINGENTS
-        D_PRIVDOCKINDS
-        D_LPUDICT
-        D_MKB10
-        D_PRIV_DIS_GROUPS
-        D_TARGET_PROGRAM
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENT_REGIONAL_PRIVS_BASE:
-    OracleSQL:
-        D_AGENT_REGIONAL_PRIVS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_REGIONAL_PRIVS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PRIV_TYPES:
-    OracleSQL:
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENTS_BASE:
-    OracleSQL:
-        D_AGENTS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENTS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CONTINGENTS_BASE:
-    OracleSQL:
-        D_CONTINGENTS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_CONTINGENTS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_EMPLOYERS_BASE:
-    OracleSQL:
-        D_EMPLOYERS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_EMPLOYERS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_TARGET_PROGRAM_BASE:
-    OracleSQL:
-        D_TARGET_PROGRAM
-        D_V_URPRIVS
-    PostgreSQL:
-        D_TARGET_PROGRAM
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_LPU:
-    OracleSQL:
-        D_LPU
-        D_LPUDICT
-        D_GEOGRAFY
-        D_V_URPRIVS
-    PostgreSQL:
-        D_LPU
-        D_LPUDICT
-        D_GEOGRAFY
-        D_V_URPRIVS
-    ---
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CONTINGENTS:
-    OracleSQL:
-        D_CONTINGENTS
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_CONTINGENTS
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_RECIPS:
-    OracleSQL:
-        D_RECIPS
-        D_PERSMEDCARD
-        D_EMPLOYERS
-        D_PRIVILEGES
-        D_CONTINGENTS
-        D_MKB10
-        D_FINSOURCES
-        D_LPU
-        D_PRIV_DIS_GROUPS
-        D_RECIPE_PRIVTYPES
-        D_PRIV_NOS_GROUPS
-        D_DIVISIONS
-        D_PURPOSE_PRIV
-        D_V_URPRIVS
-    PostgreSQL:
-        D_RECIPS
-        D_PERSMEDCARD
-        D_EMPLOYERS
-        D_PRIVILEGES
-        D_CONTINGENTS
-        D_MKB10
-        D_FINSOURCES
-        D_LPU
-        D_PRIV_DIS_GROUPS
-        D_RECIPE_PRIVTYPES
-        D_PRIV_NOS_GROUPS
-        D_DIVISIONS
-        D_PURPOSE_PRIV
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PRIV_DIS_DIAPASONES:
-    OracleSQL:
-        D_PRIV_DIS_DIAPASONES
-        D_PRIV_DIS_GROUPS
-        D_MKB10
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_PRIV_DIS_DIAPASONES
-        D_PRIV_DIS_GROUPS
-        D_MKB10
-        D_PRIV_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MKB10_BASE:
-    OracleSQL:
-        D_MKB10
-    PostgreSQL:
-        D_MKB10
-    ---
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MKB10:
-    OracleSQL:
-        D_MKB10
-    PostgreSQL:
-        D_MKB10
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_LPUDICT:
-    OracleSQL:
-        D_LPUDICT
-        D_V_URPRIVS
-    PostgreSQL:
-        D_LPUDICT
-        D_LPUKINDS
-        D_AGENTS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_SOCIALSTATES_SORT:
-    OracleSQL:
-        D_SOCIALSTATES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_SOCIALSTATES
-        D_SOCIALCATEGORIES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENT_SOCIAL_STATES:
-    OracleSQL:
-        D_AGENT_SOCIAL_STATES
-        D_SOCIALSTATES
-        D_SOCIALCATEGORIES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_SOCIAL_STATES
-        D_SOCIALSTATES
-        D_SOCIALCATEGORIES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_SOCIALSTATES:
-    OracleSQL:
-        D_SOCIALSTATES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_SOCIALSTATES
-        D_SOCIALCATEGORIES
-        D_DIRECTORIES_FN_DATA
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_SOCIALSTATES_BASE:
-    OracleSQL:
-        D_SOCIALSTATES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_SOCIALSTATES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CERTIFICATE_FORMS_BASE:
-    OracleSQL:
-        D_CERTIFICATE_FORMS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_CERTIFICATE_FORMS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_GEOGRAFY:
-    OracleSQL:
-        D_GEOGRAFY
-        D_GEOGRAFYTYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_GEOGRAFY
-        D_GEOGRAFYTYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CF_DEATH_CONTENTS:
-    OracleSQL:
-        D_CF_DEATH_CONTENTS
-        D_AGENTS
-        D_GEOGRAFY
-        D_DIRECTORIES_DATA_VER
-        D_INJURE_KINDS
-        D_PERSMEDCARD
-        D_PMC_MARKERS
-        D_MARKERS
-        D_LPUDICT
-        D_PERSDOCTYPES
-        D_V_URPRIVS
-    PostgreSQL: (вьюха не найдена)
-        Ошибка: Вьюха не найдена в PostgreSQL
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CF_PERDEATH_CONTENTS:
-    OracleSQL:
-        D_CF_PERDEATH_CONTENTS
-        D_AGENTS
-        D_GEOGRAFY
-        D_DIRECTORIES_DATA_VER
-        D_PERSMEDCARD
-        D_PMC_MARKERS
-        D_MARKERS
-        D_LPUDICT
-        D_PERSDOCTYPES
-        D_RELATION_LINK
-        D_V_URPRIVS
-    PostgreSQL:
-        D_CF_PERDEATH_CONTENTS
-        D_AGENTS
-        D_GEOGRAFY
-        D_DIRECTORIES_DATA_VER
-        D_PERSMEDCARD
-        D_PMC_MARKERS
-        D_MARKERS
-        D_LPUDICT
-        D_PERSDOCTYPES
-        D_RELATION_LINK
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DOC_TYPES:
-    OracleSQL:
-        D_DOC_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DOC_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DOC_ACCESSORIES:
-    OracleSQL:
-        D_DOC_ACCESSORIES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DOC_ACCESSORIES
-        D_DOC_KINDS
-        D_UNITLIST
-        D_DOC_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DOSE_MEASURES:
-    OracleSQL:
-        D_DOSE_MEASURES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DOSE_MEASURES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MEASURES:
-    OracleSQL:
-        D_MEASURES
-        D_MEAS_CATEGORIES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MEASURES
-        D_MEAS_CATEGORIES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_CATALOGS:
-    OracleSQL:
-        D_V_URPRIVS
-        D_CATALOGS
-    PostgreSQL:
-        D_V_URPRIVS
-        D_CATALOGS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MED_THERAPY_SCHEMES_DESC:
-    OracleSQL:
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_PRESCRIBES:
-    OracleSQL:
-        D_MP_TYPES
-        D_DOSE_MEASURES
-        D_MP_CONDITIONES
-        D_MP_ADD_ATTRIBUTES
-        D_MEASURES
-        D_REASON_CANCEL_PRESCRIBE
-        D_NOMBASE_MNN
-        D_HOSP_HISTORY_DEPS
-        D_MP_PRESCRIBES
-        D_EMPLOYERS
-        D_AGENTS
-        D_NOMMODIF
-        D_MP_DESCRIBES
-        D_MED_USE_METHODS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MP_TYPES
-        D_DOSE_MEASURES
-        D_MP_CONDITIONES
-        D_MP_ADD_ATTRIBUTES
-        D_MEASURES
-        D_REASON_CANCEL_PRESCRIBE
-        D_NOMBASE_MNN
-        D_HOSP_HISTORY_DEPS
-        D_MP_PRESCRIBES
-        D_EMPLOYERS
-        D_AGENTS
-        D_NOMMODIF
-        D_MP_DESCRIBES
-        D_MED_USE_METHODS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PRESCRIBE_ONK_SCH_SP_BASE:
-    OracleSQL:
-        D_PRESCRIBE_ONK_SCH_SP
-        D_V_URPRIVS
-    PostgreSQL:
-        D_PRESCRIBE_ONK_SCH_SP
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PERSMEDCARD_BASE:
-    OracleSQL:
-        D_EMPLOYERS
-        D_AGENTS
-        D_PERSMEDCARD
-        D_V_URPRIVS
-    PostgreSQL:
-        D_EMPLOYERS
-        D_AGENTS
-        D_PERSMEDCARD
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PRESCRIBE_ONK_SCH_BASE:
-    OracleSQL:
-        D_PRESCRIBE_ONK_SCH
-        D_V_URPRIVS
-    PostgreSQL:
-        D_PRESCRIBE_ONK_SCH
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HPK_PLAN_JOURNALS_BASE:
-    OracleSQL:
-        D_HPK_PLAN_JOURNALS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HPK_PLAN_JOURNALS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
 
 - D_V_HOSP_HISTORY_DEPS_BASE:
     OracleSQL:
@@ -607,222 +14,143 @@
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_DIR_THERAPY_SCHEMES:
+- D_V_HH_DEP_BEDS_BASE:
     OracleSQL:
-        D_DIR_THERAPY_SCHEMES
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
+        D_HH_DEP_BEDS
         D_V_URPRIVS
     PostgreSQL:
-        D_DIR_THERAPY_SCHEMES
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
+        D_HH_DEP_BEDS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_NOMMODIF_ACM_BASE:
+- D_V_DEPS_TYPES:
     OracleSQL:
-        D_NOMMODIF_ACM
+        D_DEPS_TYPES
         D_V_URPRIVS
     PostgreSQL:
-        D_NOMMODIF_ACM
+        D_DEPS_TYPES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_HOSP_HISTORIES_BASE:
+- D_V_DEPS_BASE:
     OracleSQL:
-        D_HOSP_HISTORIES
+        D_DEPS
         D_V_URPRIVS
     PostgreSQL:
-        D_HOSP_HISTORIES
+        D_DEPS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_NOMBASE_BASE:
+- D_V_AGENT_COMP_DISEASES_BASE:
     OracleSQL:
-        D_NOMBASE
+        D_AGENT_COMP_DISEASES
         D_V_URPRIVS
     PostgreSQL:
-        D_NOMBASE
+        D_AGENT_COMP_DISEASES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_MP_PRESC_SP_PRICES_BASE:
+- D_V_SERVICES_BASE:
     OracleSQL:
-        D_MP_PRESC_SP_PRICES
+        D_SERVICES
         D_V_URPRIVS
     PostgreSQL:
-        D_MP_PRESC_SP_PRICES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_DESCRIBES_ACTIVE:
-    OracleSQL:
-        D_MP_DESCRIBES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MP_DESCRIBES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MED_USE_METHODS:
-    OracleSQL:
-        D_MED_USE_METHODS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MED_USE_METHODS
         D_SERVICES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_MP_DESC_TIMES:
+- D_V_HOSP_HISTORIES_LAST:
     OracleSQL:
-        D_MP_DESC_TIMES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MP_DESC_TIMES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMBASE_MNN:
-    OracleSQL:
-        D_NOMBASE_MNN
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE_MNN
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMMODIF:
-    OracleSQL:
-        D_NOMBASE
-        D_NOMMODIF
-        D_MEASURES
+        D_HPKPJ_VMP_STATES
+        D_DEPS
+        D_HOSP_HISTORIES
+        D_PERSMEDCARD
         D_AGENTS
-        D_DOSE_MEASURES
-        D_LIFE_SPECIAL
-        D_MED_FORMS
-        D_COUNTRIES
+        D_HOSP_HISTORY_DEPS
+        D_DEPS_TYPES
+        D_PAYMENT_KIND
+        D_HPK_PLAN_JOURNALS
+        D_VMP
+        D_KSGCODES
+        D_MKB10
+        D_HOSP_RESULTS
+        D_EMPLOYERS
+        D_BED_TYPES
         D_V_URPRIVS
     PostgreSQL:
-        D_NOMBASE
-        D_NOMMODIF
-        D_MEASURES
+        D_HPKPJ_VMP_STATES
+        D_DEPS
+        D_HOSP_HISTORIES
+        D_PERSMEDCARD
         D_AGENTS
-        D_DOSE_MEASURES
-        D_LIFE_SPECIAL
-        D_MED_FORMS
-        D_COUNTRIES
+        D_HOSP_HISTORY_DEPS
+        D_DEPS_TYPES
+        D_PAYMENT_KIND
+        D_HPK_PLAN_JOURNALS
+        D_VMP
+        D_KSGCODES
+        D_MKB10
+        D_HOSP_RESULTS
+        D_EMPLOYERS
+        D_BED_TYPES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_NOMMODIF_BASE:
+- D_V_HH_DEP_BEDS:
     OracleSQL:
-        D_NOMMODIF
+        D_DEP_BEDS
+        D_HH_DEP_BEDS
+        D_HOSP_HISTORY_DEPS
+        D_HOSP_HISTORIES
+        D_DEPS
+        D_DEP_POSTS
         D_V_URPRIVS
     PostgreSQL:
-        D_NOMMODIF
+        D_DEP_BEDS
+        D_HH_DEP_BEDS
+        D_HOSP_HISTORY_DEPS
+        D_HOSP_HISTORIES
+        D_DEPS
+        D_DEP_POSTS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_PRESCRIBE_SPECS_BASE:
-    OracleSQL:
-        D_MP_PRESCRIBE_SPECS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MP_PRESCRIBE_SPECS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DIRECTIONS_BASE:
-    OracleSQL:
-        D_DIRECTIONS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DIRECTIONS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_VISITS_BASE:
-    OracleSQL:
-        D_VISITS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_VISITS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
@@ -836,595 +164,101 @@
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_MP_DESCRIBES:
+- D_V_AGENT_ALLERG_ANAMNESIS_BAS:
     OracleSQL:
-        D_MP_DESCRIBES
+        D_AGENT_ALLERG_ANAMNESIS
         D_V_URPRIVS
     PostgreSQL:
-        D_MP_DESCRIBES
+        D_AGENT_ALLERG_ANAMNESIS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_NOMBASE:
+- D_V_HOSP_HISTORIES_RELATIVE:
     OracleSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_NOMBASE
-        D_MEASURES
-        D_NOMTYPES
-        D_NOMGROUP
+        D_AGENT_RELATIVES
         D_AGENTS
-        D_COUNTRIES
-        D_TAXGR
-        D_FARM_GROUP
-        D_ACC_FARM_PROD
-        D_NOMVEN
-        D_LIFE_SPECIAL
-        D_MED_FORMS
-        D_NOM_FARMGROUPS
-        D_OKVED
-        D_DIRECTORIES_DATA_VER
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_NOMBASE
-        D_MEASURES
-        D_NOMTYPES
-        D_NOMGROUP
-        D_AGENTS
-        D_COUNTRIES
-        D_TAXGR
-        D_FARM_GROUP
-        D_ACC_FARM_PROD
-        D_NOMVEN
-        D_LIFE_SPECIAL
-        D_MED_FORMS
-        D_NOM_FARMGROUPS
-        D_OKVED
-        D_DIRECTORIES_DATA_VER
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_PRESCRIBE_SPECS:
-    OracleSQL:
-        D_AGENTS
-        D_MP_PRESCRIBE_SPECS
-        D_NOMMODIF
-        D_MP_PRESCRIBES
-        D_DOSE_MEASURES
-        D_EMPLOYERS
-        D_MED_USE_METHODS
-        D_MEASURES
-        D_DEPS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENTS
-        D_MP_PRESCRIBE_SPECS
-        D_NOMMODIF
-        D_MP_PRESCRIBES
-        D_DOSE_MEASURES
-        D_EMPLOYERS
-        D_MED_USE_METHODS
-        D_MEASURES
-        D_DEPS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_AGENT_PREGNANCY:
-    OracleSQL:
-        D_AGENT_PREGNANCY
-        D_PREGNANCY_ABORT_REASON
-        D_PREGNANCY_OUTCOMES
-        D_LPUDICT
-        D_FERT_METHODS
-        D_MKB10
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENT_PREGNANCY
-        D_PREGNANCY_ABORT_REASON
-        D_PREGNANCY_OUTCOMES
-        D_LPUDICT
-        D_FERT_METHODS
-        D_MKB10
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DIRECTORIES_DATA_VER:
-    OracleSQL:
-        D_DIRECTORIES_DATA_VER
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DIRECTORIES_DATA_VER
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HOSP_HISTORY_DIAGNS:
-    OracleSQL:
-        D_HOSP_HISTORY_DIAGNS
-        D_HOSP_DIAGN_TYPES
-        D_MKB10
-        D_DISEASECHARACTERS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HOSP_HISTORY_DIAGNS
-        D_HOSP_DIAGN_TYPES
-        D_MKB10
-        D_DISEASECHARACTERS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DIRECTION_SERVICES:
-    OracleSQL:
-        D_SERVICES_STR
-        D_VISITKINDS
-        D_DIRECTION_SERVICES
-        D_SERVICES
-        D_CABLAB
-        D_VISITPURPOSES
-        D_REFERENCE_KINDS
-        D_EMPLOYERS
-        D_AGENTS
-        D_DEPS
-        D_DIRECTIONS
-        D_REG_TYPES
-        D_DS_SERV_STATUSES
-        D_SCHEDULE_TIME_TYPES
-        D_PAYMENT_KIND
-        D_V_URPRIVS
-    PostgreSQL:
-        D_SERVICES_STR
-        D_VISITKINDS
-        D_DIRECTION_SERVICES
-        D_SERVICES
-        D_CABLAB
-        D_VISITPURPOSES
-        D_REFERENCE_KINDS
-        D_EMPLOYERS
-        D_AGENTS
-        D_DEPS
-        D_DIRECTIONS
-        D_REG_TYPES
-        D_DS_SERV_STATUSES
-        D_SCHEDULE_TIME_TYPES
-        D_PAYMENT_KIND
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMBASE_MNN_ACTIVE_BASE:
-    OracleSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_HOSP_HISTORY_DEPS:
-    OracleSQL:
-        D_AGENT_NAMES
-        D_HOSP_HISTORY_DEPS
         D_HOSP_HISTORIES
-        D_DEPS
-        D_DEPS_TYPES
-        D_PAYMENT_KIND
+        D_PERSMEDCARD
+        D_HOSP_REASONS
+        D_HOSPITALIZATION_TYPES
+        D_TRANSPORTATION_KINDS
+        D_LPUDICT
         D_MKB10
         D_HOSP_RESULTS
-        D_KSGCODES
-        D_BED_TYPES
-        D_EMPLOYERS
-        D_AGENTS
-        D_VMP
+        D_HPK_PLAN_JOURNALS
+        D_DEPS
+        D_HPKPJ_VMP_STATES
         D_HOSP_OUTCOMES
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
-        D_ALV
-        D_SCALE_REHAB
+        D_HOSP_HOURS
+        D_HH_TRANSFER_REASONS
+        D_ABILITY_STATUS
         D_V_URPRIVS
     PostgreSQL:
-        D_AGENT_NAMES
-        D_HOSP_HISTORY_DEPS
+        D_AGENT_RELATIVES
+        D_AGENTS
         D_HOSP_HISTORIES
-        D_DEPS
-        D_DEPS_TYPES
-        D_PAYMENT_KIND
+        D_PERSMEDCARD
+        D_HOSP_REASONS
+        D_HOSPITALIZATION_TYPES
+        D_TRANSPORTATION_KINDS
+        D_LPUDICT
         D_MKB10
         D_HOSP_RESULTS
-        D_KSGCODES
-        D_BED_TYPES
-        D_EMPLOYERS
-        D_AGENTS
-        D_VMP
+        D_HPK_PLAN_JOURNALS
+        D_DEPS
+        D_HPKPJ_VMP_STATES
         D_HOSP_OUTCOMES
-        D_MED_THERAPY_SCHEMES_DESC
-        D_MED_THERAPY_SCHEMES
-        D_ALV
-        D_SCALE_REHAB
+        D_HOSP_HOURS
+        D_HH_TRANSFER_REASONS
+        D_ABILITY_STATUS
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_DISEASECASES:
+- D_V_HH_DIETARIES:
     OracleSQL:
-        D_DISEASECASES
-        D_DISEASECASE_TYPES
-        D_DC_SOURCES
-        D_PERSMEDCARD
-        D_AGENTS
-        D_MKB10
-        D_MESES
-        D_EMPLOYERS
+        D_HH_DIETARIES
+        D_DIETARY_TABLE
+        D_HOSP_REGIMES
+        D_PSYCH_REGIMES
         D_V_URPRIVS
     PostgreSQL:
-        D_DISEASECASES
-        D_DISEASECASE_TYPES
-        D_DC_SOURCES
-        D_PERSMEDCARD
-        D_AGENTS
-        D_MKB10
-        D_MESES
-        D_EMPLOYERS
+        D_HH_DIETARIES
+        D_DIETARY_TABLE
+        D_HOSP_REGIMES
+        D_PSYCH_REGIMES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 --------------------------------------------------------------------------------
 
-- D_V_MED_ZHNVLP:
+- D_V_HOSP_HISTORIES_BASE:
     OracleSQL:
-        D_MED_ZHNVLP
+        D_HOSP_HISTORIES
         D_V_URPRIVS
     PostgreSQL:
-        D_MED_ZHNVLP
-        D_NOMBASE_MNN
-        D_LPUDICT
-        D_MED_FORMS
+        D_HOSP_HISTORIES
         D_V_URPRIVS
     ---
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMBASE_MKBS:
-    OracleSQL:
-        D_NOMBASE_MKBS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE_MKBS
-        D_MKB10
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_PERSMEDCARD_FIO:
-    OracleSQL:
-        D_AGENTS
-        D_PERSMEDCARD
-        D_EMPLOYERS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_AGENTS
-        D_PERSMEDCARD
-        D_EMPLOYERS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_VIS_DIAGNOSISES_BASE:
-    OracleSQL:
-        D_VIS_DIAGNOSISES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_VIS_DIAGNOSISES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_VISIT_CON_FIELDS:
-    OracleSQL:
-        D_VISIT_CON_FIELDS
-        D_ADD_DATATYPES
-        D_EDIT_METHODS
-        D_ADD_DIR_COLUMNS
-        D_ADD_DIRECTORIES
-        D_COMPOSITION
-        D_SHOW_METHOD
-        D_EXTRA_DICTS
-        D_VISIT_CONTAINERS
-        D_VISIT_TAB_FIELDS
-        D_V_EXTRA_DICT_VALUES
-        D_V_ADD_DIR_VALUES
-        D_MASKS
-        D_MASKTYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_VISIT_CON_FIELDS
-        D_ADD_DATATYPES
-        D_EDIT_METHODS
-        D_ADD_DIRECTORIES
-        D_COMPOSITION
-        D_SHOW_METHOD
-        D_EXTRA_DICTS
-        D_VISIT_CONTAINERS
-        D_VISIT_TAB_FIELDS
-        D_V_EXTRA_DICT_VALUES
-        D_V_ADD_DIR_VALUES
-        D_MASKS
-        D_MASKTYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_ADD_ATTRIBUTES:
-    OracleSQL:
-        D_MP_ADD_ATTRIBUTES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MP_ADD_ATTRIBUTES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MP_TYPES:
-    OracleSQL:
-        D_MP_TYPES
-    PostgreSQL:
-        D_MP_TYPES
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MED_FORM_USE_METHODS:
-    OracleSQL:
-        D_MED_FORM_USE_METHODS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MED_FORM_USE_METHODS
-        D_MED_USE_METHODS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_GOODSSUPPLIES:
-    OracleSQL:
-        D_GOODSSUPPLY
-        D_V_URPRIVS
-    PostgreSQL:
-        D_GOODSSUPPLY
-        D_GOODPARTY
-        D_NOMMODIF
-        D_NOMBASE
-        D_STORE
-        D_FINANSOURCES
-        D_INCOMDOC
-        D_AGENTS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMMODIF_COMPLEX:
-    OracleSQL:
-        D_NOMMODIF_COMPLEX
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMMODIF_COMPLEX
-        D_NOMMODIF
-        D_NOMBASE
-        D_DOSE_MEASURES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_MED_FORMS:
-    OracleSQL:
-        D_MED_FORMS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_MED_FORMS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMBASE_NOMMODIF_COMB:
-    OracleSQL:
-        D_NOMBASE
-        D_NOMMODIF
-        D_FARM_GROUP
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_ACC_FARM_PROD
-        D_NOMMODIF_ACM
-        D_DOSE_MEASURES
-        D_MEASURES
-        D_MED_FORMS
-        D_NOM_FARMGROUPS
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE
-        D_NOMMODIF
-        D_FARM_GROUP
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_ACC_FARM_PROD
-        D_NOMMODIF_ACM
-        D_DOSE_MEASURES
-        D_MEASURES
-        D_MED_FORMS
-        D_NOM_FARMGROUPS
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DEPS:
-    OracleSQL:
-        D_HEAD_DEP
-        D_EMPLOYERS
-        D_AGENTS
-        D_DEPS
-        D_DEPS_KINDS
-        D_DEPS_TYPES
-        D_DIVISIONS
-        D_MED_CARE_PROFILES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_HEAD_DEP
-        D_EMPLOYERS
-        D_AGENTS
-        D_DEPS
-        D_DEPS_KINDS
-        D_DEPS_TYPES
-        D_DIVISIONS
-        D_MED_CARE_PROFILES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_DEP_REQUISITES:
-    OracleSQL:
-        D_DEP_REQUISITES
-        D_PAYMENT_KIND
-        D_DAYHOSPITAL_TYPES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_DEP_REQUISITES
-        D_PAYMENT_KIND
-        D_DAYHOSPITAL_TYPES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMBASE_MNN_ACTIVE:
-    OracleSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMBASE_MNN_ACTIVE
-        D_NOMBASE_MNN
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
---------------------------------------------------------------------------------
-
-- D_V_NOMMODIF_ACM:
-    OracleSQL:
-        D_NOMMODIF_ACM
-        D_DOSE_MEASURES
-        D_V_URPRIVS
-    PostgreSQL:
-        D_NOMMODIF_ACM
-        D_DOSE_MEASURES
-        D_V_URPRIVS
-    ---
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 ====================================================================================================
 === КОНЕЦ ОТЧЕТА ПО ЗАВИСИМОСТЯМ ===

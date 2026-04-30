@@ -1,394 +1,76 @@
 ====================================================================================================
 === ОТЧЕТ ПО ТАБЛИЦАМ И ВЬЮХАМ ===
-Дата создания: Thu Apr 30 20:04:09 NOVT 2026
-Всего уникальных объектов: 76
+Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+Всего уникальных объектов: 13
 ====================================================================================================
 
 === ТАБЛИЦЫ (0) ===
 
-=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (76) ===
+=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (13) ===
 
-- D_V_AGENTS_BASE
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_AGENT_PREGNANCY
+- D_V_AGENT_ALLERG_ANAMNESIS_BAS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_AGENT_REGIONAL_PRIVS
+- D_V_AGENT_COMP_DISEASES_BASE
     Используется в формах: 1
     Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_AGENT_REGIONAL_PRIVS_BASE
+- D_V_DEPS_BASE
     Используется в формах: 1
     Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_AGENT_SOCIAL_STATES
+- D_V_DEPS_TYPES
     Используется в формах: 1
     Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
-- D_V_CATALOGS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_CERTIFICATE_FORMS_BASE
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_CF_DEATH_CONTENTS
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_CF_PERDEATH_CONTENTS
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_CONTINGENTS
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_CONTINGENTS_BASE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_DEPS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_DEP_REQUISITES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_DIRECTIONS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_DIRECTION_SERVICES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 - D_V_DIRECTION_SERVICES_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_DIRECTORIES_DATA_VER
+- D_V_HH_DEP_BEDS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_DIR_THERAPY_SCHEMES
+- D_V_HH_DEP_BEDS_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_DISEASECASES
+- D_V_HH_DIETARIES
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_DOC_ACCESSORIES
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_DOC_TYPES
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_DOSE_MEASURES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_EMPLOYERS_BASE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_GEOGRAFY
-    Используется в формах: 1
-    Формы:
-         Agents/subforms_fields/death.frm;
-
-- D_V_GOODSSUPPLIES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 - D_V_HOSP_HISTORIES_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_HOSP_HISTORY_DEPS
+- D_V_HOSP_HISTORIES_LAST
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+
+- D_V_HOSP_HISTORIES_RELATIVE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 - D_V_HOSP_HISTORY_DEPS_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_V_HOSP_HISTORY_DIAGNS
+- D_V_SERVICES_BASE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_HPK_PLAN_JOURNALS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_LPU
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_LPUDICT
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_MEASURES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MED_FORMS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MED_FORM_USE_METHODS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MED_THERAPY_SCHEMES_DESC
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MED_USE_METHODS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MED_ZHNVLP
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MKB10
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_MKB10_BASE
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_ADD_ATTRIBUTES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_DESCRIBES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_DESCRIBES_ACTIVE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_DESC_TIMES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_PRESCRIBES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_PRESCRIBE_SPECS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_PRESCRIBE_SPECS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_PRESC_SP_PRICES_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_MP_TYPES
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_MKBS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_MNN
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_MNN_ACTIVE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_MNN_ACTIVE_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMBASE_NOMMODIF_COMB
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMMODIF
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMMODIF_ACM
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMMODIF_ACM_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMMODIF_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_NOMMODIF_COMPLEX
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_PERSMEDCARD_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_PERSMEDCARD_FIO
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_PRESCRIBE_ONK_SCH_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_PRESCRIBE_ONK_SCH_SP_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_PRIV_DIS_DIAPASONES
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_PRIV_DIS_GROUPS
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_PRIV_TYPES
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_RECIPS
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_SOCIALSTATES
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
-- D_V_SOCIALSTATES_BASE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
-- D_V_SOCIALSTATES_SORT
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
-
-- D_V_TARGET_PROGRAM_BASE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_V_VISITS_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_VISIT_CON_FIELDS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_V_VIS_DIAGNOSISES_BASE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 ====================================================================================================

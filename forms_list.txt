@@ -1,4 +1,2 @@
-/Forms/Agents/agent_regional_privs/regional_priv_edit.frm
-/Forms/Agents/agent_social_states/agent_social_states_edit.frm
-/Forms/Agents/subforms_fields/death.frm
-/Forms/ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm
+/Forms/ARMMainDoc/arm_director.frm
+/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm

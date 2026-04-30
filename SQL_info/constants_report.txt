@@ -1,33 +1,8 @@
 ====================================================================================================
 === ОТЧЕТ ПО КОНСТАНТАМ (D_PKG_CONSTANTS.SEARCH_*) ===
-Дата создания: Thu Apr 30 19:57:39 NOVT 2026
-Всего уникальных констант: 5
+Дата создания: Thu Apr 30 20:16:25 NOVT 2026
+Всего уникальных констант: 0
 ====================================================================================================
-
-- PALLIATIVE_MKB
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- PK_EXCLUDE_VK_AGREE_MP
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- ST_AGREE_MP_SERVICE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- ST_VK_AGREE_MP_SERVICE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- SocStatePensioner
-    Используется в формах: 1
-    Формы:
-         Agents/agent_social_states/agent_social_states_edit.frm;
 
 ====================================================================================================
 === КОНЕЦ ОТЧЕТА ПО КОНСТАНТАМ ===

@@ -183,53 +183,63 @@ public class TmisFormAnalyzerService {
 
     /**
      * Извлечь JS формы (openWindow, openD3Form) из содержимого формы
-     * Поддерживает различные форматы вызова и ищет скрипты во всех CDATA секциях
+     * Ищет везде: в CDATA, атрибутах и тексте
      */
     private void extractJsForms(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
         Set<String> foundForms = new LinkedHashSet<>();
 
-        // Ищем ВСЕ CDATA секции в любом месте формы
-        Pattern allCDataPattern = Pattern.compile(
-                "<!\\[CDATA\\[(.*?)\\]\\]>",
-                Pattern.DOTALL
+        // Паттерн для поиска в любом контексте (атрибуты, CDATA, текст)
+        Pattern anyContextPattern = Pattern.compile(
+                "(?:openWindow|openD3Form)\\s*\\([^)]*['\"]([^'\"]+\\.frm)['\"][^)]*\\)",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher cdataMatcher = allCDataPattern.matcher(content);
-        while (cdataMatcher.find()) {
-            String scriptContent = cdataMatcher.group(1);
-            foundForms.addAll(extractFormsFromScript(scriptContent));
+        Matcher matcher = anyContextPattern.matcher(content);
+        while (matcher.find()) {
+            String formPath = matcher.group(1);
+            String normalized = normalizeFormPathFromJs(formPath);
+            if (normalized != null && isValidFormPath(normalized)) {
+                foundForms.add(normalized);
+            }
         }
 
-        // Дополнительно ищем в атрибутах onclick и других событиях
-        Pattern onclickPattern = Pattern.compile(
-                "onclick\\s*=\\s*['\"]([^'\"]*(?:openWindow|openD3Form)[^'\"]*)['\"]",
-                Pattern.DOTALL
+        // Дополнительный паттерн для поиска без .frm расширения в вызове
+        Pattern noExtensionPattern = Pattern.compile(
+                "(?:openWindow|openD3Form)\\s*\\([^)]*['\"]([^'\"]+/(?:[^'\"]+))['\"][^)]*\\)",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
-        Matcher onclickMatcher = onclickPattern.matcher(content);
-        while (onclickMatcher.find()) {
-            String onclickContent = onclickMatcher.group(1);
-            foundForms.addAll(extractFormsFromScript(onclickContent));
-        }
 
-        // Ищем прямые вызовы в XML атрибутах
-        Pattern directCallPattern = Pattern.compile(
-                "(?:openWindow|openD3Form)\\s*\\([^)]*\\)",
-                Pattern.DOTALL
-        );
-        Matcher directMatcher = directCallPattern.matcher(content);
-        while (directMatcher.find()) {
-            String callContent = directMatcher.group(0);
-            foundForms.addAll(extractFormsFromScript(callContent));
+        Matcher matcher2 = noExtensionPattern.matcher(content);
+        while (matcher2.find()) {
+            String formPath = matcher2.group(1);
+            if (!formPath.endsWith(".frm") && !formPath.endsWith(".dfrm")) {
+                formPath = formPath + ".frm";
+            }
+            String normalized = normalizeFormPathFromJs(formPath);
+            if (normalized != null && isValidFormPath(normalized)) {
+                foundForms.add(normalized);
+            }
         }
 
         // Добавляем найденные формы в FormInfo
         for (String form : foundForms) {
-            if (isValidFormPath(form)) {
-                formInfo.addJsForm(form);
-            }
+            formInfo.addJsForm(form);
         }
+    }
+
+    /**
+     * Извлечь значение атрибута из строки вида attr="value" или attr='value'
+     */
+    private String extractAttributeValue(String attrString) {
+        // Ищем кавычки и берем содержимое между ними
+        Pattern quotePattern = Pattern.compile("=['\"]([^'\"]*)['\"]");
+        Matcher matcher = quotePattern.matcher(attrString);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     /**

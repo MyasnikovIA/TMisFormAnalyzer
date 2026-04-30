@@ -1,322 +1,101 @@
 ====================================================================================================
 === ОТЧЕТ ПО ПАКЕТАМ И ФУНКЦИЯМ ===
-Дата создания: Thu Apr 30 20:04:09 NOVT 2026
-Всего уникальных объектов: 44
+Дата создания: Thu Apr 30 20:16:12 NOVT 2026
+Всего уникальных объектов: 13
 ====================================================================================================
 
-=== ПАКЕТНЫЕ ФУНКЦИИ (44) ===
+=== ПАКЕТНЫЕ ФУНКЦИИ (13) ===
 
-- D_PKG_AGENT_ALLERG_ANAMNESIS.IS_ALLERGY
-    Пакет: D_PKG_AGENT_ALLERG_ANAMNESIS
-    Функция: IS_ALLERGY
+- D_PKG_AGENT_ADDRS.GET_ACTUAL_ON_DATE
+    Пакет: D_PKG_AGENT_ADDRS
+    Функция: GET_ACTUAL_ON_DATE
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_AGENT_COMP_DISEASES.CHECK_MED
+- D_PKG_AGENT_COMP_DISEASES.GET_BY_STRING
     Пакет: D_PKG_AGENT_COMP_DISEASES
-    Функция: CHECK_MED
+    Функция: GET_BY_STRING
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_AGENT_REGIONAL_PRIVS.UPD
-    Пакет: D_PKG_AGENT_REGIONAL_PRIVS
-    Функция: UPD
+- D_PKG_AGENT_PERSDOCS.GET_ACTUAL_ON_DATE
+    Пакет: D_PKG_AGENT_PERSDOCS
+    Функция: GET_ACTUAL_ON_DATE
     Используется в формах: 1
     Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_CERTIFICATE_FORMS.GET_C_NUM
-    Пакет: D_PKG_CERTIFICATE_FORMS
-    Функция: GET_C_NUM
+- D_PKG_AGENT_POLIS.GET_ACTUAL_ON_DATE
+    Пакет: D_PKG_AGENT_POLIS
+    Функция: GET_ACTUAL_ON_DATE
     Используется в формах: 1
     Формы:
-         Agents/subforms_fields/death.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_CSE_ACCESSES.CHECK_RIGHT
+- D_PKG_AGENT_WORK_PLACES.GET_ACTUAL_ON_DATE
+    Пакет: D_PKG_AGENT_WORK_PLACES
+    Функция: GET_ACTUAL_ON_DATE
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+
+- D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
     Пакет: D_PKG_CSE_ACCESSES
-    Функция: CHECK_RIGHT
+    Функция: GET_ID_WITH_DEFAULT_RIGHTS
     Используется в формах: 1
     Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_DAT_TOOLS.DATE_RANGES_ERROR
+- D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+    Пакет: D_PKG_CSE_ACCESSES
+    Функция: GET_ID_WITH_RIGHTS
+    Используется в формах: 1
+    Формы:
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
+
+- D_PKG_DAT_TOOLS.AGE_TO_STR
     Пакет: D_PKG_DAT_TOOLS
-    Функция: DATE_RANGES_ERROR
-    Используется в формах: 2
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_DAT_TOOLS.FULL_UNITS
-    Пакет: D_PKG_DAT_TOOLS
-    Функция: FULL_UNITS
+    Функция: AGE_TO_STR
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_DAT_TOOLS.FULL_YEARS
-    Пакет: D_PKG_DAT_TOOLS
-    Функция: FULL_YEARS
+- D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
+    Пакет: D_PKG_HOSP_HISTORIES
+    Функция: GET_FACT_DAYS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_DIRECTIONS.ADD
-    Пакет: D_PKG_DIRECTIONS
-    Функция: ADD
+- D_PKG_HOSP_HISTORY_DEPS.CANCEL_CLOSE_DEP
+    Пакет: D_PKG_HOSP_HISTORY_DEPS
+    Функция: CANCEL_CLOSE_DEP
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_DIRECTION_SERVICES.ADD
-    Пакет: D_PKG_DIRECTION_SERVICES
-    Функция: ADD
+- D_PKG_SIGNAL_INFO_SETS.GET_FULL_SIGNAL_INFORMATION
+    Пакет: D_PKG_SIGNAL_INFO_SETS
+    Функция: GET_FULL_SIGNAL_INFORMATION
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
-- D_PKG_DIRECTION_SERVICES.GET_PAYMENT_KIND
-    Пакет: D_PKG_DIRECTION_SERVICES
-    Функция: GET_PAYMENT_KIND
+- D_PKG_URPRIVS.GET_STANDART_PRIVS
+    Пакет: D_PKG_URPRIVS
+    Функция: GET_STANDART_PRIVS
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_FED_NSI_LINKS.GET_CURRENT_VAL
-    Пакет: D_PKG_FED_NSI_LINKS
-    Функция: GET_CURRENT_VAL
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MKB10.CHECK_CODE_IN_RANGE
-    Пакет: D_PKG_MKB10
-    Функция: CHECK_CODE_IN_RANGE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MKB10.CHECK_RANGE
-    Пакет: D_PKG_MKB10
-    Функция: CHECK_RANGE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_PKG_MP_MODEL_PRESC_SP.GET_MAX_PRIORITY
-    Пакет: D_PKG_MP_MODEL_PRESC_SP
-    Функция: GET_MAX_PRIORITY
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_MODEL_PRESC_SP.GET_MIN_PRIORITY
-    Пакет: D_PKG_MP_MODEL_PRESC_SP
-    Функция: GET_MIN_PRIORITY
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.ADD
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: ADD
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.CHECK_PRIORITY
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: CHECK_PRIORITY
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.DEL
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: DEL
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.GET_ERRORS
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: GET_ERRORS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.GET_LIMIT_ERRORS
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: GET_LIMIT_ERRORS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.MOVE_NEXT
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: MOVE_NEXT
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBES.UPD
-    Пакет: D_PKG_MP_PRESCRIBES
-    Функция: UPD
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_DATETIME_SET
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: CREATE_SPECS_DATETIME_SET
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_EXTEMPO_SET
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: CREATE_SPECS_EXTEMPO_SET
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.CREATE_SPECS_SCHEDULE_SET
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: CREATE_SPECS_SCHEDULE_SET
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.DEL
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: DEL
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.GNMASS_RESTRICT_AUTO_EXECUTION
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: GNMASS_RESTRICT_AUTO_EXECUTION
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.PRESCRIBE_CANCEL_EXECUTION
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: PRESCRIBE_CANCEL_EXECUTION
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.PRESCRIBE_EXECUTION
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: PRESCRIBE_EXECUTION
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.PROCESS_STORE
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: PROCESS_STORE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_MP_PRESCRIBE_SPECS.UPD
-    Пакет: D_PKG_MP_PRESCRIBE_SPECS
-    Функция: UPD
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_NUM_TOOLS.STR_TO_NUM
-    Пакет: D_PKG_NUM_TOOLS
-    Функция: STR_TO_NUM
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_NUM_TOOLS.TO_STR
-    Пакет: D_PKG_NUM_TOOLS
-    Функция: TO_STR
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_NUM_TOOLS.TO_STR_WITH_DELIMETER
-    Пакет: D_PKG_NUM_TOOLS
-    Функция: TO_STR_WITH_DELIMETER
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_RLR.GET_REG_PRIVS
-    Пакет: D_PKG_RLR
-    Функция: GET_REG_PRIVS
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_PKG_SERVICES.GET_ID_BY_CODE
-    Пакет: D_PKG_SERVICES
-    Функция: GET_ID_BY_CODE
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_STD.FRM_DTS
-    Пакет: D_PKG_STD
-    Функция: FRM_DTS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_STD.FRM_TS
-    Пакет: D_PKG_STD
-    Функция: FRM_TS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_TOOLS.STR_SEPARATE
-    Пакет: D_PKG_TOOLS
-    Функция: STR_SEPARATE
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-
-- D_PKG_TOOLS.STR_SEPARATE_TO_IDS
-    Пакет: D_PKG_TOOLS
-    Функция: STR_SEPARATE_TO_IDS
-    Используется в формах: 1
-    Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_UNITPROPS.GET_SVAL
-    Пакет: D_PKG_UNITPROPS
-    Функция: GET_SVAL
-    Используется в формах: 1
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 - D_PKG_VERSIONS.GET_VERSION_BY_LPU
     Пакет: D_PKG_VERSIONS
     Функция: GET_VERSION_BY_LPU
-    Используется в формах: 4
-    Формы:
-         Agents/agent_regional_privs/regional_priv_edit.frm;
-         Agents/agent_social_states/agent_social_states_edit.frm;
-         Agents/subforms_fields/death.frm;
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
-
-- D_PKG_VISITS.GET_TEMPLATE_INFO
-    Пакет: D_PKG_VISITS
-    Функция: GET_TEMPLATE_INFO
     Используется в формах: 1
     Формы:
-         ArmPatientsInDep/SubForms/mp_prescribes_process_store.frm;
+         ArmPatientsInDep/pat_in_dep_head_nurse.frm;
 
 === САМОСТОЯТЕЛЬНЫЕ ФУНКЦИИ (0) ===
 
