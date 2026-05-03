@@ -78,17 +78,14 @@ public class FormPathUtils {
     /**
      * Проверка валидности пути формы
      */
-    /**
-     * Проверка валидности пути формы
-     */
     private boolean isValidFormPath(String path) {
         if (path == null || path.trim().isEmpty()) {
             return false;
         }
 
         // Игнорируем специальные значения
-        if ("components_m2".equals(path) || "".equals(path.trim())) {
-            return false;
+        if ("components_m2".equals(path) || "components_d3".equals(path) || "".equals(path.trim())) {
+            return true; // Это допустимые пути для SubForm
         }
 
         // Игнорируем строки, которые выглядят как JavaScript код
@@ -104,21 +101,19 @@ public class FormPathUtils {
                 lowerPath.contains("sunit") || lowerPath.contains("composition") ||
                 lowerPath.contains("show_buttons") || lowerPath.contains("height") ||
                 lowerPath.contains("width") || lowerPath.contains("onclose") ||
-                lowerPath.contains("onafterclose") || lowerPath.contains("addlistener") ||
-                lowerPath.contains("then") || lowerPath.contains("else") ||
-                lowerPath.contains("return") || lowerPath.contains("typeof") ||
-                lowerPath.contains("undefined") || lowerPath.contains("null") ||
-                lowerPath.contains("true") || lowerPath.contains("false") ||
-                lowerPath.contains("buttonedit_getcontrol") || lowerPath.contains("getproperty") ||
-                lowerPath.contains("setcontrolvalue") || lowerPath.contains("setcontrolcaption") ||
-                lowerPath.contains("getpage") || lowerPath.contains("getdom") ||
-                lowerPath.contains("this") || lowerPath.contains("_dom")) {
+                lowerPath.contains("onafterclose") || lowerPath.contains("then") ||
+                lowerPath.contains("else") || lowerPath.contains("return") ||
+                lowerPath.contains("typeof") || lowerPath.contains("undefined") ||
+                lowerPath.contains("null") || lowerPath.contains("true") ||
+                lowerPath.contains("false") || lowerPath.contains("buttonedit_getcontrol") ||
+                lowerPath.contains("getproperty") || lowerPath.contains("setcontrolvalue") ||
+                lowerPath.contains("setcontrolcaption") || lowerPath.contains("getpage") ||
+                lowerPath.contains("getdom") || lowerPath.contains("this") ||
+                lowerPath.contains("_dom")) {
             return false;
         }
 
-        // Валидные пути содержат слеши или имеют структуру папок и заканчиваются на .frm или .dfrm
-        return (path.contains("/") && (path.endsWith(".frm") || path.endsWith(".dfrm"))) ||
-                path.matches("^[A-Za-z0-9_/]+\\.(frm|dfrm)$");
+        return true;
     }
 
     /**

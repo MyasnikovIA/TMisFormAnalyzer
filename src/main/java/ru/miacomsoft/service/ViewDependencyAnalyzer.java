@@ -47,11 +47,6 @@ public class ViewDependencyAnalyzer {
         }
     }
 
-    // Добавляем публичный метод в ViewDependencyAnalyzer (если его нет):
-    public ViewTableDependencies analyzeViewPublic(String viewName) {
-        return analyzeView(viewName);
-    }
-
     public void setCancelled(boolean cancelled) {
         isCancelled.set(cancelled);
         if (cancelled && progressCallback != null) {
@@ -493,5 +488,12 @@ public class ViewDependencyAnalyzer {
         POSTGRES_URL = url;
         POSTGRES_USER = user;
         POSTGRES_PASSWORD = password;
+    }
+
+    /**
+     * Публичный метод для анализа одной вьюхи (без колбэков)
+     */
+    public ViewTableDependencies analyzeViewPublic(String viewName) {
+        return analyzeView(viewName);
     }
 }

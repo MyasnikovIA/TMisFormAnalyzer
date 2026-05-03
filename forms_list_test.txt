@@ -1,17 +1,14 @@
 /Forms/HospDirAccounting/hospdiraccounting.frm
 /Forms/HospPlan/hp_directions_edit.frm
 /Forms/HospPlan/hospitalisation.frm
-/Forms/ArmPatientsInDep/SubForms/hh_deps_edit.frm
+
 /Forms/ArmAidsCenter/Registr_vich.frm
 
 
 
+СИСТЕМНЫЕ ОПЦИИ:
 /Forms/ARMMainDoc/main_doc.frm
 /Forms/HospPlan/hp_directions_edit.frm
-
-
-
-
 /Forms/ARMMainDoc/arm_director.frm
 /Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
 
@@ -19,3 +16,14 @@
 
 /Forms/components_d3.frm
 /Forms/DBTest.frm
+
+
+
+/Forms/NR/subforms/patient_data.frm
+
+
+D_V_USERPROCS
+/Forms/ArmPatientsInDep/SubForms/hh_deps_edit.frm
+
+SubForm
+/Forms/components.frm

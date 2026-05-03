@@ -8,6 +8,7 @@ import java.util.*;
 import ru.miacomsoft.service.ViewDependencyAnalyzer;
 import ru.miacomsoft.model.ViewTableDependencies;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Сервис для генерации отчетов по анализу форм
@@ -22,10 +23,11 @@ public class ReportGeneratorService {
     private Map<String, PackageFunctionInfo> allPackagesFunctions;
     private int totalSqlQueries;
     private Map<String, UnknownObjectInfo> allUnknownObjects;
-    private Map<String, ConstantInfo> allConstants;  // ДОБАВИТЬ ДЛЯ КОНСТАНТ
+    private Map<String, ConstantInfo> allConstants;
     private SettingsModel settings;
+    // Кэш для уже загруженных зависимостей вьюх
+    private Map<String, ViewTableDependencies> loadedViewDependencies = new ConcurrentHashMap<>();
 
-    // Добавляем конструктор с параметром:
     public ReportGeneratorService(SettingsModel settings) {
         this.settings = settings;
         this.analyzedForms = new ArrayList<>();
@@ -35,18 +37,15 @@ public class ReportGeneratorService {
         this.allConstants = new LinkedHashMap<>();
         this.totalSqlQueries = 0;
     }
-    // Также оставляем конструктор по умолчанию для обратной совместимости:
+
     public ReportGeneratorService() {
         this(new SettingsModel());
     }
-
 
     public void addAnalysisResult(FormInfo formInfo) {
         analyzedForms.add(formInfo);
         totalSqlQueries += formInfo.getTotalSqlQueries();
 
-
-        // Очищаем unknown объекты от констант
         Set<String> cleanedUnknown = new LinkedHashSet<>();
         for (String unknown : formInfo.getUnknownObjects()) {
             if (!unknown.contains("D_PKG_CONSTANTS")) {
@@ -55,7 +54,6 @@ public class ReportGeneratorService {
         }
         formInfo.getUnknownObjects().clear();
         formInfo.getUnknownObjects().addAll(cleanedUnknown);
-
 
         for (String tvName : formInfo.getTablesViews()) {
             allTablesViews.computeIfAbsent(tvName, TableViewInfo::new)
@@ -72,14 +70,12 @@ public class ReportGeneratorService {
                     .addUsage(formInfo.getFormPath(), getSqlPreviewForUnknown(formInfo, unknownName));
         }
 
-        // ДОБАВИТЬ БЛОК ДЛЯ КОНСТАНТ
         for (String constantName : formInfo.getConstants()) {
             allConstants.computeIfAbsent(constantName, ConstantInfo::new)
                     .addUsage(formInfo.getFormPath(), getSqlPreviewForConstant(formInfo, constantName));
         }
     }
 
-    // Добавить вспомогательный метод для констант:
     private String getSqlPreviewForConstant(FormInfo formInfo, String constantName) {
         for (SqlInfo sql : formInfo.getSqlQueries()) {
             if (sql.getConstants().contains(constantName)) {
@@ -128,7 +124,7 @@ public class ReportGeneratorService {
         generateFormsListReport();
         generateSummaryReport();
         generateViewDependenciesReport();
-        generateConstantsReport();  // ДОБАВИТЬ ВЫЗОВ
+        generateConstantsReport();
         System.out.println("\n  Все отчеты успешно сгенерированы!");
     }
 
@@ -141,13 +137,10 @@ public class ReportGeneratorService {
 
     private void generateFormReports() throws IOException {
         int batchNumber = 1;
-
-        // Для итогового файла
         Path summaryFilePath = Paths.get(OUTPUT_DIR, "forms_report_all.txt");
         PrintWriter summaryWriter = new PrintWriter(Files.newBufferedWriter(summaryFilePath));
 
         try {
-            // Записываем заголовок итогового файла
             summaryWriter.println("=".repeat(100));
             summaryWriter.println("=== ПОЛНЫЙ ОТЧЕТ ПО ФОРМАМ T-MIS ===");
             summaryWriter.println("Дата создания: " + new Date());
@@ -160,9 +153,8 @@ public class ReportGeneratorService {
                 int end = Math.min(i + BATCH_SIZE, analyzedForms.size());
                 List<FormInfo> batch = analyzedForms.subList(i, end);
 
-                // Создаем файл пакета
                 String fileName = String.format("forms_report_%03d.txt", batchNumber);
-                File resFragDir = new File(OUTPUT_DIR,"Frag");
+                File resFragDir = new File(OUTPUT_DIR, "Frag");
                 if (!resFragDir.exists()) {
                     resFragDir.mkdirs();
                 }
@@ -172,7 +164,6 @@ public class ReportGeneratorService {
                     writeFormReportHeader(batchWriter, batchNumber, batch.size());
                     for (FormInfo formInfo : batch) {
                         writeFormReport(batchWriter, formInfo);
-                        // Также пишем в итоговый файл
                         writeFormReportToSummary(summaryWriter, formInfo);
                     }
                     writeFormReportFooter(batchWriter, batch);
@@ -182,7 +173,6 @@ public class ReportGeneratorService {
                 batchNumber++;
             }
 
-            // Записываем футер итогового файла
             summaryWriter.println();
             summaryWriter.println("=".repeat(100));
             summaryWriter.println("=== КОНЕЦ ПОЛНОГО ОТЧЕТА ===");
@@ -195,10 +185,486 @@ public class ReportGeneratorService {
         System.out.println("  Создан: forms_report_all.txt (полный отчет)");
     }
 
+    /**
+     * Генерация только основного отчета с выбранной конфигурацией
+     * (используется только если не используется инкрементальный режим)
+     * При инкрементальном режиме этот метод не вызывается, так как отчет
+     * создается постепенно через appendFormToMainReport
+     */
+    public void generateMainReport() throws IOException {
+        // Проверяем, существует ли уже отчет, созданный инкрементально
+        Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
+
+        // Если отчет уже существует и есть проанализированные формы - значит он создан инкрементально
+        if (Files.exists(mainReportPath) && !analyzedForms.isEmpty()) {
+            System.out.println("  Отчет уже создан инкрементально. Для пересоздания удалите файл: " + mainReportPath);
+            return;
+        }
+
+        // Иначе создаем отчет целиком (только если нет инкрементальных данных)
+        createOutputDirectory();
+
+        // Загружаем зависимости вьюх если нужно
+        Map<String, ViewTableDependencies> viewDependencies = null;
+        if (ReportConfig.isIncludeViewTables() || ReportConfig.isIncludeViewDetails()) {
+            viewDependencies = loadViewDependencies();
+        }
+
+        try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(mainReportPath))) {
+            // Заголовок отчета
+            writer.println("=".repeat(100));
+            writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS ===");
+            writer.println("Дата создания: " + new Date());
+            writer.println("Всего форм: " + analyzedForms.size());
+            writer.println("Всего SQL запросов: " + totalSqlQueries);
+            writer.println("-".repeat(100));
+            writer.println("КОНФИГУРАЦИЯ ОТЧЕТА:");
+            writer.println("  SQL содержимое: " + (ReportConfig.isIncludeSqlContent() ? "ДА" : "НЕТ"));
+            writer.println("  JS формы: " + (ReportConfig.isIncludeJsForms() ? "ДА" : "НЕТ"));
+            writer.println("  Таблицы/вьюхи: " + (ReportConfig.isIncludeTablesViews() ? "ДА" : "НЕТ"));
+            writer.println("  Таблицы через вьюхи: " + (ReportConfig.isIncludeViewTables() ? "ДА" : "НЕТ"));
+            writer.println("  Композиции JS: " + (ReportConfig.isIncludeJsUnitCompositions() ? "ДА" : "НЕТ"));
+            writer.println("  Детали вьюх: " + (ReportConfig.isIncludeViewDetails() ? "ДА" : "НЕТ"));
+            writer.println("=".repeat(100));
+            writer.println();
+
+            // Выводим каждую форму
+            for (FormInfo formInfo : analyzedForms) {
+                writeFormReportWithConfig(writer, formInfo, viewDependencies);
+            }
+
+            // Итоговая статистика
+            writer.println();
+            writer.println("=".repeat(100));
+            writer.println("=== ИТОГОВАЯ СТАТИСТИКА ===");
+            writer.println("Всего проанализировано форм: " + analyzedForms.size());
+            writer.println("Всего SQL запросов: " + totalSqlQueries);
+
+            long baseCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && f.getOverrides().isEmpty()).count();
+            long fullCount = analyzedForms.stream().filter(FormInfo::isFullyReplaced).count();
+            long partialCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && !f.getOverrides().isEmpty()).count();
+
+            writer.println("Базовые формы: " + baseCount);
+            writer.println("Полностью замененные: " + fullCount);
+            writer.println("Частично переопределенные: " + partialCount);
+
+            long tableCount = allTablesViews.values().stream()
+                    .filter(tv -> tv.getType() == TableViewInfo.Type.TABLE)
+                    .count();
+            long viewCount = allTablesViews.values().stream()
+                    .filter(tv -> tv.getType() == TableViewInfo.Type.VIEW)
+                    .count();
+
+            writer.println("Уникальных таблиц: " + tableCount);
+            writer.println("Уникальных представлений (вьюх): " + viewCount);
+            writer.println("Уникальных пакетов/функций: " + allPackagesFunctions.size());
+            writer.println("Уникальных констант: " + allConstants.size());
+            writer.println("Объектов для разбора: " + allUnknownObjects.size());
+            writer.println("=".repeat(100));
+        }
+
+        System.out.println("  Создан: forms_report.txt");
+    }
+
+    private Map<String, ViewTableDependencies> loadViewDependencies() {
+        Map<String, ViewTableDependencies> result = new LinkedHashMap<>();
+
+        Map<String, TableViewInfo> viewsOnly = new LinkedHashMap<>();
+        for (Map.Entry<String, TableViewInfo> entry : allTablesViews.entrySet()) {
+            if (entry.getValue().getType() == TableViewInfo.Type.VIEW) {
+                viewsOnly.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        if (viewsOnly.isEmpty()) {
+            return result;
+        }
+
+        System.out.println("  Загрузка зависимостей для " + viewsOnly.size() + " вьюх...");
+
+        ViewDependencyAnalyzer analyzer = new ViewDependencyAnalyzer();
+
+        int count = 0;
+        for (Map.Entry<String, TableViewInfo> entry : viewsOnly.entrySet()) {
+            count++;
+            String viewName = entry.getKey();
+            System.out.print("    Анализ вьюхи [" + count + "/" + viewsOnly.size() + "]: " + viewName + " ... ");
+
+            try {
+                ViewTableDependencies deps = analyzer.analyzeViewPublic(viewName);
+                result.put(viewName, deps);
+                System.out.println("OK (таблиц: " + deps.getOracleTables().size() + ")");
+            } catch (Exception e) {
+                System.err.println("ОШИБКА: " + e.getMessage());
+                ViewTableDependencies errorDeps = new ViewTableDependencies(viewName);
+                errorDeps.setExistsInOracle(false);
+                errorDeps.setOracleError(e.getMessage());
+                result.put(viewName, errorDeps);
+            }
+        }
+
+        return result;
+    }
+
+    private void writeFormReportWithConfig(PrintWriter writer, FormInfo formInfo,
+                                           Map<String, ViewTableDependencies> viewDependencies) {
+        writer.println("-".repeat(100));
+        writer.println("ФОРМА: " + formInfo.getFormPath());
+        writer.println("-".repeat(100));
+        writer.println("Базовая форма: " + formInfo.getBaseFormPath());
+
+        if (formInfo.isFullyReplaced()) {
+            writer.println("СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА");
+            writer.println("Файл замены: " + formInfo.getReplacementPath());
+        } else if (!formInfo.getOverrides().isEmpty()) {
+            writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
+            writer.println("Переопределения:");
+            for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
+                writer.println("  - " + override.toString());
+            }
+        } else {
+            writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
+        }
+
+        writer.println();
+        writeUserFormsSection(writer, formInfo);
+
+        // Блок SubForm
+        writer.println("Список подключаемых форм subForm:");
+        if (formInfo.getSubForms().isEmpty()) {
+            writer.println("     (не найдено)");
+        } else {
+            for (String subForm : formInfo.getSubForms()) {
+                // Очищаем от лишних символов при выводе
+                String cleanPath = subForm.replaceAll("^[\"']|[\"']$|/?>$", "");
+                writer.println("     " + cleanPath);
+            }
+        }
+        writer.println();
+
+        if (ReportConfig.isIncludeJsForms()) {
+            writer.println("Список вызываемых форм в JS:");
+            if (formInfo.getJsForms().isEmpty()) {
+                writer.println("     (не найдено)");
+            } else {
+                for (String jsForm : formInfo.getJsForms()) {
+                    writer.println("     " + jsForm);
+                }
+            }
+            writer.println();
+        }
+
+        if (ReportConfig.isIncludeSqlContent()) {
+            writeSqlQueriesSectionFull(writer, formInfo);
+        } else {
+            writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
+            writer.println("     (содержимое SQL запросов исключено для краткости)");
+            writer.println();
+        }
+
+        if (ReportConfig.isIncludeTablesViews() && !formInfo.getTablesViews().isEmpty()) {
+            writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
+            for (String tv : formInfo.getTablesViews()) {
+                writer.println("  - " + tv);
+            }
+            writer.println();
+        }
+
+        if (ReportConfig.isIncludeViewTables()) {
+            writeViewTablesSection(writer, formInfo);
+        }
+
+        if (ReportConfig.isIncludeViewDetails() && viewDependencies != null && !viewDependencies.isEmpty()) {
+            writeViewDetailsSection(writer, formInfo, viewDependencies);
+        }
+
+        if (!formInfo.getPackagesFunctions().isEmpty()) {
+            writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
+            for (String pf : formInfo.getPackagesFunctions()) {
+                writer.println("  - " + pf);
+            }
+            writer.println();
+        }
+
+        if (!formInfo.getUserProcedures().isEmpty()) {
+            writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
+            for (String proc : formInfo.getUserProcedures()) {
+                writer.println("  - " + proc);
+            }
+            writer.println();
+        }
+
+        if (!formInfo.getSystemOptions().isEmpty()) {
+            writer.println("СИСТЕМНЫЕ ОПЦИИ:");
+            for (String opt : formInfo.getSystemOptions()) {
+                writer.println("  - " + opt);
+            }
+            writer.println();
+        }
+
+        if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
+            writer.println("КОНСТАНТЫ:");
+            for (String constant : formInfo.getConstants()) {
+                writer.println("  - " + constant);
+            }
+            writer.println();
+        }
+
+        // ========== КОМПОЗИЦИИ В ТЭГАХ UnitEdit (сначала) ==========
+        if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
+            for (String composition : formInfo.getUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+
+        // ========== КОМПОЗИЦИИ ИЗ JS (UniversalComposition) (после UnitEdit) ==========
+        if (ReportConfig.isIncludeJsUnitCompositions() &&
+                formInfo.getJsUnitCompositions() != null &&
+                !formInfo.getJsUnitCompositions().isEmpty()) {
+            writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
+            for (String composition : formInfo.getJsUnitCompositions()) {
+                writer.println(composition + ";");
+            }
+            writer.println();
+        }
+
+        if (!formInfo.getUnknownObjects().isEmpty()) {
+            writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
+            for (String obj : formInfo.getUnknownObjects()) {
+                writer.println("  - " + obj);
+            }
+            writer.println();
+        }
+    }
+    /**
+     * Добавить информацию об одной форме в основной отчет (инкрементально)
+     */
+    public void appendFormToMainReport(FormInfo formInfo) throws IOException {
+        createOutputDirectory();
+
+        // Получаем зависимости вьюх если нужно (только для вьюх этой формы)
+        Map<String, ViewTableDependencies> viewDependencies = null;
+        if (ReportConfig.isIncludeViewTables() || ReportConfig.isIncludeViewDetails()) {
+            viewDependencies = loadViewDependenciesForForm(formInfo);
+        }
+
+        // Основной файл отчета
+        Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
+        boolean fileExists = Files.exists(mainReportPath);
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(mainReportPath.toFile(), true))) {
+            // Если файл только создается, пишем заголовок
+            if (!fileExists) {
+                writer.println("=".repeat(100));
+                writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS ===");
+                writer.println("Дата создания: " + new Date());
+                writer.println("-".repeat(100));
+                writer.println("КОНФИГУРАЦИЯ ОТЧЕТА:");
+                writer.println("  SQL содержимое: " + (ReportConfig.isIncludeSqlContent() ? "ДА" : "НЕТ"));
+                writer.println("  JS формы: " + (ReportConfig.isIncludeJsForms() ? "ДА" : "НЕТ"));
+                writer.println("  Таблицы/вьюхи: " + (ReportConfig.isIncludeTablesViews() ? "ДА" : "НЕТ"));
+                writer.println("  Таблицы через вьюхи: " + (ReportConfig.isIncludeViewTables() ? "ДА" : "НЕТ"));
+                writer.println("  Композиции JS: " + (ReportConfig.isIncludeJsUnitCompositions() ? "ДА" : "НЕТ"));
+                writer.println("  Детали вьюх: " + (ReportConfig.isIncludeViewDetails() ? "ДА" : "НЕТ"));
+                writer.println("=".repeat(100));
+                writer.println();
+            }
+
+            // Пишем информацию о форме
+            writeFormReportWithConfig(writer, formInfo, viewDependencies);
+        }
+    }
 
     /**
-     * Запись отчета о форме в итоговый файл
+     * Загрузка зависимостей только для вьюх, используемых в конкретной форме
      */
+    private Map<String, ViewTableDependencies> loadViewDependenciesForForm(FormInfo formInfo) {
+        Map<String, ViewTableDependencies> result = new LinkedHashMap<>();
+
+        // Собираем только вьюхи, используемые в этой форме
+        Set<String> viewsUsed = new LinkedHashSet<>();
+        for (String tv : formInfo.getTablesViews()) {
+            if (tv.startsWith("D_V_")) {
+                viewsUsed.add(tv);
+            }
+        }
+
+        if (viewsUsed.isEmpty()) {
+            return result;
+        }
+
+        ViewDependencyAnalyzer analyzer = new ViewDependencyAnalyzer();
+
+        for (String viewName : viewsUsed) {
+            // Проверяем, не загружали ли уже эту вьюху
+            if (loadedViewDependencies.containsKey(viewName)) {
+                result.put(viewName, loadedViewDependencies.get(viewName));
+                continue;
+            }
+
+            try {
+                System.out.print("    Анализ вьюхи: " + viewName + " ... ");
+                ViewTableDependencies deps = analyzer.analyzeViewPublic(viewName);
+                result.put(viewName, deps);
+                loadedViewDependencies.put(viewName, deps);
+                System.out.println("OK (таблиц: " + deps.getOracleTables().size() + ")");
+            } catch (Exception e) {
+                System.err.println("ОШИБКА: " + e.getMessage());
+                ViewTableDependencies errorDeps = new ViewTableDependencies(viewName);
+                errorDeps.setExistsInOracle(false);
+                errorDeps.setOracleError(e.getMessage());
+                result.put(viewName, errorDeps);
+                loadedViewDependencies.put(viewName, errorDeps);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Завершить формирование отчета (добавить итоговую статистику)
+     */
+    /**
+     * Завершить формирование отчета (добавить итоговую статистику)
+     */
+    public void finishMainReport() throws IOException {
+        Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
+
+        if (!Files.exists(mainReportPath)) {
+            return;
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(mainReportPath.toFile(), true))) {
+            writer.println();
+            writer.println("=".repeat(100));
+            writer.println("=== ИТОГОВАЯ СТАТИСТИКА ===");
+            writer.println("Всего проанализировано форм: " + analyzedForms.size());
+            writer.println("Всего SQL запросов: " + totalSqlQueries);
+
+            long baseCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && f.getOverrides().isEmpty()).count();
+            long fullCount = analyzedForms.stream().filter(FormInfo::isFullyReplaced).count();
+            long partialCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && !f.getOverrides().isEmpty()).count();
+
+            writer.println("Базовые формы: " + baseCount);
+            writer.println("Полностью замененные: " + fullCount);
+            writer.println("Частично переопределенные: " + partialCount);
+
+            long tableCount = allTablesViews.values().stream()
+                    .filter(tv -> tv.getType() == TableViewInfo.Type.TABLE)
+                    .count();
+            long viewCount = allTablesViews.values().stream()
+                    .filter(tv -> tv.getType() == TableViewInfo.Type.VIEW)
+                    .count();
+
+            writer.println("Уникальных таблиц: " + tableCount);
+            writer.println("Уникальных представлений (вьюх): " + viewCount);
+            writer.println("Уникальных пакетов/функций: " + allPackagesFunctions.size());
+            writer.println("Уникальных констант: " + allConstants.size());
+            writer.println("Объектов для разбора: " + allUnknownObjects.size());
+            writer.println("=".repeat(100));
+        }
+
+        System.out.println("  Отчет завершен: forms_report.txt");
+    }
+
+    private void writeSqlQueriesSectionFull(PrintWriter writer, FormInfo formInfo) {
+        writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
+        writer.println();
+
+        int sqlNum = 1;
+        for (SqlInfo sql : formInfo.getSqlQueries()) {
+            writer.println("  [" + sqlNum + "] " + sql.getSourceType() + ": " +
+                    (sql.getComponentName().isEmpty() ? "unnamed" : sql.getComponentName()));
+            writer.println("      Источник: " + sql.getSourcePath());
+            if (sql.getBaseFormPath() != null) {
+                writer.println("      Базовая форма: " + sql.getBaseFormPath());
+            }
+            writer.println("      SQL:");
+
+            String fullXml = sql.getSqlContent();
+            if (fullXml != null && !fullXml.isEmpty()) {
+                String[] lines = fullXml.split("\\r?\\n");
+                for (String line : lines) {
+                    writer.println("      " + line);
+                }
+            } else {
+                writer.println("      (SQL запрос не найден)");
+            }
+
+            writer.println();
+
+            if (!sql.getTablesViews().isEmpty()) {
+                writer.println("      Таблицы/вьюхи:");
+                for (String tv : sql.getTablesViews()) {
+                    writer.println("          " + tv + ";");
+                }
+            }
+
+            if (!sql.getPackagesFunctions().isEmpty()) {
+                writer.println("      Пакеты/функции:");
+                for (String pf : sql.getPackagesFunctions()) {
+                    writer.println("          " + pf + ";");
+                }
+            }
+
+            if (!sql.getUserProcedures().isEmpty()) {
+                writer.println("      Пользовательские процедуры:");
+                for (String proc : sql.getUserProcedures()) {
+                    writer.println("          " + proc + ";");
+                }
+            }
+
+            if (!sql.getConstants().isEmpty()) {
+                writer.println("      Константы (D_PKG_CONSTANTS):");
+                for (String constant : sql.getConstants()) {
+                    writer.println("          " + constant + ";");
+                }
+            }
+
+            writer.println();
+            sqlNum++;
+        }
+    }
+
+    private void writeViewDetailsSection(PrintWriter writer, FormInfo formInfo,
+                                         Map<String, ViewTableDependencies> viewDependencies) {
+        Set<String> viewsUsed = new LinkedHashSet<>();
+        for (String tv : formInfo.getTablesViews()) {
+            if (tv.startsWith("D_V_")) {
+                viewsUsed.add(tv);
+            }
+        }
+
+        if (viewsUsed.isEmpty()) {
+            return;
+        }
+
+        writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):");
+        writer.println();
+
+        for (String viewName : viewsUsed) {
+            ViewTableDependencies deps = viewDependencies.get(viewName);
+            if (deps != null && deps.isExistsInOracle()) {
+                writer.println("  " + viewName + ":");
+                Set<String> tables = deps.getOracleTables();
+                if (tables.isEmpty()) {
+                    writer.println("      (таблицы не найдены)");
+                } else {
+                    for (String table : tables) {
+                        writer.println("      - " + table);
+                    }
+                }
+                writer.println();
+            } else if (deps != null && deps.getOracleError() != null) {
+                writer.println("  " + viewName + ":");
+                writer.println("      Ошибка: " + deps.getOracleError());
+                writer.println();
+            }
+        }
+    }
+
     private void writeFormReportToSummary(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
         writer.println("ФОРМА: " + formInfo.getFormPath());
@@ -219,12 +685,8 @@ public class ReportGeneratorService {
         }
 
         writer.println();
-
-        // ========== БЛОК ЮЗЕРФОРМЫ ==========
         writeUserFormsSection(writer, formInfo);
-        // ========== КОНЕЦ БЛОКА ==========
 
-        // ========== БЛОК SubForm и JS формы ==========
         writer.println("Список подключаемых форм subForm:");
         if (formInfo.getSubForms().isEmpty()) {
             writer.println("     (не найдено)");
@@ -244,7 +706,6 @@ public class ReportGeneratorService {
             }
         }
         writer.println();
-        // ========== КОНЕЦ БЛОКОВ ==========
 
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
         writer.println();
@@ -292,7 +753,6 @@ public class ReportGeneratorService {
                 }
             }
 
-            // Системные опции
             if (!formInfo.getSystemOptions().isEmpty()) {
                 writer.println("СИСТЕМНЫЕ ОПЦИИ:");
                 for (String opt : formInfo.getSystemOptions()) {
@@ -341,7 +801,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+
         if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
             for (String composition : formInfo.getUnitCompositions()) {
@@ -349,8 +809,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-// ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+
         if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
             for (String composition : formInfo.getJsUnitCompositions()) {
@@ -358,7 +817,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-// ========== КОНЕЦ БЛОКА ==========
+
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
@@ -368,43 +827,11 @@ public class ReportGeneratorService {
         }
     }
 
-
-    /**
-     * Получить таблицы, используемые во вьюхе из Oracle
-     */
-    private Set<String> getTablesUsedInView(String viewName) {
-        Set<String> tables = new LinkedHashSet<>();
-
-        if (!AnalysisConfig.isIncludeViewTableDependencies()) {
-            return tables;
-        }
-
-        // Используем существующий ViewDependencyAnalyzer
-        ru.miacomsoft.service.ViewDependencyAnalyzer analyzer =
-                new ru.miacomsoft.service.ViewDependencyAnalyzer();
-
-        try {
-            ru.miacomsoft.model.ViewTableDependencies deps = analyzer.analyzeView(viewName);
-            if (deps.isExistsInOracle()) {
-                tables.addAll(deps.getOracleTables());
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка при анализе вьюхи " + viewName + ": " + e.getMessage());
-        }
-
-        return tables;
-    }
-
-    /**
-     * Запись информации о таблицах через вьюхи в отчет
-     * Выводит единый уникальный список всех таблиц, используемых во вьюхах формы
-     */
     private void writeViewTablesSection(PrintWriter writer, FormInfo formInfo) {
         if (!AnalysisConfig.isIncludeViewTableDependencies()) {
             return;
         }
 
-        // Собираем все вьюхи, используемые в форме
         Set<String> viewsUsed = new LinkedHashSet<>();
         for (String tv : formInfo.getTablesViews()) {
             if (tv.startsWith("D_V_")) {
@@ -416,15 +843,12 @@ public class ReportGeneratorService {
             return;
         }
 
-        // Собираем уникальные таблицы из всех вьюх
         Set<String> allTables = new LinkedHashSet<>();
-
         ViewDependencyAnalyzer analyzer = new ViewDependencyAnalyzer();
 
         for (String viewName : viewsUsed) {
             try {
-                ru.miacomsoft.model.ViewTableDependencies deps = analyzer.analyzeView(viewName);
-
+                ViewTableDependencies deps = analyzer.analyzeView(viewName);
                 if (deps.isExistsInOracle()) {
                     allTables.addAll(deps.getOracleTables());
                 }
@@ -444,9 +868,7 @@ public class ReportGeneratorService {
         writer.println();
     }
 
-    /**
-     * Запись отчета о форме в итоговый файл (без SQL)
-     */
+
     private void writeFormReportToSummaryWithoutSql(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
         writer.println("ФОРМА: " + formInfo.getFormPath());
@@ -467,11 +889,8 @@ public class ReportGeneratorService {
         }
 
         writer.println();
-
-        // Блок ЮЗЕРФОРМЫ
         writeUserFormsSection(writer, formInfo);
 
-        // Блок SubForm и JS формы
         writer.println("Список подключаемых форм subForm:");
         if (formInfo.getSubForms().isEmpty()) {
             writer.println("     (не найдено)");
@@ -492,12 +911,10 @@ public class ReportGeneratorService {
         }
         writer.println();
 
-        // Только количество SQL запросов, без их содержимого
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
         writer.println("     (содержимое SQL запросов исключено для краткости)");
         writer.println();
 
-        // Таблицы и вьюхи
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
@@ -508,8 +925,6 @@ public class ReportGeneratorService {
 
         writeViewTablesSection(writer, formInfo);
 
-
-        // Пакеты и функции
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
@@ -518,7 +933,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Пользовательские процедуры
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
@@ -527,8 +941,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-
-        // Системные опции
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
@@ -537,7 +949,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== БЛОК КОНСТАНТ ==========
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
@@ -545,8 +956,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
-        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+
         if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
             for (String composition : formInfo.getUnitCompositions()) {
@@ -554,8 +964,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-        // ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+
         if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
             for (String composition : formInfo.getJsUnitCompositions()) {
@@ -563,8 +972,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-// ========== КОНЕЦ БЛОКА ==========
-        // Неизвестные объекты
+
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
@@ -573,6 +981,7 @@ public class ReportGeneratorService {
             writer.println();
         }
     }
+
     private void writeFormReportHeader(PrintWriter writer, int batchNumber, int batchSize) {
         writer.println("=".repeat(100));
         writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS (ПАКЕТ " + batchNumber + ") ===");
@@ -581,7 +990,7 @@ public class ReportGeneratorService {
         writer.println("=".repeat(100));
         writer.println();
     }
-    // ДОБАВИТЬ МЕТОД ДЛЯ ГЕНЕРАЦИИ ОТЧЕТА ПО КОНСТАНТАМ
+
     private void generateConstantsReport() throws IOException {
         Path filePath = Paths.get(OUTPUT_DIR, "constants_report.txt");
 
@@ -618,7 +1027,6 @@ public class ReportGeneratorService {
         writer.println("-".repeat(100));
         writer.println("ФОРМА: " + formInfo.getFormPath());
         writer.println("-".repeat(100));
-
         writer.println("Базовая форма: " + formInfo.getBaseFormPath());
 
         if (formInfo.isFullyReplaced()) {
@@ -635,12 +1043,8 @@ public class ReportGeneratorService {
         }
 
         writer.println();
-
-        // ========== БЛОК ЮЗЕРФОРМЫ ==========
         writeUserFormsSection(writer, formInfo);
-        // ========== КОНЕЦ БЛОКА ==========
 
-        // ========== БЛОК SubForm и JS формы ==========
         writer.println("Список подключаемых форм subForm:");
         if (formInfo.getSubForms().isEmpty()) {
             writer.println("     (не найдено)");
@@ -660,9 +1064,7 @@ public class ReportGeneratorService {
             }
         }
         writer.println();
-        // ========== КОНЕЦ БЛОКОВ ==========
 
-        // ========== БЛОК КОНСТАНТ ==========
         if (!formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ (D_PKG_CONSTANTS.SEARCH_*):");
             for (String constant : formInfo.getConstants()) {
@@ -670,7 +1072,6 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
 
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
         writer.println();
@@ -724,7 +1125,7 @@ public class ReportGeneratorService {
                     writer.println("          " + constant + ";");
                 }
             }
-// ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+
             if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
                 writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
                 for (String composition : formInfo.getUnitCompositions()) {
@@ -732,8 +1133,7 @@ public class ReportGeneratorService {
                 }
                 writer.println();
             }
-// ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-// ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+
             if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
                 writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
                 for (String composition : formInfo.getJsUnitCompositions()) {
@@ -741,7 +1141,7 @@ public class ReportGeneratorService {
                 }
                 writer.println();
             }
-// ========== КОНЕЦ БЛОКА ==========
+
             writer.println();
             sqlNum++;
         }
@@ -801,10 +1201,6 @@ public class ReportGeneratorService {
         return absolutePath;
     }
 
-    /**
-     * Запись информации о UserForms в отчет
-     * Показывает ВСЕ переопределения из FormInfo без дубликатов
-     */
     private void writeUserFormsSection(PrintWriter writer, FormInfo formInfo) {
         writer.println("ЮЗЕРФОРМЫ:");
 
@@ -814,7 +1210,6 @@ public class ReportGeneratorService {
             return;
         }
 
-        // Группируем по регионам
         Map<String, List<FormInfo.OverrideInfo>> overridesByRegion = new LinkedHashMap<>();
         for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
             overridesByRegion.computeIfAbsent(override.getRegionName(), k -> new ArrayList<>()).add(override);
@@ -826,10 +1221,9 @@ public class ReportGeneratorService {
 
             writer.println("     ===== " + region + " =====");
 
-            // Используем Set для уникальных путей и имен файлов
             Set<String> fullReplacements = new LinkedHashSet<>();
             Set<String> partialDfrm = new LinkedHashSet<>();
-            Map<String, Set<String>> dotDCatalogs = new LinkedHashMap<>(); // catalogPath -> Set<fileName>
+            Map<String, Set<String>> dotDCatalogs = new LinkedHashMap<>();
 
             for (FormInfo.OverrideInfo override : overrides) {
                 String path = override.getOverridePath();
@@ -853,12 +1247,10 @@ public class ReportGeneratorService {
                 }
             }
 
-            // 1. Полные замены (.frm)
             for (String path : fullReplacements) {
                 writer.println("        ПОЛНАЯ ЗАМЕНА: " + path);
             }
 
-            // 2. .d каталоги и их содержимое (уникальное)
             for (Map.Entry<String, Set<String>> catalogEntry : dotDCatalogs.entrySet()) {
                 String catalogPath = catalogEntry.getKey();
                 writer.println("        КАТАЛОГ: " + catalogPath);
@@ -867,7 +1259,6 @@ public class ReportGeneratorService {
                 }
             }
 
-            // 3. Отдельные .dfrm файлы
             for (String path : partialDfrm) {
                 writer.println("        ЧАСТИЧНОЕ ПЕРЕОПРЕДЕЛЕНИЕ: " + path);
             }
@@ -886,9 +1277,7 @@ public class ReportGeneratorService {
         writer.println("SQL запросов: " + totalQueries);
         writer.println("=".repeat(100));
     }
-    /**
-     * Генерация отчета по таблицам и вьюхам
-     */
+
     private void generateTablesViewsReport() throws IOException {
         Path filePath = Paths.get(OUTPUT_DIR, "tables_views_report.txt");
 
@@ -900,7 +1289,6 @@ public class ReportGeneratorService {
             writer.println("=".repeat(100));
             writer.println();
 
-            // Разделяем на таблицы и вьюхи
             List<TableViewInfo> tables = new ArrayList<>();
             List<TableViewInfo> views = new ArrayList<>();
 
@@ -912,11 +1300,9 @@ public class ReportGeneratorService {
                 }
             }
 
-            // Сортируем по имени
             tables.sort(Comparator.comparing(TableViewInfo::getName));
             views.sort(Comparator.comparing(TableViewInfo::getName));
 
-            // Выводим таблицы
             writer.println("=== ТАБЛИЦЫ (" + tables.size() + ") ===");
             writer.println();
             for (TableViewInfo tv : tables) {
@@ -929,7 +1315,6 @@ public class ReportGeneratorService {
                 writer.println();
             }
 
-            // Выводим вьюхи
             writer.println("=== ПРЕДСТАВЛЕНИЯ (ВЬЮХИ) (" + views.size() + ") ===");
             writer.println();
             for (TableViewInfo tv : views) {
@@ -948,9 +1333,6 @@ public class ReportGeneratorService {
         System.out.println("  Создан: tables_views_report.txt");
     }
 
-    /**
-     * Генерация отчета по пакетам и функциям
-     */
     private void generatePackagesFunctionsReport() throws IOException {
         Path filePath = Paths.get(OUTPUT_DIR, "packages_functions_report.txt");
 
@@ -962,7 +1344,6 @@ public class ReportGeneratorService {
             writer.println("=".repeat(100));
             writer.println();
 
-            // Разделяем на пакетные функции и standalone
             List<PackageFunctionInfo> packageFunctions = new ArrayList<>();
             List<PackageFunctionInfo> standaloneFunctions = new ArrayList<>();
 
@@ -974,11 +1355,9 @@ public class ReportGeneratorService {
                 }
             }
 
-            // Сортируем по имени
             packageFunctions.sort(Comparator.comparing(PackageFunctionInfo::getFullName));
             standaloneFunctions.sort(Comparator.comparing(PackageFunctionInfo::getFullName));
 
-            // Пакетные функции
             writer.println("=== ПАКЕТНЫЕ ФУНКЦИИ (" + packageFunctions.size() + ") ===");
             writer.println();
             for (PackageFunctionInfo pf : packageFunctions) {
@@ -993,7 +1372,6 @@ public class ReportGeneratorService {
                 writer.println();
             }
 
-            // Standalone функции
             writer.println("=== САМОСТОЯТЕЛЬНЫЕ ФУНКЦИИ (" + standaloneFunctions.size() + ") ===");
             writer.println();
             for (PackageFunctionInfo pf : standaloneFunctions) {
@@ -1012,10 +1390,6 @@ public class ReportGeneratorService {
         System.out.println("  Создан: packages_functions_report.txt");
     }
 
-
-    /**
-     * Генерация списка всех форм
-     */
     private void generateFormsListReport() throws IOException {
         Path filePath = Paths.get(OUTPUT_DIR, "forms_list.txt");
 
@@ -1062,9 +1436,6 @@ public class ReportGeneratorService {
         System.out.println("  Создан: forms_list.txt");
     }
 
-    /**
-     * Генерация общего сводного отчета
-     */
     private void generateSummaryReport() throws IOException {
         Path filePath = Paths.get(OUTPUT_DIR, "summary_report.txt");
 
@@ -1075,13 +1446,11 @@ public class ReportGeneratorService {
             writer.println("=".repeat(80));
             writer.println();
 
-            // Общая статистика
             writer.println("ОБЩАЯ СТАТИСТИКА:");
             writer.println("  Всего проанализировано форм: " + analyzedForms.size());
             writer.println("  Всего SQL запросов: " + totalSqlQueries);
             writer.println();
 
-            // Статистика по статусам
             long baseCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && f.getOverrides().isEmpty()).count();
             long fullCount = analyzedForms.stream().filter(FormInfo::isFullyReplaced).count();
             long partialCount = analyzedForms.stream().filter(f -> !f.isFullyReplaced() && !f.getOverrides().isEmpty()).count();
@@ -1092,7 +1461,6 @@ public class ReportGeneratorService {
             writer.println("  Частично переопределенные: " + partialCount);
             writer.println();
 
-            // Статистика по типам компонентов
             long m2DatasetCount = analyzedForms.stream()
                     .flatMap(f -> f.getSqlQueries().stream())
                     .filter(sql -> sql.getSourceType().equals("M2 DataSet"))
@@ -1117,7 +1485,6 @@ public class ReportGeneratorService {
             writer.println("  D3 Action: " + d3ActionCount);
             writer.println();
 
-            // Статистика по таблицам и вьюхам
             long tableCount = allTablesViews.values().stream()
                     .filter(tv -> tv.getType() == TableViewInfo.Type.TABLE)
                     .count();
@@ -1131,7 +1498,6 @@ public class ReportGeneratorService {
             writer.println("  Всего: " + allTablesViews.size());
             writer.println();
 
-            // Статистика по пакетам и функциям
             long packageFuncCount = allPackagesFunctions.values().stream()
                     .filter(pf -> pf.getType() == PackageFunctionInfo.Type.PACKAGE_FUNCTION)
                     .count();
@@ -1145,14 +1511,11 @@ public class ReportGeneratorService {
             writer.println("  Всего: " + allPackagesFunctions.size());
             writer.println();
 
-            // В методе generateSummaryReport добавить:
             long unknownCount = allUnknownObjects.size();
             writer.println("СТАТИСТИКА ПО НЕИЗВЕСТНЫМ ОБЪЕКТАМ:");
             writer.println("  Всего объектов для разбора: " + unknownCount);
             writer.println();
 
-
-            // После блока системных опций в summary отчете
             writer.println("СТАТИСТИКА ПО КОНСТАНТАМ:");
             writer.println("  Всего уникальных констант: " + allConstants.size());
             writer.println();
@@ -1167,7 +1530,6 @@ public class ReportGeneratorService {
                     });
             writer.println();
 
-
             writer.println("ТОП-10 НЕИЗВЕСТНЫХ ОБЪЕКТОВ (требуют анализа):");
             allUnknownObjects.values().stream()
                     .sorted((a, b) -> Integer.compare(b.getUsedInForms().size(), a.getUsedInForms().size()))
@@ -1178,7 +1540,6 @@ public class ReportGeneratorService {
                     });
             writer.println();
 
-            // Топ-10 наиболее часто используемых таблиц/вьюх
             writer.println("ТОП-10 НАИБОЛЕЕ ЧАСТО ИСПОЛЬЗУЕМЫХ ТАБЛИЦ/ВЬЮХ:");
             allTablesViews.values().stream()
                     .sorted((a, b) -> Integer.compare(b.getUsedInForms().size(), a.getUsedInForms().size()))
@@ -1189,7 +1550,6 @@ public class ReportGeneratorService {
                     });
             writer.println();
 
-            // Топ-10 наиболее часто используемых пакетов/функций
             writer.println("ТОП-10 НАИБОЛЕЕ ЧАСТО ИСПОЛЬЗУЕМЫХ ПАКЕТОВ/ФУНКЦИЙ:");
             allPackagesFunctions.values().stream()
                     .sorted((a, b) -> Integer.compare(b.getUsedInForms().size(), a.getUsedInForms().size()))
@@ -1208,7 +1568,6 @@ public class ReportGeneratorService {
         System.out.println("  Создан: summary_report.txt");
     }
 
-    // Getters для получения агрегированных данных
     public List<FormInfo> getAnalyzedForms() {
         return analyzedForms;
     }
@@ -1224,14 +1583,10 @@ public class ReportGeneratorService {
     public int getTotalSqlQueries() {
         return totalSqlQueries;
     }
-    /**
-     * Генерация отчета по зависимостям таблиц от вьюх
-     * (Анализ Oracle и PostgreSQL)
-     */
+
     public void generateViewDependenciesReport() throws IOException {
         System.out.println("\n=== АНАЛИЗ ЗАВИСИМОСТЕЙ ВЬЮХ (Oracle/PostgreSQL) ===");
 
-        // Фильтруем только вьюхи
         Map<String, TableViewInfo> viewsOnly = new LinkedHashMap<>();
         for (Map.Entry<String, TableViewInfo> entry : allTablesViews.entrySet()) {
             if (entry.getValue().getType() == TableViewInfo.Type.VIEW) {
@@ -1267,7 +1622,7 @@ public class ReportGeneratorService {
 
         try {
             Map<String, ViewTableDependencies> dependencies = analyzer.analyzeAllViews(viewsOnly);
-            analyzer.generateViewDependenciesReport(dependencies);  // ВЫЗЫВАЕМ С ПАРАМЕТРОМ
+            analyzer.generateViewDependenciesReport(dependencies);
             System.out.println("  Анализ зависимостей вьюх завершен");
         } catch (InterruptedException e) {
             System.out.println("  Анализ зависимостей вьюх прерван: " + e.getMessage());
@@ -1275,18 +1630,13 @@ public class ReportGeneratorService {
         }
     }
 
-    /**
-     * Генерация отчета по формам без SQL запросов (только структура)
-     */
     public void generateFormReportsWithoutSql() throws IOException {
         int batchNumber = 1;
 
-        // Для итогового файла
         Path summaryFilePath = Paths.get(OUTPUT_DIR, "forms_report_all_without_sql.txt");
         PrintWriter summaryWriter = new PrintWriter(Files.newBufferedWriter(summaryFilePath));
 
         try {
-            // Записываем заголовок итогового файла
             summaryWriter.println("=".repeat(100));
             summaryWriter.println("=== ПОЛНЫЙ ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) ===");
             summaryWriter.println("Дата создания: " + new Date());
@@ -1299,7 +1649,6 @@ public class ReportGeneratorService {
                 int end = Math.min(i + BATCH_SIZE, analyzedForms.size());
                 List<FormInfo> batch = analyzedForms.subList(i, end);
 
-                // Создаем файл пакета
                 String fileName = String.format("forms_report_without_sql_%03d.txt", batchNumber);
                 File resFragDir = new File(OUTPUT_DIR, "Frag");
                 if (!resFragDir.exists()) {
@@ -1311,7 +1660,6 @@ public class ReportGeneratorService {
                     writeFormReportHeaderWithoutSql(batchWriter, batchNumber, batch.size());
                     for (FormInfo formInfo : batch) {
                         writeFormReportWithoutSql(batchWriter, formInfo);
-                        // Также пишем в итоговый файл
                         writeFormReportToSummaryWithoutSql(summaryWriter, formInfo);
                     }
                     writeFormReportFooterWithoutSql(batchWriter, batch);
@@ -1321,7 +1669,6 @@ public class ReportGeneratorService {
                 batchNumber++;
             }
 
-            // Записываем футер итогового файла
             summaryWriter.println();
             summaryWriter.println("=".repeat(100));
             summaryWriter.println("=== КОНЕЦ ПОЛНОГО ОТЧЕТА (БЕЗ SQL) ===");
@@ -1334,13 +1681,10 @@ public class ReportGeneratorService {
         System.out.println("  Создан: forms_report_all_without_sql.txt (полный отчет без SQL)");
     }
 
-
-
     private void writeFormReportWithoutSql(PrintWriter writer, FormInfo formInfo) {
         writer.println("-".repeat(100));
         writer.println("ФОРМА: " + formInfo.getFormPath());
         writer.println("-".repeat(100));
-
         writer.println("Базовая форма: " + formInfo.getBaseFormPath());
 
         if (formInfo.isFullyReplaced()) {
@@ -1357,11 +1701,8 @@ public class ReportGeneratorService {
         }
 
         writer.println();
-
-        // Блок ЮЗЕРФОРМЫ
         writeUserFormsSection(writer, formInfo);
 
-        // Блок SubForm и JS формы
         writer.println("Список подключаемых форм subForm:");
         if (formInfo.getSubForms().isEmpty()) {
             writer.println("     (не найдено)");
@@ -1382,12 +1723,10 @@ public class ReportGeneratorService {
         }
         writer.println();
 
-        // Только количество SQL запросов, без их содержимого
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
         writer.println("     (содержимое SQL запросов исключено для краткости)");
         writer.println();
 
-        // Таблицы и вьюхи
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
@@ -1396,7 +1735,8 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Пакеты и функции
+        writeViewTablesSection(writer, formInfo);
+
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
@@ -1405,7 +1745,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Пользовательские процедуры
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
@@ -1414,7 +1753,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Системные опции
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
@@ -1423,8 +1761,6 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== БЛОК КОНСТАНТ ==========
-        // ДОБАВИТЬ ЭТОТ БЛОК!!!
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
@@ -1432,8 +1768,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== КОНЕЦ БЛОКА КОНСТАНТ ==========
-        // ========== БЛОК КОМПОЗИЦИЙ UNITEDIT ==========
+
         if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
             for (String composition : formInfo.getUnitCompositions()) {
@@ -1441,7 +1776,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-        // ========== БЛОК КОМПОЗИЦИЙ ИЗ JS (UniversalComposition) ==========
+
         if (formInfo.getJsUnitCompositions() != null && !formInfo.getJsUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ ИЗ JS (UniversalComposition):");
             for (String composition : formInfo.getJsUnitCompositions()) {
@@ -1449,9 +1784,7 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
-// ========== КОНЕЦ БЛОКА ==========
-        // ========== КОНЕЦ БЛОКА КОМПОЗИЦИЙ ==========
-        // Неизвестные объекты
+
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
@@ -1461,9 +1794,6 @@ public class ReportGeneratorService {
         }
     }
 
-    /**
-     * Заголовок пакетного файла (без SQL)
-     */
     private void writeFormReportHeaderWithoutSql(PrintWriter writer, int batchNumber, int batchSize) {
         writer.println("=".repeat(100));
         writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS (БЕЗ SQL) (ПАКЕТ " + batchNumber + ") ===");
@@ -1473,9 +1803,6 @@ public class ReportGeneratorService {
         writer.println();
     }
 
-    /**
-     * Футер пакетного файла (без SQL)
-     */
     private void writeFormReportFooterWithoutSql(PrintWriter writer, List<FormInfo> batch) {
         int totalQueries = batch.stream().mapToInt(FormInfo::getTotalSqlQueries).sum();
         writer.println("=".repeat(100));
@@ -1484,5 +1811,4 @@ public class ReportGeneratorService {
         writer.println("SQL запросов: " + totalQueries);
         writer.println("=".repeat(100));
     }
-
 }

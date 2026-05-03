@@ -1,9 +1,15 @@
 package ru.miacomsoft.service;
 
+import ru.miacomsoft.model.AnalysisConfig;
 import ru.miacomsoft.model.FormInfo;
+import ru.miacomsoft.model.ReportConfig;
+import ru.miacomsoft.model.SettingsModel;
 import ru.miacomsoft.model.SqlInfo;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,18 +24,300 @@ public class TmisFormAnalyzerService {
     private final FileScannerService scannerService;
     private final UserFormsResolver userFormsResolver;
     private final SqlExtractorService sqlExtractor;
+    private final SettingsModel settings;
+    private ReportGeneratorService reportService;
 
     public TmisFormAnalyzerService(String projectRoot) {
         this.projectRoot = projectRoot;
         this.scannerService = new FileScannerService(projectRoot);
         this.userFormsResolver = new UserFormsResolver(scannerService);
         this.sqlExtractor = new SqlExtractorService();
+        this.settings = new SettingsModel();
+    }
+
+    public TmisFormAnalyzerService(SettingsModel settings) {
+        this.projectRoot = settings.getProjectPath();
+        this.scannerService = new FileScannerService(projectRoot);
+        this.userFormsResolver = new UserFormsResolver(scannerService);
+        this.sqlExtractor = new SqlExtractorService();
+        this.settings = settings;
+    }
+
+
+    /**
+     * Запуск полного анализа всех форм
+     */
+    public void runFullAnalysis() throws IOException {
+        System.out.println("=".repeat(80));
+        System.out.println("=== АНАЛИЗАТОР ФОРМ T-MIS (M2/D3) ===");
+        System.out.println("=".repeat(80));
+
+        System.out.println("Корневой каталог проекта: " + projectRoot);
+        System.out.println();
+
+        // Выводим конфигурацию отчета
+        printReportConfig();
+        System.out.println();
+
+        System.out.println("Анализ таблиц через вьюхи: " +
+                (AnalysisConfig.isIncludeViewTableDependencies() ? "ВКЛЮЧЕН" : "ВЫКЛЮЧЕН"));
+        System.out.println();
+
+        // Получаем список форм для анализа
+        Set<String> formsToAnalyze = getFormsToAnalyze();
+
+        System.out.println("Найдено форм для анализа: " + formsToAnalyze.size());
+        System.out.println();
+
+        // Создаем сервис генерации отчетов
+        reportService = new ReportGeneratorService(settings);
+
+        // Создаем выходную директорию
+        Path outputDir = Paths.get(settings.getOutputDir());
+        if (!Files.exists(outputDir)) {
+            Files.createDirectories(outputDir);
+        }
+
+        // Анализируем каждую форму
+        int processed = 0;
+        int errors = 0;
+        long startTime = System.currentTimeMillis();
+
+        for (String formPath : formsToAnalyze) {
+            processed++;
+            long formStartTime = System.currentTimeMillis();
+
+            System.out.print("Анализ [" + processed + "/" + formsToAnalyze.size() + "]: " + formPath + " ... ");
+
+            try {
+                FormInfo result = analyzeForm(formPath);
+                if (result != null) {
+                    reportService.addAnalysisResult(result);
+
+                    // СРАЗУ ДОПИСЫВАЕМ ФОРМУ В ОТЧЕТ
+                    reportService.appendFormToMainReport(result);
+
+                    long formElapsed = System.currentTimeMillis() - formStartTime;
+                    System.out.println("OK (SQL: " + result.getTotalSqlQueries() + ", " + formElapsed + "ms)");
+                } else {
+                    System.out.println("ПРОПУЩЕН (форма не найдена)");
+                    errors++;
+                }
+            } catch (Exception e) {
+                System.err.println("ОШИБКА: " + e.getMessage());
+                errors++;
+            }
+        }
+
+        long totalElapsed = System.currentTimeMillis() - startTime;
+        long totalMinutes = totalElapsed / 60000;
+        long totalSeconds = (totalElapsed % 60000) / 1000;
+
+        System.out.println();
+        System.out.println("=".repeat(80));
+        System.out.println("=== ЗАВЕРШЕНИЕ АНАЛИЗА ===");
+
+        // Добавляем итоговую статистику в отчет
+        reportService.finishMainReport();
+
+        // Выводим итоговую статистику
+        printFinalStatistics(processed, errors, totalMinutes, totalSeconds);
+    }
+
+    /**
+     * Вывод конфигурации отчета
+     */
+    private void printReportConfig() {
+        System.out.println("КОНФИГУРАЦИЯ ОТЧЕТА:");
+        System.out.println("  SQL содержимое: " + (ReportConfig.isIncludeSqlContent() ? "ВКЛ" : "ВЫКЛ"));
+        System.out.println("  JS формы: " + (ReportConfig.isIncludeJsForms() ? "ВКЛ" : "ВЫКЛ"));
+        System.out.println("  Таблицы/вьюхи: " + (ReportConfig.isIncludeTablesViews() ? "ВКЛ" : "ВЫКЛ"));
+        System.out.println("  Таблицы через вьюхи: " + (ReportConfig.isIncludeViewTables() ? "ВКЛ" : "ВЫКЛ"));
+        System.out.println("  Композиции JS: " + (ReportConfig.isIncludeJsUnitCompositions() ? "ВКЛ" : "ВЫКЛ"));
+        System.out.println("  Детали вьюх: " + (ReportConfig.isIncludeViewDetails() ? "ВКЛ" : "ВЫКЛ"));
+    }
+
+    /**
+     * Вывод итоговой статистики
+     */
+    private void printFinalStatistics(int processed, int errors, long totalMinutes, long totalSeconds) {
+        System.out.println();
+        System.out.println("=== ИТОГОВАЯ СТАТИСТИКА ===");
+        System.out.println("Обработано форм: " + processed);
+        System.out.println("Ошибок: " + errors);
+        System.out.println("Всего SQL запросов: " + reportService.getTotalSqlQueries());
+        System.out.println("Уникальных таблиц/вьюх: " + reportService.getUniqueTablesViews().size());
+        System.out.println("Уникальных пакетов/функций: " + reportService.getUniquePackagesFunctions().size());
+        System.out.println("Общее время выполнения: " + totalMinutes + " мин " + totalSeconds + " сек");
+        System.out.println();
+        System.out.println("Результаты сохранены в директории: " + settings.getOutputDir() + "/");
+        System.out.println("Основной отчет: " + settings.getOutputDir() + "/forms_report.txt");
+    }
+
+
+
+    /**
+     * Вывод итоговой статистики
+     */
+    private void printFinalStatistics(int processed) {
+        System.out.println();
+        System.out.println("=== АНАЛИЗ ЗАВЕРШЕН ===");
+        System.out.println("Обработано форм: " + processed);
+        System.out.println("Всего SQL запросов: " + reportService.getTotalSqlQueries());
+        System.out.println("Уникальных таблиц/вьюх: " + reportService.getUniqueTablesViews().size());
+        System.out.println("Уникальных пакетов/функций: " + reportService.getUniquePackagesFunctions().size());
+        System.out.println();
+        System.out.println("Результаты сохранены в директории: " + settings.getOutputDir() + "/");
+    }
+
+    /**
+     * Получение списка форм для анализа
+     */
+    private Set<String> getFormsToAnalyze() {
+        Set<String> forms = new LinkedHashSet<>();
+        Path listFile = Paths.get(AnalysisConfig.getFormsListFile());
+
+        if (Files.exists(listFile)) {
+            try {
+                List<String> lines = Files.readAllLines(listFile);
+                boolean hasContent = false;
+
+                for (String line : lines) {
+                    String trimmed = line.trim();
+                    if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
+                        hasContent = true;
+                        String formPath = extractBaseFormPath(trimmed);
+                        if (formPath != null) {
+                            forms.add(formPath);
+                        }
+                    }
+                }
+
+                if (hasContent) {
+                    System.out.println("Загружено форм из списка: " + forms.size());
+                    return forms;
+                } else if (AnalysisConfig.isScanAllFormsIfListEmpty()) {
+                    System.out.println("Файл " + AnalysisConfig.getFormsListFile() + " пуст или содержит только комментарии.");
+                    System.out.println("Выполняется сканирование всех форм в проекте...");
+                }
+            } catch (IOException e) {
+                System.err.println("Ошибка чтения файла списка: " + e.getMessage());
+                if (AnalysisConfig.isScanAllFormsIfListEmpty()) {
+                    System.out.println("Выполняется сканирование всех форм в проекте...");
+                }
+            }
+        } else if (AnalysisConfig.isScanAllFormsIfListEmpty()) {
+            System.out.println("Файл " + AnalysisConfig.getFormsListFile() + " не найден.");
+            System.out.println("Выполняется сканирование всех форм в проекте...");
+        }
+
+        // Сканируем все формы в проекте
+        return scanAllForms();
+    }
+
+    /**
+     * Сканирование всех форм в проекте (.frm и .dfrm)
+     */
+    private Set<String> scanAllForms() {
+        Set<String> allForms = new LinkedHashSet<>();
+        Path rootPath = Paths.get(projectRoot);
+
+        try {
+            // Сканируем каталог Forms (базовые формы)
+            Path formsPath = rootPath.resolve("Forms");
+            if (Files.exists(formsPath)) {
+                try (java.util.stream.Stream<Path> walk = Files.walk(formsPath)) {
+                    walk.filter(Files::isRegularFile)
+                            .filter(p -> p.toString().endsWith(".frm"))
+                            .forEach(p -> {
+                                String relativePath = formsPath.relativize(p).toString().replace("\\", "/");
+                                allForms.add(relativePath);
+                            });
+                }
+                System.out.println("  Найдено базовых форм (.frm) в Forms/: " +
+                        allForms.stream().filter(f -> f.endsWith(".frm")).count());
+            }
+
+            // Сканируем все каталоги UserForms (переопределения)
+            try (java.util.stream.Stream<Path> list = Files.list(rootPath)) {
+                list.filter(Files::isDirectory)
+                        .filter(p -> p.getFileName().toString().startsWith("UserForms"))
+                        .forEach(userFormsDir -> {
+                            try (java.util.stream.Stream<Path> walk = Files.walk(userFormsDir)) {
+                                walk.filter(Files::isRegularFile)
+                                        .filter(p -> p.toString().endsWith(".frm") || p.toString().endsWith(".dfrm"))
+                                        .forEach(p -> {
+                                            String relativePath = userFormsDir.relativize(p).toString().replace("\\", "/");
+                                            String fullPath = userFormsDir.getFileName().toString() + "/" + relativePath;
+                                            String baseFormPath = extractBaseFormPath(fullPath);
+                                            if (baseFormPath != null && !allForms.contains(baseFormPath)) {
+                                                allForms.add(baseFormPath);
+                                            }
+                                        });
+                            } catch (IOException e) {
+                                System.err.println("Ошибка сканирования " + userFormsDir + ": " + e.getMessage());
+                            }
+                        });
+            }
+
+            System.out.println("Всего найдено уникальных форм: " + allForms.size());
+
+        } catch (IOException e) {
+            System.err.println("Ошибка при сканировании проекта: " + e.getMessage());
+        }
+
+        return allForms;
+    }
+
+    /**
+     * Извлечение базового пути формы из пути переопределения
+     */
+    private String extractBaseFormPath(String path) {
+        if (!path.startsWith("UserForms") && !path.startsWith("/UserForms")) {
+            return normalizeFormPath(path);
+        }
+
+        String withoutUserForms = path.replaceFirst("^/?UserForms[^/]*/", "");
+
+        if (withoutUserForms.contains(".d/")) {
+            String basePath = withoutUserForms.substring(0, withoutUserForms.indexOf(".d/"));
+            return basePath + ".frm";
+        }
+
+        if (withoutUserForms.endsWith(".dfrm")) {
+            String basePath = withoutUserForms.substring(0, withoutUserForms.length() - 5);
+            return basePath + ".frm";
+        }
+
+        if (withoutUserForms.endsWith(".frm")) {
+            return withoutUserForms;
+        }
+
+        return normalizeFormPath(withoutUserForms);
+    }
+
+    /**
+     * Нормализация пути формы
+     */
+    private String normalizeFormPath(String path) {
+        String normalized = path;
+        if (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+        if (normalized.startsWith("Forms/")) {
+            normalized = normalized.substring(6);
+        }
+        if (normalized.startsWith("forms/")) {
+            normalized = normalized.substring(6);
+        }
+        if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm")) {
+            normalized = normalized + ".frm";
+        }
+        return normalized;
     }
 
     /**
      * Проанализировать форму по заданному пути
-     * @param formPath Путь к форме (относительно Forms/ или полный)
-     * @return FormInfo с результатами анализа, или null если форма не найдена
      */
     public FormInfo analyzeForm(String formPath) {
         String normalizedPath = normalizeFormPath(formPath);
@@ -62,7 +350,6 @@ public class TmisFormAnalyzerService {
                 baseContent, baseFormPathObj.toString(), null
         );
 
-// После добавления констант в formInfo
         for (SqlInfo sql : sqlQueries) {
             formInfo.addSqlQuery(sql);
             for (String tv : sql.getTablesViews()) formInfo.addTableView(tv);
@@ -72,35 +359,18 @@ public class TmisFormAnalyzerService {
             for (String unknown : sql.getUnknownObjects()) formInfo.addUnknownObject(unknown);
             for (String constant : sql.getConstants()) {
                 formInfo.addConstant(constant);
-                System.out.println("[DEBUG] Добавлена константа в FormInfo: " + constant + " для формы " + formPath);
             }
         }
+
         // Если есть ПОЛНОЕ переопределение, можно также проанализировать и его
         if (formInfo.isFullyReplaced() && formInfo.getReplacementPath() != null) {
             String userContent = scannerService.readFileContent(Path.of(formInfo.getReplacementPath()));
             if (userContent != null) {
                 // Анализируем пользовательскую форму (опционально)
-                // Можно добавить в отдельный список или сравнить
             }
         }
 
-        // После извлечения SQL запросов, добавьте принудительный поиск констант
-        Set<String> forceConstants = new LinkedHashSet<>();
-        Pattern constPattern = Pattern.compile("D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*'([^']+)'", Pattern.DOTALL);
-        Matcher constMatcher = constPattern.matcher(baseContent);
-        while (constMatcher.find()) {
-            String constant = constMatcher.group(1);
-            forceConstants.add(constant);
-            System.out.println("Принудительно найдена константа: " + constant);
-        }
-
-        for (String constant : forceConstants) {
-            formInfo.addConstant(constant);
-        }
-
-        System.out.println("[DEBUG] Всего констант в FormInfo для формы " + formPath + ": " + formInfo.getConstants().size());
-
-        // ПРЯМОЙ ПОИСК КОНСТАНТ В СОДЕРЖИМОМ ФОРМЫ
+        // Прямой поиск констант в содержимом формы
         Pattern directConstPattern = Pattern.compile(
                 "D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -111,7 +381,6 @@ public class TmisFormAnalyzerService {
             String constant = directMatcher.group(1);
             if (constant != null && !constant.isEmpty()) {
                 directConstants.add(constant);
-                System.out.println("[DEBUG DIRECT] Найдена константа в форме: " + constant);
             }
         }
 
@@ -119,85 +388,19 @@ public class TmisFormAnalyzerService {
             formInfo.addConstant(constant);
         }
 
-        System.out.println("[DEBUG DIRECT] Всего констант найдено прямым поиском: " + directConstants.size());
-
-
         return formInfo;
-    }
-
-    /**
-     * Извлечь формы из D3Api.showForm вызовов
-     * Форматы:
-     * - D3Api.showForm('Reports/sign_data', ...)
-     * - D3Api.showForm('help_view', null, ...)
-     * - D3Api.showForm('System/change_password')
-     */
-    private void extractD3ApiShowForms(String content, FormInfo formInfo) {
-        if (content == null || content.isEmpty()) return;
-
-        Set<String> foundForms = new LinkedHashSet<>();
-
-        // Универсальный паттерн для D3Api.showForm
-        // Ищет: D3Api.showForm('путь/к/форме', ...)
-        Pattern d3ApiPattern = Pattern.compile(
-                "D3Api\\.showForm\\s*\\(\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher matcher = d3ApiPattern.matcher(content);
-        while (matcher.find()) {
-            String formPath = matcher.group(1);
-            // Добавляем .frm если нет расширения
-            // if (!formPath.endsWith(".frm") && !formPath.endsWith(".dfrm")) {
-            //     formPath = formPath + ".frm";
-            // }
-            formPath = "(D3Api.showForm) "+formPath ;
-
-            String normalized = normalizeFormPathFromJs(formPath);
-            if (normalized != null && isValidFormPath(normalized)) {
-                foundForms.add(normalized);
-            }
-        }
-
-        // Добавляем найденные формы в subForm (или можно создать отдельный блок)
-        for (String form : foundForms) {
-            formInfo.addSubForm(form);
-        }
-
-        if (!foundForms.isEmpty()) {
-            System.out.println("  Найдено D3Api.showForm: " + foundForms.size());
-        }
-    }
-
-    /**
-     * Нормализация пути формы
-     */
-    private String normalizeFormPath(String formPath) {
-        String normalized = formPath;
-
-        // Убираем префикс Forms/ если есть
-        if (normalized.startsWith("Forms/")) {
-            normalized = normalized.substring(6);
-        }
-
-        // Убираем префикс / если есть
-        if (normalized.startsWith("/")) {
-            normalized = normalized.substring(1);
-        }
-
-        // Добавляем .frm если нужно
-        if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm")) {
-            normalized = normalized + ".frm";
-        }
-
-        return normalized;
     }
 
     /**
      * Извлечь SubForm из содержимого формы
      */
+    /**
+     * Извлечь SubForm из содержимого формы
+     */
     private void extractSubForms(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
+
+        Set<String> foundPaths = new LinkedHashSet<>();
 
         // Паттерн для D3 синтаксиса: <cmpSubForm path="...">
         Pattern d3SubFormPattern = Pattern.compile(
@@ -211,183 +414,158 @@ public class TmisFormAnalyzerService {
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
+        // Паттерн для path без кавычек - ТОЛЬКО если есть слеш (полный путь)
+        // Исключаем одиночные слова типа "Eko"
+        Pattern m2SubFormNoQuotesPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']SubForm[\"'][^>]*path\\s*=\\s*([^\\s/>]+/[^\\s/>]+)",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
         Matcher d3Matcher = d3SubFormPattern.matcher(content);
         while (d3Matcher.find()) {
-            String path = d3Matcher.group(1);
-            if (isValidFormPath(path)) {
-                formInfo.addSubForm(path);
+            String path = d3Matcher.group(1).trim();
+            if (!path.isEmpty()) {
+                path = path.replaceAll("^[\"']|[\"']$", "");
+                foundPaths.add(path);
             }
         }
 
         Matcher m2Matcher = m2SubFormPattern.matcher(content);
         while (m2Matcher.find()) {
-            String path = m2Matcher.group(1);
-            if (isValidFormPath(path)) {
-                formInfo.addSubForm(path);
+            String path = m2Matcher.group(1).trim();
+            if (!path.isEmpty()) {
+                path = path.replaceAll("^[\"']|[\"']$", "");
+                foundPaths.add(path);
             }
+        }
+
+        Matcher m2NoQuotesMatcher = m2SubFormNoQuotesPattern.matcher(content);
+        while (m2NoQuotesMatcher.find()) {
+            String path = m2NoQuotesMatcher.group(1).trim();
+            if (!path.isEmpty() && path.contains("/")) {
+                path = path.replaceAll("^[\"']|[\"']$", "");
+                foundPaths.add(path);
+            }
+        }
+
+        for (String path : foundPaths) {
+            formInfo.addSubForm(path);
+            System.out.println("  Найден SubForm: " + path);
         }
     }
 
     /**
      * Извлечь JS формы (openWindow, openD3Form) из содержимого формы
-     * Ищет везде: в CDATA, атрибутах и тексте
      */
     private void extractJsForms(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
         Set<String> foundForms = new LinkedHashSet<>();
 
-        // Паттерн для поиска в любом контексте (атрибуты, CDATA, текст)
-        Pattern anyContextPattern = Pattern.compile(
-                "(?:openWindow|openD3Form)\\s*\\([^)]*['\"]([^'\"]+\\.frm)['\"][^)]*\\)",
+        Pattern openD3FormPattern = Pattern.compile(
+                "openD3Form\\s*\\(\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher matcher = anyContextPattern.matcher(content);
-        while (matcher.find()) {
-            String formPath = matcher.group(1);
-            String normalized = normalizeFormPathFromJs(formPath);
-            if (normalized != null && isValidFormPath(normalized)) {
-                foundForms.add(normalized);
-            }
-        }
-
-        // Дополнительный паттерн для поиска без .frm расширения в вызове
-        Pattern noExtensionPattern = Pattern.compile(
-                "(?:openWindow|openD3Form)\\s*\\([^)]*['\"]([^'\"]+/(?:[^'\"]+))['\"][^)]*\\)",
+        Pattern openWindowPattern = Pattern.compile(
+                "openWindow\\s*\\(\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher matcher2 = noExtensionPattern.matcher(content);
-        while (matcher2.find()) {
-            String formPath = matcher2.group(1);
-            if (!formPath.endsWith(".frm") && !formPath.endsWith(".dfrm")) {
-                formPath = formPath + ".frm";
-            }
-            String normalized = normalizeFormPathFromJs(formPath);
-            if (normalized != null && isValidFormPath(normalized)) {
-                foundForms.add(normalized);
+        Pattern openD3FormObjectPattern = Pattern.compile(
+                "openD3Form\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3Matcher = openD3FormPattern.matcher(content);
+        while (d3Matcher.find()) {
+            String formPath = d3Matcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty()) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена openD3Form: " + formPath);
             }
         }
 
-        // Добавляем найденные формы в FormInfo
+        Matcher windowMatcher = openWindowPattern.matcher(content);
+        while (windowMatcher.find()) {
+            String formPath = windowMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty()) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена openWindow: " + formPath);
+            }
+        }
+
+        Matcher objectMatcher = openD3FormObjectPattern.matcher(content);
+        while (objectMatcher.find()) {
+            String formPath = objectMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty()) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена openD3Form (объект): " + formPath);
+            }
+        }
+
         for (String form : foundForms) {
             formInfo.addJsForm(form);
         }
     }
 
     /**
-     * Извлечь значение атрибута из строки вида attr="value" или attr='value'
+     * Извлечь формы из D3Api.showForm вызовов
+     * Форматы:
+     * - D3Api.showForm('Reports/sign_data', ...)
+     * - D3Api.showForm('help_view', null, ...)
+     * - D3Api.showForm('System/change_password')
+     * - D3Api.showForm('components_d3', document.getElementById('d3_components_page'))
      */
-    private String extractAttributeValue(String attrString) {
-        // Ищем кавычки и берем содержимое между ними
-        Pattern quotePattern = Pattern.compile("=['\"]([^'\"]*)['\"]");
-        Matcher matcher = quotePattern.matcher(attrString);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-
     /**
-     * Извлечь все пути к формам из JS скрипта
-     * Поддерживает различные форматы вызова
+     * Извлечь формы из D3Api.showForm вызовов
      */
-    private Set<String> extractFormsFromScript(String scriptContent) {
-        Set<String> forms = new LinkedHashSet<>();
+    /**
+     * Извлечь формы из D3Api.showForm вызовов
+     */
+    private void extractD3ApiShowForms(String content, FormInfo formInfo) {
+        if (content == null || content.isEmpty()) return;
 
-        if (scriptContent == null || scriptContent.isEmpty()) {
-            return forms;
-        }
+        Set<String> foundForms = new LinkedHashSet<>();
 
-        // Паттерн для openWindow со строковым параметром: openWindow('path/to/form.frm', ...)
-        Pattern openWindowStringPattern = Pattern.compile(
-                "openWindow\\s*\\(\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
-                Pattern.DOTALL
+        // Паттерн для D3Api.showForm с кавычками
+        Pattern d3ApiPattern = Pattern.compile(
+                "D3Api\\.showForm\\s*\\(\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для openWindow с объектом: openWindow({name: 'path/to/form.frm', ...}, ...)
-        Pattern openWindowObjectPattern = Pattern.compile(
-                "openWindow\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
-                Pattern.DOTALL
-        );
-
-        // Паттерн для openD3Form со строковым параметром
-        Pattern openD3StringPattern = Pattern.compile(
-                "openD3Form\\s*\\(\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
-                Pattern.DOTALL
-        );
-
-        // Паттерн для openD3Form с объектом: openD3Form({name: 'path/to/form.frm', ...}, ...)
-        Pattern openD3ObjectPattern = Pattern.compile(
-                "openD3Form\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]",
-                Pattern.DOTALL
-        );
-
-        // Паттерн для openD3Form с тремя параметрами: openD3Form('path', true, {vars: {...}})
-        Pattern openD3ThreeParamsPattern = Pattern.compile(
-                "openD3Form\\s*\\(\\s*['\"]([^'\"]+(?:\\.frm)?)['\"]\\s*,\\s*true\\s*,\\s*\\{",
-                Pattern.DOTALL
-        );
-
-        // Собираем все совпадения
-        Matcher m1 = openWindowStringPattern.matcher(scriptContent);
-        while (m1.find()) {
-            String path = normalizeFormPathFromJs(m1.group(1));
-            if (path != null) forms.add(path);
+        Matcher matcher = d3ApiPattern.matcher(content);
+        while (matcher.find()) {
+            String formPath = matcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty()) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена D3Api.showForm: " + formPath);
+            }
         }
 
-        Matcher m2 = openWindowObjectPattern.matcher(scriptContent);
-        while (m2.find()) {
-            String path = normalizeFormPathFromJs(m2.group(1));
-            if (path != null) forms.add(path);
+        for (String form : foundForms) {
+            formInfo.addSubForm(form);
         }
-
-        Matcher m3 = openD3StringPattern.matcher(scriptContent);
-        while (m3.find()) {
-            String path = normalizeFormPathFromJs(m3.group(1));
-            if (path != null) forms.add(path);
-        }
-
-        Matcher m4 = openD3ObjectPattern.matcher(scriptContent);
-        while (m4.find()) {
-            String path = normalizeFormPathFromJs(m4.group(1));
-            if (path != null) forms.add(path);
-        }
-
-        Matcher m5 = openD3ThreeParamsPattern.matcher(scriptContent);
-        while (m5.find()) {
-            String path = normalizeFormPathFromJs(m5.group(1));
-            if (path != null) forms.add(path);
-        }
-
-        return forms;
     }
 
     /**
      * Извлечь композиции из UnitEdit компонентов
-     * Форматы:
-     * - M2: <component cmptype="UnitEdit" name="..." unit="INJURE_KINDS" composition="DEFAULT" .../>
-     * - D3: <cmpUnitEdit name="..." unit="INJURE_KINDS" composition="DEFAULT" .../>
      */
     private void extractUnitCompositions(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
         Set<String> compositions = new LinkedHashSet<>();
 
-        // Паттерн для M2 синтаксиса
         Pattern m2UnitEditPattern = Pattern.compile(
                 "<component\\s+cmptype\\s*=\\s*[\"']UnitEdit[\"'][^>]*?\\s+unit\\s*=\\s*[\"']([^\"']+)[\"'][^>]*?\\s+composition\\s*=\\s*[\"']([^\"']+)[\"'][^>]*/?>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для D3 синтаксиса
         Pattern d3UnitEditPattern = Pattern.compile(
                 "<cmpUnitEdit[^>]*?\\s+unit\\s*=\\s*[\"']([^\"']+)[\"'][^>]*?\\s+composition\\s*=\\s*[\"']([^\"']+)[\"'][^>]*/?>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Обработка M2
         Matcher m2Matcher = m2UnitEditPattern.matcher(content);
         while (m2Matcher.find()) {
             String unit = m2Matcher.group(1);
@@ -395,7 +573,6 @@ public class TmisFormAnalyzerService {
             compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
         }
 
-        // Обработка D3
         Matcher d3Matcher = d3UnitEditPattern.matcher(content);
         while (d3Matcher.find()) {
             String unit = d3Matcher.group(1);
@@ -403,40 +580,29 @@ public class TmisFormAnalyzerService {
             compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
         }
 
-        // Добавляем в FormInfo
         for (String comp : compositions) {
             formInfo.addUnitComposition(comp);
-        }
-
-        if (!compositions.isEmpty()) {
-            System.out.println("  Найдено композиций UnitEdit: " + compositions.size());
         }
     }
 
     /**
-     * Извлечь композиции из JS вызовов UniversalComposition/UniversalComposition
-     * Ищет вызовы openWindow и openD3Form с name='UniversalComposition/UniversalComposition'
-     * и извлекает unit и composition
+     * Извлечь композиции из JS вызовов UniversalComposition
      */
     private void extractJsUnitCompositions(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
         Set<String> compositions = new LinkedHashSet<>();
 
-        // Паттерн для поиска openWindow с UniversalComposition
-        // Ищет: openWindow({ ... 'unit':'XXX', 'composition':'YYY' ... })
         Pattern openWindowPattern = Pattern.compile(
                 "openWindow\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]UniversalComposition/UniversalComposition['\"][^}]*\\}",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для поиска openD3Form с UniversalComposition
         Pattern openD3FormPattern = Pattern.compile(
                 "openD3Form\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]UniversalComposition/UniversalComposition['\"][^}]*\\}",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Извлекаем unit и composition из найденных объектов
         Matcher openWindowMatcher = openWindowPattern.matcher(content);
         while (openWindowMatcher.find()) {
             String objectBlock = openWindowMatcher.group();
@@ -449,13 +615,8 @@ public class TmisFormAnalyzerService {
             extractUnitAndComposition(objectBlock, compositions);
         }
 
-        // Добавляем в FormInfo
         for (String comp : compositions) {
             formInfo.addJsUnitComposition(comp);
-        }
-
-        if (!compositions.isEmpty()) {
-            System.out.println("  Найдено JS композиций UniversalComposition: " + compositions.size());
         }
     }
 
@@ -463,13 +624,11 @@ public class TmisFormAnalyzerService {
      * Извлечь unit и composition из блока объекта
      */
     private void extractUnitAndComposition(String objectBlock, Set<String> compositions) {
-        // Паттерн для unit (с одинарными или двойными кавычками)
         Pattern unitPattern = Pattern.compile(
                 "unit\\s*:\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для composition (с одинарными или двойными кавычками)
         Pattern compositionPattern = Pattern.compile(
                 "composition\\s*:\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -494,16 +653,12 @@ public class TmisFormAnalyzerService {
         }
 
         String normalized = formPath.trim();
-
-        // Убираем возможные кавычки
         normalized = normalized.replaceAll("^['\"]|['\"]$", "");
 
-        // Если путь содержит параметры или vars - обрезаем
         if (normalized.contains(",") || normalized.contains("}")) {
             return null;
         }
 
-        // Добавляем .frm если нет расширения и это не похоже на переменную
         if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm") &&
                 !normalized.contains("'") && !normalized.contains("\"") &&
                 !normalized.contains("+") && !normalized.contains("getVar") &&
@@ -511,31 +666,11 @@ public class TmisFormAnalyzerService {
             normalized = normalized + ".frm";
         }
 
-        // Игнорируем вызовы с переменными
         if (normalized.contains("getVar") || normalized.contains("getValue") ||
                 normalized.contains("$") || normalized.contains("' +") ||
                 normalized.contains("\" +")) {
             return null;
         }
-
-        return normalized;
-    }
-    /**
-     * Нормализация пути формы из JS вызовов
-     * Убирает лишние символы и приводит к стандартному виду
-     */
-    private String normalizeJsFormPath(String formPath) {
-        if (formPath == null || formPath.trim().isEmpty()) {
-            return "";
-        }
-
-        String normalized = formPath.trim();
-
-        // Убираем возможные пробелы и кавычки
-        normalized = normalized.replaceAll("['\"]", "");
-
-        // Убираем .frm если есть (добавим позже, если нужно)
-        // but keep original extension
 
         return normalized;
     }
@@ -547,21 +682,36 @@ public class TmisFormAnalyzerService {
         if (path == null || path.trim().isEmpty()) {
             return false;
         }
-        // Игнорируем специальные значения
+
         if ("components_m2".equals(path) || "".equals(path.trim())) {
             return false;
         }
-        // Игнорируем строки, которые выглядят как JavaScript код
-        if (path.contains("function") || path.contains("setValue") ||
-                path.contains("executeAction") || path.contains("getControl") ||
-                path.contains("printReportByCode") || path.contains("SysDate") ||
-                path.contains("refreshDataSet") || path.contains("getDataSet") ||
-                path.contains("showAlert") || path.contains("confirm") ||
-                path.contains("closeWindow") || path.contains("addListener") ||
-                path.contains("getVar") || path.contains("setVar")) {
+
+        String lowerPath = path.toLowerCase();
+        if (lowerPath.contains("function") || lowerPath.contains("setvalue") ||
+                lowerPath.contains("executeaction") || lowerPath.contains("getcontrol") ||
+                lowerPath.contains("printreportbycode") || lowerPath.contains("sysdate") ||
+                lowerPath.contains("refreshdataset") || lowerPath.contains("getdataset") ||
+                lowerPath.contains("showalert") || lowerPath.contains("confirm") ||
+                lowerPath.contains("closewindow") || lowerPath.contains("addlistener") ||
+                lowerPath.contains("getvar") || lowerPath.contains("setvar") ||
+                lowerPath.contains("modalresult") || lowerPath.contains("getproperty") ||
+                lowerPath.contains("sunit") || lowerPath.contains("composition") ||
+                lowerPath.contains("show_buttons") || lowerPath.contains("height") ||
+                lowerPath.contains("width") || lowerPath.contains("onclose") ||
+                lowerPath.contains("onafterclose") || lowerPath.contains("then") ||
+                lowerPath.contains("else") || lowerPath.contains("return") ||
+                lowerPath.contains("typeof") || lowerPath.contains("undefined") ||
+                lowerPath.contains("null") || lowerPath.contains("true") ||
+                lowerPath.contains("false") || lowerPath.contains("buttonedit_getcontrol") ||
+                lowerPath.contains("getproperty") || lowerPath.contains("setcontrolvalue") ||
+                lowerPath.contains("setcontrolcaption") || lowerPath.contains("getpage") ||
+                lowerPath.contains("getdom") || lowerPath.contains("this") ||
+                lowerPath.contains("_dom")) {
             return false;
         }
-        return path.contains("/") || path.endsWith(".frm") || path.endsWith(".dfrm") ||
-                path.matches("^[a-zA-Z_/]+$");
+
+        return (path.contains("/") && (path.endsWith(".frm") || path.endsWith(".dfrm"))) ||
+                path.matches("^[A-Za-z0-9_/]+\\.(frm|dfrm)$");
     }
 }

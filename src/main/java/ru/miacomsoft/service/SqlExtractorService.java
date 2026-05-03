@@ -278,18 +278,13 @@ public class SqlExtractorService {
 
         // Определяем тип закрывающего тэга
         String closeTag;
-        if (componentType.contains("DataSet")) {
-            if (componentType.startsWith("M2")) {
-                closeTag = "</component>";
-            } else {
-                closeTag = "</cmpDataSet>";
-            }
+        if ("cmpDataSet".equalsIgnoreCase(componentType)) {
+            closeTag = "</cmpDataSet>";
+        } else if ("component".equalsIgnoreCase(componentType)) {
+            closeTag = "</component>";
         } else {
-            if (componentType.startsWith("M2")) {
-                closeTag = "</component>";
-            } else {
-                closeTag = "</cmpAction>";
-            }
+            // По умолчанию ищем закрывающий тэг для того же имени
+            closeTag = "</" + componentType + ">";
         }
 
         // Ищем закрывающий тэг
@@ -495,7 +490,8 @@ public class SqlExtractorService {
     }
 
     private void processSqlComponent(String componentType, String componentName, String sqlContent,
-                                     String sourcePath, String baseFormPath, List<SqlInfo> queries) {
+                                     String fullXml, String sourcePath, String baseFormPath,
+                                     List<SqlInfo> queries) {
         if (sqlContent == null || sqlContent.trim().isEmpty()) {
             return;
         }
@@ -504,11 +500,13 @@ public class SqlExtractorService {
         String cleanedSql = removeAllComments(sqlContent);
 
         SqlInfo sqlInfo = new SqlInfo();
-        sqlInfo.setSourceType(componentType);  // "D3 DataSet" или "M2 DataSet"
+        sqlInfo.setSourceType(componentType);
         sqlInfo.setSourcePath(sourcePath);
         sqlInfo.setBaseFormPath(baseFormPath);
         sqlInfo.setComponentName(componentName);
-        sqlInfo.setSqlContent(sqlContent);
+
+        // Сохраняем полный XML с тегами
+        sqlInfo.setSqlContent(fullXml != null ? fullXml : sqlContent);
         sqlInfo.setCleanSql(cleanSql(cleanedSql));
 
         // Извлекаем все объекты
@@ -651,9 +649,9 @@ public class SqlExtractorService {
     private List<SqlInfo> extractAllComponents(String content, String sourcePath, String baseFormPath) {
         List<SqlInfo> queries = new ArrayList<>();
 
-        // 1. Паттерн для D3 компонентов с CDATA (cmpDataset - с маленькой d)
+        // 1. Паттерн для D3 компонентов c CDATA (cmpDataSet) - только DataSet
         Pattern d3DatasetPattern = Pattern.compile(
-                "<cmpDataset\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataset>",
+                "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataSet>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
@@ -661,24 +659,13 @@ public class SqlExtractorService {
         while (d3DatasetMatcher.find()) {
             String componentName = d3DatasetMatcher.group(1);
             String sqlContent = d3DatasetMatcher.group(2);
-            processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
+            String fullXml = extractFullComponentXml(content, d3DatasetMatcher.start(), "cmpDataSet");
+            processSqlComponent("D3 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
         }
 
-        // 2. Паттерн для D3 компонентов с CDATA (cmpDataSet - с большой D) - существующий
-        Pattern d3DataSetPattern = Pattern.compile(
-                "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataSet>",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher d3DataSetMatcher = d3DataSetPattern.matcher(content);
-        while (d3DataSetMatcher.find()) {
-            String componentName = d3DataSetMatcher.group(1);
-            String sqlContent = d3DataSetMatcher.group(2);
-            processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
-        }
-        // 3. Паттерн для D3 компонентов БЕЗ CDATA (cmpDataset)
+        // 2. Паттерн для D3 компонентов БЕЗ CDATA (cmpDataSet)
         Pattern d3DatasetDirectPattern = Pattern.compile(
-                "<cmpDataset\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpDataset>",
+                "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpDataSet>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
@@ -690,49 +677,111 @@ public class SqlExtractorService {
             if (body != null && !body.contains("CDATA")) {
                 String sqlContent = cleanSqlBody(body);
                 if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                    processSqlComponent("D3 DataSet", componentName, sqlContent, sourcePath, baseFormPath, queries);
+                    String fullXml = extractFullComponentXml(content, d3DatasetDirectMatcher.start(), "cmpDataSet");
+                    processSqlComponent("D3 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
                 }
             }
         }
 
-
-        // 1. Паттерн для компонентов С CDATA
-        Pattern withCDataPattern = Pattern.compile(
-                "<component\\s+cmptype\\s*=\\s*[\"'](\\w+)[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>.*?<!\\[CDATA\\[(.*?)\\]\\]>.*?</component>",
+        // 3. Паттерн для M2 DataSet с CDATA
+        Pattern m2DatasetWithCDataPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']DataSet[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>.*?<!\\[CDATA\\[(.*?)\\]\\]>.*?</component>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher withCDataMatcher = withCDataPattern.matcher(content);
-        while (withCDataMatcher.find()) {
-            String componentType = withCDataMatcher.group(1);
-            String componentName = withCDataMatcher.group(2);
-            String sqlContent = withCDataMatcher.group(3);
-
-            processSqlComponent(componentType, componentName, sqlContent, sourcePath, baseFormPath, queries);
+        Matcher m2DatasetWithCDataMatcher = m2DatasetWithCDataPattern.matcher(content);
+        while (m2DatasetWithCDataMatcher.find()) {
+            String componentName = m2DatasetWithCDataMatcher.group(1);
+            String sqlContent = m2DatasetWithCDataMatcher.group(2);
+            String fullXml = extractFullComponentXml(content, m2DatasetWithCDataMatcher.start(), "component");
+            processSqlComponent("M2 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
         }
 
-        // 2. Паттерн для компонентов БЕЗ CDATA (SQL прямо в теле)
-        Pattern withoutCDataPattern = Pattern.compile(
-                "<component\\s+cmptype\\s*=\\s*[\"'](\\w+)[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</component>",
+        // 4. Паттерн для M2 DataSet БЕЗ CDATA
+        Pattern m2DatasetWithoutCDataPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']DataSet[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</component>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher withoutCDataMatcher = withoutCDataPattern.matcher(content);
-        while (withoutCDataMatcher.find()) {
-            String componentType = withoutCDataMatcher.group(1);
-            String componentName = withoutCDataMatcher.group(2);
-            String body = withoutCDataMatcher.group(3);
+        Matcher m2DatasetWithoutCDataMatcher = m2DatasetWithoutCDataPattern.matcher(content);
+        while (m2DatasetWithoutCDataMatcher.find()) {
+            String componentName = m2DatasetWithoutCDataMatcher.group(1);
+            String body = m2DatasetWithoutCDataMatcher.group(2);
 
-            // Пропускаем уже обработанные с CDATA
-            if (body.contains("CDATA")) {
-                continue;
+            if (body != null && !body.contains("CDATA")) {
+                String sqlContent = cleanSqlBody(body);
+                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
+                    String fullXml = extractFullComponentXml(content, m2DatasetWithoutCDataMatcher.start(), "component");
+                    processSqlComponent("M2 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+                }
             }
+        }
 
-            // Очищаем тело от вложенных компонентов
-            String sqlContent = cleanSqlBody(body);
+        // 5. Паттерн для M2 Action с CDATA
+        Pattern m2ActionWithCDataPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']Action[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>.*?<!\\[CDATA\\[(.*?)\\]\\]>.*?</component>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
 
-            if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                processSqlComponent(componentType, componentName, sqlContent, sourcePath, baseFormPath, queries);
+        Matcher m2ActionWithCDataMatcher = m2ActionWithCDataPattern.matcher(content);
+        while (m2ActionWithCDataMatcher.find()) {
+            String componentName = m2ActionWithCDataMatcher.group(1);
+            String sqlContent = m2ActionWithCDataMatcher.group(2);
+            String fullXml = extractFullComponentXml(content, m2ActionWithCDataMatcher.start(), "component");
+            processSqlComponent("M2 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+        }
+
+        // 6. Паттерн для M2 Action БЕЗ CDATA
+        Pattern m2ActionWithoutCDataPattern = Pattern.compile(
+                "<component\\s+cmptype\\s*=\\s*[\"']Action[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</component>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher m2ActionWithoutCDataMatcher = m2ActionWithoutCDataPattern.matcher(content);
+        while (m2ActionWithoutCDataMatcher.find()) {
+            String componentName = m2ActionWithoutCDataMatcher.group(1);
+            String body = m2ActionWithoutCDataMatcher.group(2);
+
+            if (body != null && !body.contains("CDATA")) {
+                String sqlContent = cleanSqlBody(body);
+                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
+                    String fullXml = extractFullComponentXml(content, m2ActionWithoutCDataMatcher.start(), "component");
+                    processSqlComponent("M2 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+                }
+            }
+        }
+
+        // 7. Паттерн для D3 Action с CDATA (cmpAction)
+        Pattern d3ActionWithCDataPattern = Pattern.compile(
+                "<cmpAction\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpAction>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3ActionWithCDataMatcher = d3ActionWithCDataPattern.matcher(content);
+        while (d3ActionWithCDataMatcher.find()) {
+            String componentName = d3ActionWithCDataMatcher.group(1);
+            String sqlContent = d3ActionWithCDataMatcher.group(2);
+            String fullXml = extractFullComponentXml(content, d3ActionWithCDataMatcher.start(), "cmpAction");
+            processSqlComponent("D3 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+        }
+
+        // 8. Паттерн для D3 Action БЕЗ CDATA (cmpAction)
+        Pattern d3ActionWithoutCDataPattern = Pattern.compile(
+                "<cmpAction\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpAction>",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher d3ActionWithoutCDataMatcher = d3ActionWithoutCDataPattern.matcher(content);
+        while (d3ActionWithoutCDataMatcher.find()) {
+            String componentName = d3ActionWithoutCDataMatcher.group(1);
+            String body = d3ActionWithoutCDataMatcher.group(2);
+
+            if (body != null && !body.contains("CDATA")) {
+                String sqlContent = cleanSqlBody(body);
+                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
+                    String fullXml = extractFullComponentXml(content, d3ActionWithoutCDataMatcher.start(), "cmpAction");
+                    processSqlComponent("D3 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+                }
             }
         }
 
