@@ -118,6 +118,19 @@ public class MainFrame extends JFrame {
         panel.add(settingsButton);
         panel.add(openOutputDirButton);
 
+        // Добавляем в конец метода createToolbarPanel:
+        JCheckBox includeViewTablesCheckbox = new JCheckBox("Анализировать таблицы вьюх");
+        includeViewTablesCheckbox.setToolTipText("При включении будет анализировать DDL вьюх в Oracle для определения используемых таблиц");
+        includeViewTablesCheckbox.addActionListener(e -> {
+            ru.miacomsoft.model.AnalysisConfig.setIncludeViewTableDependencies(
+                    includeViewTablesCheckbox.isSelected()
+            );
+            appendLog("Анализ таблиц через вьюхи: " +
+                    (includeViewTablesCheckbox.isSelected() ? "ВКЛЮЧЕН" : "ВЫКЛЮЧЕН"));
+        });
+
+        panel.add(includeViewTablesCheckbox);
+
         return panel;
     }
 
@@ -369,7 +382,7 @@ public class MainFrame extends JFrame {
 
             FileScannerService scannerService = new FileScannerService(settings.getProjectPath());
             TmisFormAnalyzerService analyzerService = new TmisFormAnalyzerService(settings.getProjectPath());
-            ReportGeneratorService reportService = new ReportGeneratorService();
+            ReportGeneratorService reportService = new ReportGeneratorService(settings);
 
             processedForms = 0;
             successCount = 0;

@@ -23,16 +23,23 @@ public class ReportGeneratorService {
     private int totalSqlQueries;
     private Map<String, UnknownObjectInfo> allUnknownObjects;
     private Map<String, ConstantInfo> allConstants;  // ДОБАВИТЬ ДЛЯ КОНСТАНТ
+    private SettingsModel settings;
 
-
-    public ReportGeneratorService() {
+    // Добавляем конструктор с параметром:
+    public ReportGeneratorService(SettingsModel settings) {
+        this.settings = settings;
         this.analyzedForms = new ArrayList<>();
         this.allTablesViews = new LinkedHashMap<>();
         this.allPackagesFunctions = new LinkedHashMap<>();
         this.allUnknownObjects = new LinkedHashMap<>();
-        this.allConstants = new LinkedHashMap<>();  // ДОБАВИТЬ
+        this.allConstants = new LinkedHashMap<>();
         this.totalSqlQueries = 0;
     }
+    // Также оставляем конструктор по умолчанию для обратной совместимости:
+    public ReportGeneratorService() {
+        this(new SettingsModel());
+    }
+
 
     public void addAnalysisResult(FormInfo formInfo) {
         analyzedForms.add(formInfo);
@@ -361,6 +368,82 @@ public class ReportGeneratorService {
         }
     }
 
+
+    /**
+     * Получить таблицы, используемые во вьюхе из Oracle
+     */
+    private Set<String> getTablesUsedInView(String viewName) {
+        Set<String> tables = new LinkedHashSet<>();
+
+        if (!AnalysisConfig.isIncludeViewTableDependencies()) {
+            return tables;
+        }
+
+        // Используем существующий ViewDependencyAnalyzer
+        ru.miacomsoft.service.ViewDependencyAnalyzer analyzer =
+                new ru.miacomsoft.service.ViewDependencyAnalyzer();
+
+        try {
+            ru.miacomsoft.model.ViewTableDependencies deps = analyzer.analyzeView(viewName);
+            if (deps.isExistsInOracle()) {
+                tables.addAll(deps.getOracleTables());
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка при анализе вьюхи " + viewName + ": " + e.getMessage());
+        }
+
+        return tables;
+    }
+
+    /**
+     * Запись информации о таблицах через вьюхи в отчет
+     * Выводит единый уникальный список всех таблиц, используемых во вьюхах формы
+     */
+    private void writeViewTablesSection(PrintWriter writer, FormInfo formInfo) {
+        if (!AnalysisConfig.isIncludeViewTableDependencies()) {
+            return;
+        }
+
+        // Собираем все вьюхи, используемые в форме
+        Set<String> viewsUsed = new LinkedHashSet<>();
+        for (String tv : formInfo.getTablesViews()) {
+            if (tv.startsWith("D_V_")) {
+                viewsUsed.add(tv);
+            }
+        }
+
+        if (viewsUsed.isEmpty()) {
+            return;
+        }
+
+        // Собираем уникальные таблицы из всех вьюх
+        Set<String> allTables = new LinkedHashSet<>();
+
+        ViewDependencyAnalyzer analyzer = new ViewDependencyAnalyzer();
+
+        for (String viewName : viewsUsed) {
+            try {
+                ru.miacomsoft.model.ViewTableDependencies deps = analyzer.analyzeView(viewName);
+
+                if (deps.isExistsInOracle()) {
+                    allTables.addAll(deps.getOracleTables());
+                }
+            } catch (Exception e) {
+                System.err.println("Ошибка при анализе вьюхи " + viewName + ": " + e.getMessage());
+            }
+        }
+
+        if (allTables.isEmpty()) {
+            return;
+        }
+
+        writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ:");
+        for (String table : allTables) {
+            writer.println("  - " + table);
+        }
+        writer.println();
+    }
+
     /**
      * Запись отчета о форме в итоговый файл (без SQL)
      */
@@ -422,6 +505,9 @@ public class ReportGeneratorService {
             }
             writer.println();
         }
+
+        writeViewTablesSection(writer, formInfo);
+
 
         // Пакеты и функции
         if (!formInfo.getPackagesFunctions().isEmpty()) {
