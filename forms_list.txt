@@ -1,2 +1,13 @@
-/Forms/components.frm
-/Forms/Eko/queue_for_cryo.frm
+/Forms/#examples/barcode.frm
+/Forms/ARMMainDoc/arm_director.frm
+/Forms/ARMMainDoc/main_doc.frm
+/Forms/ARMMainDoc/neotl_patients.frm
+/Forms/ARMMainDoc/stac_pat_in_deps.frm
+/Forms/ARMMainDoc/stac_pat_in_hpk_plan.frm
+/Forms/ARMMainDoc/stac_pat_in_oper.frm
+/Forms/Agents/subforms_fields/trf_anamnesis.frm
+/Forms/Analytical/HPK_PLAN_FREE_PLACES.frm
+/Forms/Analytical/analytic_by_hh.frm
+/Forms/Analytical/analytic_by_needs_lp.frm
+/Forms/Analytical/analytic_hpk_svod.frm
+/Forms/Analytical/hosp_planing.frm

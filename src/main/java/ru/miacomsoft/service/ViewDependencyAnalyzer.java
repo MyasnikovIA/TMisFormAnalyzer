@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.*;
 
@@ -22,9 +23,29 @@ public class ViewDependencyAnalyzer {
     private static String POSTGRES_USER = "postgres";
     private static String POSTGRES_PASSWORD = "postgres";
 
+    // ========== КЭШИРОВАНИЕ (хранится в оперативной памяти) ==========
+    // Кэш для результатов анализа вьюх
+    private static final Map<String, ViewTableDependencies> viewCache = new ConcurrentHashMap<>();
+
+    // Кэш для DDL вьюх из Oracle
+    private static final Map<String, String> oracleDDLCache = new ConcurrentHashMap<>();
+
+    // Кэш для DDL вьюх из PostgreSQL
+    private static final Map<String, String> postgresDDLCache = new ConcurrentHashMap<>();
+
+    // Кэш для извлеченных таблиц из DDL (чтобы не парсить повторно)
+    private static final Map<String, Set<String>> parsedTablesCache = new ConcurrentHashMap<>();
+
+    // Статистика кэша
+    private static int cacheHits = 0;
+    private static int cacheMisses = 0;
+
     // Флаги для управления процессом
     private AtomicBoolean isPaused = new AtomicBoolean(false);
     private AtomicBoolean isCancelled = new AtomicBoolean(false);
+
+    // Колбэк для проверки остановки извне
+    private java.util.function.BooleanSupplier externalStopCondition = () -> false;
 
     // Колбэки для прогресса
     private ProgressCallback progressCallback;
@@ -37,6 +58,10 @@ public class ViewDependencyAnalyzer {
 
     public void setProgressCallback(ProgressCallback callback) {
         this.progressCallback = callback;
+    }
+
+    public void setExternalStopCondition(java.util.function.BooleanSupplier condition) {
+        this.externalStopCondition = condition;
     }
 
     public void setPaused(boolean paused) {
@@ -56,33 +81,61 @@ public class ViewDependencyAnalyzer {
     }
 
     public boolean isCancelled() {
-        return isCancelled.get();
+        return isCancelled.get() || externalStopCondition.getAsBoolean();
+    }
+
+    /**
+     * Очистить весь кэш (вызывается при смене настроек БД или перезапуске)
+     */
+    public static void clearCache() {
+        viewCache.clear();
+        oracleDDLCache.clear();
+        postgresDDLCache.clear();
+        parsedTablesCache.clear();
+        cacheHits = 0;
+        cacheMisses = 0;
+        System.out.println("Кэш вьюх полностью очищен");
+    }
+
+    /**
+     * Получить статистику кэша
+     */
+    public static String getCacheStats() {
+        return String.format("Кэш: просмотров=%d, попаданий=%d, промахов=%d, процент попаданий=%.1f%%",
+                cacheHits + cacheMisses, cacheHits, cacheMisses,
+                (cacheHits + cacheMisses) > 0 ? (cacheHits * 100.0 / (cacheHits + cacheMisses)) : 0);
+    }
+
+    /**
+     * Получить размер кэша
+     */
+    public static int getCacheSize() {
+        return viewCache.size();
+    }
+
+    /**
+     * Проверить, есть ли вьюха в кэше
+     */
+    public static boolean isInCache(String viewName) {
+        return viewCache.containsKey(viewName.toUpperCase());
     }
 
     private void checkPauseAndCancel() throws InterruptedException {
-        if (isCancelled.get()) {
+        if (isCancelled()) {
             throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН");
         }
 
-        while (isPaused.get() && !isCancelled.get()) {
-            if (progressCallback != null) {
-                //progressCallback.onLog("  ⏸ Ожидание возобновления...");
-            }
+        while (isPaused.get() && !isCancelled()) {
             Thread.sleep(200);
         }
 
-        if (isCancelled.get()) {
+        if (isCancelled()) {
             throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН");
         }
     }
 
     private static final Pattern TABLE_FROM_JOIN_PATTERN = Pattern.compile(
             "\\b(FROM|JOIN)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+)?)\\b",
-            Pattern.CASE_INSENSITIVE
-    );
-
-    private static final Pattern TABLE_IN_QUERY_PATTERN = Pattern.compile(
-            "\\b([A-Z][A-Z0-9_]+)\\s+(?:WHERE|LEFT|RIGHT|INNER|OUTER|ON|,|\\()",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -95,7 +148,7 @@ public class ViewDependencyAnalyzer {
     ));
 
     /**
-     * Анализ всех вьюх с поддержкой остановки
+     * Анализ всех вьюх с поддержкой кэширования
      */
     public Map<String, ViewTableDependencies> analyzeAllViews(Map<String, TableViewInfo> viewsInfo) throws InterruptedException {
         Map<String, ViewTableDependencies> result = new LinkedHashMap<>();
@@ -103,14 +156,27 @@ public class ViewDependencyAnalyzer {
         if (progressCallback != null) {
             progressCallback.onLog("\n=== АНАЛИЗ ЗАВИСИМОСТЕЙ ВЬЮХ ===");
             progressCallback.onLog("Всего вьюх для анализа: " + viewsInfo.size());
+
+            int cachedCount = 0;
+            for (String viewName : viewsInfo.keySet()) {
+                if (viewCache.containsKey(viewName.toUpperCase())) {
+                    cachedCount++;
+                }
+            }
+            if (cachedCount > 0) {
+                progressCallback.onLog("Из них уже в кэше: " + cachedCount);
+                progressCallback.onLog(getCacheStats());
+            }
         }
 
         int total = viewsInfo.size();
         int processed = 0;
+        int fromCache = 0;
+        int fromDB = 0;
 
         for (Map.Entry<String, TableViewInfo> entry : viewsInfo.entrySet()) {
-            // КРИТИЧНО: Проверяем отмену перед обработкой каждой вьюхи
-            if (isCancelled.get()) {
+            // Проверяем остановку
+            if (isCancelled()) {
                 if (progressCallback != null) {
                     progressCallback.onLog("  Анализ прерван пользователем на вьюхе " + entry.getKey());
                     progressCallback.onCancelled();
@@ -118,7 +184,6 @@ public class ViewDependencyAnalyzer {
                 throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН ПОЛЬЗОВАТЕЛЕМ");
             }
 
-            // Проверка паузы
             checkPauseAndCancel();
 
             String viewName = entry.getKey();
@@ -134,15 +199,23 @@ public class ViewDependencyAnalyzer {
                 progressCallback.onProgress(processed, total, viewName, -1, -1);
             }
 
-            // КРИТИЧНО: Проверяем еще раз перед анализом
-            if (isCancelled.get()) {
+            if (isCancelled()) {
                 throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН ПОЛЬЗОВАТЕЛЕМ");
             }
 
-            ViewTableDependencies dependencies = analyzeView(viewName);
+            // Пытаемся получить из кэша
+            ViewTableDependencies dependencies = getFromCache(viewName);
+            boolean fromCacheFlag = (dependencies != null);
 
-            // КРИТИЧНО: Проверяем после анализа
-            if (isCancelled.get()) {
+            if (dependencies == null) {
+                dependencies = analyzeViewWithCache(viewName);
+                fromDB++;
+                putInCache(viewName, dependencies);
+            } else {
+                fromCache++;
+            }
+
+            if (isCancelled()) {
                 throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН ПОЛЬЗОВАТЕЛЕМ");
             }
 
@@ -152,11 +225,12 @@ public class ViewDependencyAnalyzer {
             int oracleCount = dependencies.getOracleTables().size();
             int postgresCount = dependencies.getPostgresTables().size();
 
+            String cacheInfo = fromCacheFlag ? " (из кэша)" : " (из БД)";
             String status;
             if (dependencies.isExistsInOracle() || dependencies.isExistsInPostgres()) {
-                status = "OK (Oracle: " + oracleCount + ", PG: " + postgresCount + ")";
+                status = "OK (Oracle: " + oracleCount + ", PG: " + postgresCount + ")" + cacheInfo;
             } else {
-                status = "НЕ НАЙДЕНА";
+                status = "НЕ НАЙДЕНА" + cacheInfo;
             }
 
             String logMessage = "  [" + processed + "/" + total + "] " + viewName + " ... " + status;
@@ -166,32 +240,105 @@ public class ViewDependencyAnalyzer {
             }
         }
 
-        String completionMessage = "Анализ завершен. Обработано вьюх: " + processed;
+        String completionMessage = "Анализ завершен. Обработано вьюх: " + processed +
+                " (из кэша: " + fromCache + ", из БД: " + fromDB + ")";
         if (progressCallback != null) {
             progressCallback.onLog(completionMessage);
+            progressCallback.onLog(getCacheStats());
+            progressCallback.onLog("Размер кэша: " + viewCache.size());
         }
 
         return result;
     }
 
+    /**
+     * Получить результат из кэша
+     */
+    private ViewTableDependencies getFromCache(String viewName) {
+        String key = viewName.toUpperCase();
+        ViewTableDependencies cached = viewCache.get(key);
 
-    public ViewTableDependencies analyzeView(String viewName) {
+        if (cached != null) {
+            cacheHits++;
+            if (progressCallback != null) {
+                progressCallback.onLog("    Кэш HIT для " + viewName);
+            }
+        } else {
+            cacheMisses++;
+        }
+
+        return cached;
+    }
+
+    /**
+     * Сохранить результат в кэш
+     */
+    private void putInCache(String viewName, ViewTableDependencies dependencies) {
+        String key = viewName.toUpperCase();
+        viewCache.put(key, dependencies);
+    }
+
+    /**
+     * Анализ вьюхи с кэшированием DDL и результатов парсинга
+     */
+    private ViewTableDependencies analyzeViewWithCache(String viewName) {
         ViewTableDependencies dependencies = new ViewTableDependencies(viewName);
 
-        analyzeInOracle(viewName, dependencies);
-        analyzeInPostgres(viewName, dependencies);
+        // Проверяем остановку перед анализом
+        if (isCancelled()) {
+            dependencies.setExistsInOracle(false);
+            dependencies.setExistsInPostgres(false);
+            dependencies.setOracleError("Остановлено пользователем");
+            dependencies.setPostgresError("Остановлено пользователем");
+            return dependencies;
+        }
+
+        analyzeInOracleWithCache(viewName, dependencies);
+
+        if (isCancelled()) {
+            return dependencies;
+        }
+
+        analyzeInPostgresWithCache(viewName, dependencies);
 
         return dependencies;
     }
 
-    private void analyzeInOracle(String viewName, ViewTableDependencies dependencies) {
-        if (isCancelled.get()) {
+    /**
+     * Анализ в Oracle с кэшированием DDL
+     */
+    private void analyzeInOracleWithCache(String viewName, ViewTableDependencies dependencies) {
+        if (isCancelled()) {
             dependencies.setExistsInOracle(false);
             dependencies.setOracleError("Остановлено пользователем");
             return;
         }
 
-        String ddl = getOracleViewDDL(viewName);
+        String key = viewName.toUpperCase();
+        String ddl = oracleDDLCache.get(key);
+
+        if (ddl == null) {
+            if (progressCallback != null) {
+                progressCallback.onLog("    Загрузка Oracle DDL для " + viewName + " ...");
+            }
+            ddl = getOracleViewDDL(viewName);
+            if (ddl != null && !isCancelled()) {
+                oracleDDLCache.put(key, ddl);
+                if (progressCallback != null) {
+                    progressCallback.onLog("    Oracle DDL для " + viewName + " закэширован");
+                }
+            }
+        } else {
+            if (progressCallback != null) {
+                progressCallback.onLog("    Oracle DDL для " + viewName + " взят из кэша");
+            }
+        }
+
+        if (isCancelled()) {
+            dependencies.setExistsInOracle(false);
+            dependencies.setOracleError("Остановлено пользователем");
+            return;
+        }
 
         if (ddl == null) {
             dependencies.setExistsInOracle(false);
@@ -200,18 +347,52 @@ public class ViewDependencyAnalyzer {
         }
 
         dependencies.setExistsInOracle(true);
-        Set<String> tables = extractTablesFromDDL(ddl);
+
+        // Пытаемся получить распарсенные таблицы из кэша
+        Set<String> tables = getParsedTablesFromCache(key + "_ORACLE");
+        if (tables == null) {
+            tables = extractTablesFromDDL(ddl);
+            putParsedTablesToCache(key + "_ORACLE", tables);
+        }
+
         dependencies.addAllOracleTables(tables);
     }
 
-    private void analyzeInPostgres(String viewName, ViewTableDependencies dependencies) {
-        if (isCancelled.get()) {
+    /**
+     * Анализ в PostgreSQL с кэшированием DDL
+     */
+    private void analyzeInPostgresWithCache(String viewName, ViewTableDependencies dependencies) {
+        if (isCancelled()) {
             dependencies.setExistsInPostgres(false);
             dependencies.setPostgresError("Остановлено пользователем");
             return;
         }
 
-        String ddl = getPostgresViewDDL(viewName);
+        String key = viewName.toLowerCase();
+        String ddl = postgresDDLCache.get(key);
+
+        if (ddl == null) {
+            if (progressCallback != null) {
+                progressCallback.onLog("    Загрузка PostgreSQL DDL для " + viewName + " ...");
+            }
+            ddl = getPostgresViewDDL(viewName);
+            if (ddl != null && !isCancelled()) {
+                postgresDDLCache.put(key, ddl);
+                if (progressCallback != null) {
+                    progressCallback.onLog("    PostgreSQL DDL для " + viewName + " закэширован");
+                }
+            }
+        } else {
+            if (progressCallback != null) {
+                progressCallback.onLog("    PostgreSQL DDL для " + viewName + " взят из кэша");
+            }
+        }
+
+        if (isCancelled()) {
+            dependencies.setExistsInPostgres(false);
+            dependencies.setPostgresError("Остановлено пользователем");
+            return;
+        }
 
         if (ddl == null) {
             dependencies.setExistsInPostgres(false);
@@ -220,75 +401,180 @@ public class ViewDependencyAnalyzer {
         }
 
         dependencies.setExistsInPostgres(true);
-        Set<String> tables = extractTablesFromDDL(ddl);
+
+        // Пытаемся получить распарсенные таблицы из кэша
+        Set<String> tables = getParsedTablesFromCache(key + "_POSTGRES");
+        if (tables == null) {
+            tables = extractTablesFromDDL(ddl);
+            putParsedTablesToCache(key + "_POSTGRES", tables);
+        }
+
         dependencies.addAllPostgresTables(tables);
     }
 
+    /**
+     * Получить распарсенные таблицы из кэша
+     */
+    private Set<String> getParsedTablesFromCache(String key) {
+        Set<String> cached = parsedTablesCache.get(key);
+        if (cached != null && progressCallback != null) {
+            progressCallback.onLog("    Распарсенные таблицы для " + key + " взяты из кэша");
+        }
+        return cached;
+    }
+
+    /**
+     * Сохранить распарсенные таблицы в кэш
+     */
+    private void putParsedTablesToCache(String key, Set<String> tables) {
+        parsedTablesCache.put(key, tables);
+    }
+
+    public ViewTableDependencies analyzeView(String viewName) {
+        // Проверяем кэш сначала
+        ViewTableDependencies cached = getFromCache(viewName);
+        if (cached != null) {
+            return cached;
+        }
+
+        // Анализируем и сохраняем в кэш
+        ViewTableDependencies dependencies = analyzeViewWithCache(viewName);
+        putInCache(viewName, dependencies);
+
+        return dependencies;
+    }
+
     private String getOracleViewDDL(String viewName) {
-        if (isCancelled.get()) {
+        if (isCancelled()) {
             return null;
         }
 
         String sql = "SELECT TEXT FROM ALL_VIEWS WHERE VIEW_NAME = ?";
 
-        try (Connection conn = DriverManager.getConnection(ORACLE_URL, ORACLE_USER, ORACLE_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        // Используем таймаут для подключения
+        Properties props = new Properties();
+        props.setProperty("user", ORACLE_USER);
+        props.setProperty("password", ORACLE_PASSWORD);
+        props.setProperty("oracle.net.CONNECT_TIMEOUT", "5000");  // 5 секунд таймаут
+        props.setProperty("oracle.jdbc.ReadTimeout", "10000");    // 10 секунд на чтение
 
-            pstmt.setString(1, viewName.toUpperCase());
-            pstmt.setQueryTimeout(10);
-            ResultSet rs = pstmt.executeQuery();
+        // Создаем Connection с таймаутом в отдельном потоке, чтобы можно было прервать
+        final String[] result = {null};
+        final Exception[] exception = {null};
 
-            if (rs.next()) {
-                return rs.getString("TEXT");
+        Thread queryThread = new Thread(() -> {
+            try (Connection conn = DriverManager.getConnection(ORACLE_URL, props);
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                if (isCancelled()) {
+                    return;
+                }
+
+                pstmt.setString(1, viewName.toUpperCase());
+                pstmt.setQueryTimeout(10);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (rs.next() && !isCancelled()) {
+                    result[0] = rs.getString("TEXT");
+                }
+
+            } catch (SQLException e) {
+                exception[0] = e;
             }
+        });
 
-        } catch (SQLException e) {
-            if (progressCallback != null && !isCancelled.get()) {
-                progressCallback.onLog("  Oracle ошибка: " + e.getMessage());
+        queryThread.start();
+
+        try {
+            queryThread.join(15000); // Ждем максимум 15 секунд
+            if (queryThread.isAlive()) {
+                queryThread.interrupt();
+                if (progressCallback != null) {
+                    progressCallback.onLog("  Oracle запрос для " + viewName + " прерван по таймауту");
+                }
+                return null;
             }
-        }
-
-        return null;
-    }
-
-    private String getPostgresViewDDL(String viewName) {
-        if (isCancelled.get()) {
+        } catch (InterruptedException e) {
+            queryThread.interrupt();
+            Thread.currentThread().interrupt();
             return null;
         }
 
-        String sql = "SELECT pg_get_viewdef(?, true) as viewdef";
-
-        try (Connection conn = DriverManager.getConnection(POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            String getOidSql = "SELECT oid FROM pg_class WHERE relname = ? AND relkind = 'v'";
-            try (PreparedStatement oidStmt = conn.prepareStatement(getOidSql)) {
-                oidStmt.setString(1, viewName.toLowerCase());
-                oidStmt.setQueryTimeout(10);
-                ResultSet oidRs = oidStmt.executeQuery();
-
-                if (oidRs.next()) {
-                    int oid = oidRs.getInt("oid");
-                    pstmt.setInt(1, oid);
-                    pstmt.setQueryTimeout(10);
-                    ResultSet rs = pstmt.executeQuery();
-
-                    if (rs.next()) {
-                        return rs.getString("viewdef");
-                    }
-                }
-            }
-
-        } catch (SQLException e) {
-            if (progressCallback != null && !isCancelled.get()) {
-                progressCallback.onLog("  PostgreSQL ошибка: " + e.getMessage());
-            }
+        if (exception[0] != null && progressCallback != null && !isCancelled()) {
+            progressCallback.onLog("  Oracle ошибка: " + exception[0].getMessage());
         }
 
-        return null;
+        return result[0];
     }
 
+    private String getPostgresViewDDL(String viewName) {
+        if (isCancelled()) {
+            return null;
+        }
 
+        final String[] result = {null};
+        final Exception[] exception = {null};
+
+        Thread queryThread = new Thread(() -> {
+            try {
+                DriverManager.setLoginTimeout(5);
+
+                try (Connection conn = DriverManager.getConnection(POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD)) {
+
+                    if (isCancelled()) {
+                        return;
+                    }
+
+                    String getOidSql = "SELECT oid FROM pg_class WHERE relname = ? AND relkind = 'v'";
+                    try (PreparedStatement oidStmt = conn.prepareStatement(getOidSql)) {
+                        oidStmt.setString(1, viewName.toLowerCase());
+                        oidStmt.setQueryTimeout(10);
+                        ResultSet oidRs = oidStmt.executeQuery();
+
+                        if (oidRs.next() && !isCancelled()) {
+                            int oid = oidRs.getInt("oid");
+
+                            String sql = "SELECT pg_get_viewdef(?, true) as viewdef";
+                            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                                pstmt.setInt(1, oid);
+                                pstmt.setQueryTimeout(10);
+                                ResultSet rs = pstmt.executeQuery();
+
+                                if (rs.next() && !isCancelled()) {
+                                    result[0] = rs.getString("viewdef");
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                exception[0] = e;
+            }
+        });
+
+        queryThread.start();
+
+        try {
+            queryThread.join(15000); // Ждем максимум 15 секунд
+            if (queryThread.isAlive()) {
+                queryThread.interrupt();
+                if (progressCallback != null) {
+                    progressCallback.onLog("  PostgreSQL запрос для " + viewName + " прерван по таймауту");
+                }
+                return null;
+            }
+        } catch (InterruptedException e) {
+            queryThread.interrupt();
+            Thread.currentThread().interrupt();
+            return null;
+        }
+
+        if (exception[0] != null && progressCallback != null && !isCancelled()) {
+            progressCallback.onLog("  PostgreSQL ошибка: " + exception[0].getMessage());
+        }
+
+        return result[0];
+    }
 
     private Set<String> extractTablesFromDDL(String ddl) {
         Set<String> tables = new LinkedHashSet<>();
@@ -299,16 +585,6 @@ public class ViewDependencyAnalyzer {
 
         String cleanDdl = ddl.replaceAll("\\s+", " ").toUpperCase();
 
-        // SQL ключевые слова для исключения
-        Set<String> sqlKeywords = new HashSet<>(Arrays.asList(
-                "SELECT", "FROM", "WHERE", "JOIN", "LEFT", "RIGHT", "INNER", "OUTER",
-                "CROSS", "FULL", "ON", "AND", "OR", "NOT", "IN", "EXISTS", "BETWEEN",
-                "LIKE", "IS", "NULL", "AS", "UNION", "INTERSECT", "MINUS", "WITH",
-                "RECURSIVE", "ORDER", "GROUP", "HAVING", "BY", "ASC", "DESC", "NULLS",
-                "FIRST", "LAST", "CASE", "WHEN", "THEN", "ELSE", "END", "DISTINCT",
-                "ALL", "ANY", "SOME"
-        ));
-
         // 1. Собираем все потенциальные имена таблиц из FROM, JOIN
         Set<String> potentialTables = new LinkedHashSet<>();
         Matcher matcher = TABLE_FROM_JOIN_PATTERN.matcher(cleanDdl);
@@ -318,32 +594,28 @@ public class ViewDependencyAnalyzer {
                 tableName = tableName.substring(tableName.lastIndexOf(".") + 1);
             }
 
-            // Исключаем SQL ключевые слова
-            if (!sqlKeywords.contains(tableName)) {
+            if (!SQL_KEYWORDS.contains(tableName)) {
                 potentialTables.add(tableName);
             }
         }
 
-        // 2. Собираем все алиасы из AS или после имени таблицы
+        // 2. Собираем все алиасы
         Set<String> aliases = new LinkedHashSet<>();
 
-        // Паттерн для явных алиасов с AS: FROM table AS alias
         Pattern explicitAliasPattern = Pattern.compile("\\b(?:FROM|JOIN)\\s+[A-Z0-9_]+\\s+AS\\s+([A-Z0-9_]+)\\b");
         Matcher explicitMatcher = explicitAliasPattern.matcher(cleanDdl);
         while (explicitMatcher.find()) {
             String alias = explicitMatcher.group(1);
-            if (!sqlKeywords.contains(alias) && alias.length() > 1) {
+            if (!SQL_KEYWORDS.contains(alias) && alias.length() > 1) {
                 aliases.add(alias);
             }
         }
 
-        // Паттерн для неявных алиасов без AS: FROM table alias
         Pattern implicitAliasPattern = Pattern.compile("\\b(?:FROM|JOIN)\\s+[A-Z0-9_]+\\s+([A-Z0-9_]+)\\b");
         Matcher implicitMatcher = implicitAliasPattern.matcher(cleanDdl);
         while (implicitMatcher.find()) {
             String alias = implicitMatcher.group(1);
-            // Исключаем SQL ключевые слова и слишком короткие имена (1-2 буквы)
-            if (!sqlKeywords.contains(alias) && alias.length() > 2 && !alias.matches("^[A-Z]{1,2}$")) {
+            if (!SQL_KEYWORDS.contains(alias) && alias.length() > 2 && !alias.matches("^[A-Z]{1,2}$")) {
                 aliases.add(alias);
             }
         }
@@ -353,24 +625,21 @@ public class ViewDependencyAnalyzer {
         Matcher subqueryMatcher = subqueryAliasPattern.matcher(cleanDdl);
         while (subqueryMatcher.find()) {
             String alias = subqueryMatcher.group(1);
-            if (!sqlKeywords.contains(alias) && alias.length() > 1) {
+            if (!SQL_KEYWORDS.contains(alias) && alias.length() > 1) {
                 aliases.add(alias);
             }
         }
 
         // 4. Фильтруем потенциальные таблицы, исключая алиасы
         for (String tableName : potentialTables) {
-            // Исключаем, если это алиас
             if (aliases.contains(tableName)) {
                 continue;
             }
 
-            // Исключаем слишком короткие имена (1-2 буквы) - это почти всегда алиасы
             if (tableName.matches("^[A-Z]{1,2}$")) {
                 continue;
             }
 
-            // Оставляем только имена, начинающиеся с D_ или содержащие подчеркивание
             if (tableName.startsWith("D_") || tableName.contains("_")) {
                 tables.add(tableName);
             }
@@ -379,13 +648,11 @@ public class ViewDependencyAnalyzer {
         return tables;
     }
 
-
     private void checkCancelled() throws InterruptedException {
-        if (isCancelled.get()) {
+        if (isCancelled()) {
             throw new InterruptedException("АНАЛИЗ ОСТАНОВЛЕН ПОЛЬЗОВАТЕЛЕМ");
         }
     }
-
 
     public void generateViewDependenciesReport(Map<String, ViewTableDependencies> dependencies) throws IOException {
         String outputPath = "SQL_info/view_dependencies_report.txt";
@@ -403,6 +670,8 @@ public class ViewDependencyAnalyzer {
             writer.println("=== ОТЧЕТ ПО ЗАВИСИМОСТЯМ ТАБЛИЦ ОТ ВЬЮХ ===");
             writer.println("Дата создания: " + new Date());
             writer.println("Всего проанализировано вьюх: " + dependencies.size());
+            writer.println("Размер кэша: " + viewCache.size());
+            writer.println("Статистика кэша: " + getCacheStats());
             writer.println("=".repeat(100));
             writer.println();
 
@@ -411,7 +680,10 @@ public class ViewDependencyAnalyzer {
                 ViewTableDependencies dep = entry.getValue();
                 count++;
 
-                writer.println("- " + dep.getViewName() + ":");
+                boolean fromCache = viewCache.containsKey(dep.getViewName().toUpperCase());
+                String cacheMarker = fromCache ? " [ИЗ КЭША]" : "";
+
+                writer.println("- " + dep.getViewName() + ":" + cacheMarker);
 
                 if (dep.isExistsInOracle()) {
                     writer.println("    OracleSQL:");
@@ -475,6 +747,7 @@ public class ViewDependencyAnalyzer {
 
         if (progressCallback != null) {
             progressCallback.onLog("  Создан: " + outputPath);
+            progressCallback.onLog("  " + getCacheStats());
         }
     }
 
@@ -482,17 +755,18 @@ public class ViewDependencyAnalyzer {
         ORACLE_URL = url;
         ORACLE_USER = user;
         ORACLE_PASSWORD = password;
+        // При смене конфигурации очищаем кэш, так как данные могут измениться
+        clearCache();
     }
 
     public static void setPostgresConfig(String url, String user, String password) {
         POSTGRES_URL = url;
         POSTGRES_USER = user;
         POSTGRES_PASSWORD = password;
+        // При смене конфигурации очищаем кэш
+        clearCache();
     }
 
-    /**
-     * Публичный метод для анализа одной вьюхи (без колбэков)
-     */
     public ViewTableDependencies analyzeViewPublic(String viewName) {
         return analyzeView(viewName);
     }

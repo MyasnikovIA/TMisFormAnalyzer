@@ -1,51 +1,317 @@
 ====================================================================================================
 === ОТЧЕТ ПО ФОРМАМ T-MIS ===
-Дата создания: Sun May 03 15:01:58 NOVT 2026
+Дата создания: Sun May 03 18:33:03 NOVT 2026
 ----------------------------------------------------------------------------------------------------
 КОНФИГУРАЦИЯ ОТЧЕТА:
   SQL содержимое: НЕТ
-  JS формы: ДА
-  Таблицы/вьюхи: ДА
-  Таблицы через вьюхи: ДА
-  Композиции JS: ДА
+  JS формы: НЕТ
+  Таблицы/вьюхи: НЕТ
+  Таблицы через вьюхи: НЕТ
+  Композиции JS: НЕТ
   Детали вьюх: НЕТ
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: components.frm
+ФОРМА: #examples/barcode.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/components.frm
+Базовая форма: /var/www/t-mis/mis/Forms/#examples/barcode.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
      (не найдено)
 
 Список подключаемых форм subForm:
-     components_m2
-     components_d3
-
-Список вызываемых форм в JS:
      (не найдено)
 
 SQL ЗАПРОСЫ (0):
      (содержимое SQL запросов исключено для краткости)
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: Eko/queue_for_cryo.frm
+ФОРМА: ARMMainDoc/arm_director.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/Eko/queue_for_cryo.frm
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/arm_director.frm
 СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
 
 ЮЗЕРФОРМЫ:
      (не найдено)
 
 Список подключаемых форм subForm:
-     Eko/search_patient
-     Eko/subforms/queue_list
-     Eko/subforms/cryo_list
+     (не найдено)
 
-Список вызываемых форм в JS:
-     Eko/edit_direction_cryo
+SQL ЗАПРОСЫ (0):
+     (содержимое SQL запросов исключено для краткости)
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/main_doc.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/main_doc.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsKrasnodarOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d/main_doc.dfrm
+  - [UserFormsMagadan] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d/main_doc.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsKrasnodarOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKrasnodarOD/ARMMainDoc/main_doc.d
+            └── main_doc.dfrm
+
+     ===== UserFormsMagadan =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMagadan/ARMMainDoc/main_doc.d
+            └── main_doc.dfrm
+
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (12):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_CHIEFDOC.GET_DEP_BED_INF
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_EMP_RIGHTS
+  - D_PKG_CHIEFDOC.GET_OPERS_STATUS
+  - D_PKG_CHIEFDOC.GET_EMERGENCY_INFO
+  - D_PKG_CHIEFDOC.GET_SERVICE_TYPES
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE
+  - D_PKG_MP_PRESCRIBES.GET_NOMMODIF_EXPENSE_SPEC
+
+СИСТЕМНЫЕ ОПЦИИ:
+  - BjNoticeVK_MSE
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_CL_DEP_BED_CONTROL
+  - D_CL_OPER_ROOMS_CONTROL
+  - D_CL_EMERGENCY_INFO
+  - D_CL_GET_SERVICE_TYPES
+  - D_CL_MP_PRESC_EXPENSE
+  - D_CL_MP_PRESC_EXPENSE_SPEC
+  - D_PKG_OPTIONS.GET
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/neotl_patients.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/neotl_patients.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/neotl_patients.d/neotl_patients.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsEgis3Tomsk =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/neotl_patients.d
+            └── neotl_patients.dfrm
+
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (2):
+     (содержимое SQL запросов исключено для краткости)
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/stac_pat_in_deps.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/stac_pat_in_deps.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/stac_pat_in_deps.d/stac_pat_in_deps.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsEgis3Tomsk =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/stac_pat_in_deps.d
+            └── stac_pat_in_deps.dfrm
+
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (2):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_DAT_TOOLS.FULL_YEARS
+  - D_PKG_HOSP_HISTORIES.GET_OPERS
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/stac_pat_in_hpk_plan.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/stac_pat_in_hpk_plan.frm
+СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА
+Файл замены: /var/www/t-mis/mis/UserFormsSaratov/ARMMainDoc/stac_pat_in_hpk_plan.frm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsEgis3Novosib =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/ARMMainDoc/stac_pat_in_hpk_plan.d
+            └── nsk_printHH.dfrm
+
+     ===== UserFormsSaratov =====
+        ПОЛНАЯ ЗАМЕНА: /var/www/t-mis/mis/UserFormsSaratov/ARMMainDoc/stac_pat_in_hpk_plan.frm
+
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (2):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_HPK_PLAN_JOURNALS.GET_HOSP_HISTORY_STATUS
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: ARMMainDoc/stac_pat_in_oper.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/stac_pat_in_oper.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (2):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_OPERATING_ROOMS.GET_ORDER
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Agents/subforms_fields/trf_anamnesis.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Agents/subforms_fields/trf_anamnesis.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (1):
+     (содержимое SQL запросов исключено для краткости)
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_STD.FRM_DT
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Analytical/HPK_PLAN_FREE_PLACES.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Analytical/HPK_PLAN_FREE_PLACES.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (3):
+     (содержимое SQL запросов исключено для краткости)
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="PAYMENT_KIND"  composition="LIST_NAME";
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Analytical/analytic_by_hh.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Analytical/analytic_by_hh.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsRKB3] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKB3/Analytical/analytic_by_hh.d/analytic_by_hh.dfrm
+  - [UserFormsRKOD] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRKOD/Analytical/analytic_by_hh.d/analytic_by_hh.dfrm
+  - [UserFormsRkob] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsRkob/Analytical/analytic_by_hh.d/analytic_by_hh.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsRKB3 =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/Analytical/analytic_by_hh.d
+            └── analytic_by_hh.dfrm
+
+     ===== UserFormsRKOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKOD/Analytical/analytic_by_hh.d
+            └── analytic_by_hh.dfrm
+
+     ===== UserFormsRkob =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRkob/Analytical/analytic_by_hh.d
+            └── analytic_by_hh.dfrm
+
+
+Список подключаемых форм subForm:
+     ArmPatientsInDep/SubForms/hh_dep_beds
+     ArmPatientsInDep/SubForms/hh_deps
+     ArmPatientsInDep/SubForms/bj_bulletin_contents
+     ArmPatientsInDep/SubForms/hpk_plan_journal_comment
+     ArmPatientsInDep/SubForms/hh_dir_servs_sop
+     ArmPatientsInDep/SubForms/mp_prescribes
+
+SQL ЗАПРОСЫ (7):
+     (содержимое SQL запросов исключено для краткости)
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_DAT_TOOLS.FULL_YEARS
+  - D_PKG_HOSP_HISTORIES.GET_FACT_DAYS
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_RIGHTS
+  - D_PKG_HOSP_HISTORY_DEPS.UPD
+  - D_PKG_CSE_ACCESSES.GET_ID_WITH_DEFAULT_RIGHTS
+  - D_PKG_URPRIVS.GET_STANDART_PRIVS
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="GEOGRAFY"  composition="DEFAULT";
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Analytical/analytic_by_needs_lp.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Analytical/analytic_by_needs_lp.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (0):
+     (содержимое SQL запросов исключено для краткости)
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="DEPS"  composition="DEFAULT_NAME";
+        unit="NOMBASE_MNN"  composition="GRID";
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Analytical/analytic_hpk_svod.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Analytical/analytic_hpk_svod.frm
+СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
+Переопределения:
+  - [UserFormsEgis3Novosib] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Novosib/Analytical/analytic_hpk_svod.d/analytic_hpk_svod.dfrm
+
+ЮЗЕРФОРМЫ:
+     ===== UserFormsEgis3Novosib =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/Analytical/analytic_hpk_svod.d
+            └── analytic_hpk_svod.dfrm
+
+
+Список подключаемых форм subForm:
+     (не найдено)
+
+SQL ЗАПРОСЫ (3):
+     (содержимое SQL запросов исключено для краткости)
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="PAYMENT_KIND"  composition="LIST_NAME";
+
+----------------------------------------------------------------------------------------------------
+ФОРМА: Analytical/hosp_planing.frm
+----------------------------------------------------------------------------------------------------
+Базовая форма: /var/www/t-mis/mis/Forms/Analytical/hosp_planing.frm
+СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)
+
+ЮЗЕРФОРМЫ:
+     (не найдено)
+
+Список подключаемых форм subForm:
+     (не найдено)
 
 SQL ЗАПРОСЫ (0):
      (содержимое SQL запросов исключено для краткости)
@@ -53,14 +319,14 @@ SQL ЗАПРОСЫ (0):
 
 ====================================================================================================
 === ИТОГОВАЯ СТАТИСТИКА ===
-Всего проанализировано форм: 2
-Всего SQL запросов: 0
-Базовые формы: 2
-Полностью замененные: 0
-Частично переопределенные: 0
+Всего проанализировано форм: 13
+Всего SQL запросов: 34
+Базовые формы: 7
+Полностью замененные: 1
+Частично переопределенные: 5
 Уникальных таблиц: 0
-Уникальных представлений (вьюх): 0
-Уникальных пакетов/функций: 0
+Уникальных представлений (вьюх): 32
+Уникальных пакетов/функций: 17
 Уникальных констант: 0
-Объектов для разбора: 0
+Объектов для разбора: 8
 ====================================================================================================

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,15 @@ public class TmisFormAnalyzerService {
     private final SqlExtractorService sqlExtractor;
     private final SettingsModel settings;
     private ReportGeneratorService reportService;
+
+    // Callback for progress updates
+    private ProgressCallback progressCallback;
+    private java.util.function.BooleanSupplier stopCondition = () -> false;
+
+    // Separate interface for progress callback (not inner to avoid confusion)
+    public interface ProgressCallback {
+        void onProgress(int processed, int total, String currentForm);
+    }
 
     public TmisFormAnalyzerService(String projectRoot) {
         this.projectRoot = projectRoot;
@@ -43,6 +53,9 @@ public class TmisFormAnalyzerService {
         this.settings = settings;
     }
 
+    public void setProgressCallback(ProgressCallback callback) {
+        this.progressCallback = callback;
+    }
 
     /**
      * Запуск полного анализа всех форм
@@ -78,14 +91,30 @@ public class TmisFormAnalyzerService {
             Files.createDirectories(outputDir);
         }
 
+        // ========== НОВЫЙ КОД: ОЧИЩАЕМ СТАРЫЙ ОТЧЕТ ==========
+        reportService.clearMainReport();
+        reportService.createMainReportHeader();
+        // =====================================================
+
         // Анализируем каждую форму
         int processed = 0;
         int errors = 0;
         long startTime = System.currentTimeMillis();
+        int totalForms = formsToAnalyze.size();
 
         for (String formPath : formsToAnalyze) {
+            // Проверка на остановку
+            if (isStopRequested()) {
+                System.out.println("Анализ остановлен пользователем");
+                break;
+            }
+
             processed++;
             long formStartTime = System.currentTimeMillis();
+
+            if (progressCallback != null) {
+                progressCallback.onProgress(processed, totalForms, formPath);
+            }
 
             System.out.print("Анализ [" + processed + "/" + formsToAnalyze.size() + "]: " + formPath + " ... ");
 
@@ -93,8 +122,6 @@ public class TmisFormAnalyzerService {
                 FormInfo result = analyzeForm(formPath);
                 if (result != null) {
                     reportService.addAnalysisResult(result);
-
-                    // СРАЗУ ДОПИСЫВАЕМ ФОРМУ В ОТЧЕТ
                     reportService.appendFormToMainReport(result);
 
                     long formElapsed = System.currentTimeMillis() - formStartTime;
@@ -152,22 +179,6 @@ public class TmisFormAnalyzerService {
         System.out.println();
         System.out.println("Результаты сохранены в директории: " + settings.getOutputDir() + "/");
         System.out.println("Основной отчет: " + settings.getOutputDir() + "/forms_report.txt");
-    }
-
-
-
-    /**
-     * Вывод итоговой статистики
-     */
-    private void printFinalStatistics(int processed) {
-        System.out.println();
-        System.out.println("=== АНАЛИЗ ЗАВЕРШЕН ===");
-        System.out.println("Обработано форм: " + processed);
-        System.out.println("Всего SQL запросов: " + reportService.getTotalSqlQueries());
-        System.out.println("Уникальных таблиц/вьюх: " + reportService.getUniqueTablesViews().size());
-        System.out.println("Уникальных пакетов/функций: " + reportService.getUniquePackagesFunctions().size());
-        System.out.println();
-        System.out.println("Результаты сохранены в директории: " + settings.getOutputDir() + "/");
     }
 
     /**
@@ -394,9 +405,6 @@ public class TmisFormAnalyzerService {
     /**
      * Извлечь SubForm из содержимого формы
      */
-    /**
-     * Извлечь SubForm из содержимого формы
-     */
     private void extractSubForms(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
@@ -414,13 +422,6 @@ public class TmisFormAnalyzerService {
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для path без кавычек - ТОЛЬКО если есть слеш (полный путь)
-        // Исключаем одиночные слова типа "Eko"
-        Pattern m2SubFormNoQuotesPattern = Pattern.compile(
-                "<component\\s+cmptype\\s*=\\s*[\"']SubForm[\"'][^>]*path\\s*=\\s*([^\\s/>]+/[^\\s/>]+)",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
         Matcher d3Matcher = d3SubFormPattern.matcher(content);
         while (d3Matcher.find()) {
             String path = d3Matcher.group(1).trim();
@@ -434,15 +435,6 @@ public class TmisFormAnalyzerService {
         while (m2Matcher.find()) {
             String path = m2Matcher.group(1).trim();
             if (!path.isEmpty()) {
-                path = path.replaceAll("^[\"']|[\"']$", "");
-                foundPaths.add(path);
-            }
-        }
-
-        Matcher m2NoQuotesMatcher = m2SubFormNoQuotesPattern.matcher(content);
-        while (m2NoQuotesMatcher.find()) {
-            String path = m2NoQuotesMatcher.group(1).trim();
-            if (!path.isEmpty() && path.contains("/")) {
                 path = path.replaceAll("^[\"']|[\"']$", "");
                 foundPaths.add(path);
             }
@@ -511,24 +503,12 @@ public class TmisFormAnalyzerService {
 
     /**
      * Извлечь формы из D3Api.showForm вызовов
-     * Форматы:
-     * - D3Api.showForm('Reports/sign_data', ...)
-     * - D3Api.showForm('help_view', null, ...)
-     * - D3Api.showForm('System/change_password')
-     * - D3Api.showForm('components_d3', document.getElementById('d3_components_page'))
-     */
-    /**
-     * Извлечь формы из D3Api.showForm вызовов
-     */
-    /**
-     * Извлечь формы из D3Api.showForm вызовов
      */
     private void extractD3ApiShowForms(String content, FormInfo formInfo) {
         if (content == null || content.isEmpty()) return;
 
         Set<String> foundForms = new LinkedHashSet<>();
 
-        // Паттерн для D3Api.showForm с кавычками
         Pattern d3ApiPattern = Pattern.compile(
                 "D3Api\\.showForm\\s*\\(\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -643,75 +623,12 @@ public class TmisFormAnalyzerService {
             compositions.add(String.format("        unit=\"%s\"  composition=\"%s\"", unit, composition));
         }
     }
-
-    /**
-     * Нормализация пути формы из JS вызова
-     */
-    private String normalizeFormPathFromJs(String formPath) {
-        if (formPath == null || formPath.trim().isEmpty()) {
-            return null;
-        }
-
-        String normalized = formPath.trim();
-        normalized = normalized.replaceAll("^['\"]|['\"]$", "");
-
-        if (normalized.contains(",") || normalized.contains("}")) {
-            return null;
-        }
-
-        if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm") &&
-                !normalized.contains("'") && !normalized.contains("\"") &&
-                !normalized.contains("+") && !normalized.contains("getVar") &&
-                normalized.contains("/")) {
-            normalized = normalized + ".frm";
-        }
-
-        if (normalized.contains("getVar") || normalized.contains("getValue") ||
-                normalized.contains("$") || normalized.contains("' +") ||
-                normalized.contains("\" +")) {
-            return null;
-        }
-
-        return normalized;
+    public void setStopRequested(java.util.function.BooleanSupplier stopCondition) {
+        this.stopCondition = stopCondition;
     }
 
-    /**
-     * Проверка валидности пути формы
-     */
-    private boolean isValidFormPath(String path) {
-        if (path == null || path.trim().isEmpty()) {
-            return false;
-        }
-
-        if ("components_m2".equals(path) || "".equals(path.trim())) {
-            return false;
-        }
-
-        String lowerPath = path.toLowerCase();
-        if (lowerPath.contains("function") || lowerPath.contains("setvalue") ||
-                lowerPath.contains("executeaction") || lowerPath.contains("getcontrol") ||
-                lowerPath.contains("printreportbycode") || lowerPath.contains("sysdate") ||
-                lowerPath.contains("refreshdataset") || lowerPath.contains("getdataset") ||
-                lowerPath.contains("showalert") || lowerPath.contains("confirm") ||
-                lowerPath.contains("closewindow") || lowerPath.contains("addlistener") ||
-                lowerPath.contains("getvar") || lowerPath.contains("setvar") ||
-                lowerPath.contains("modalresult") || lowerPath.contains("getproperty") ||
-                lowerPath.contains("sunit") || lowerPath.contains("composition") ||
-                lowerPath.contains("show_buttons") || lowerPath.contains("height") ||
-                lowerPath.contains("width") || lowerPath.contains("onclose") ||
-                lowerPath.contains("onafterclose") || lowerPath.contains("then") ||
-                lowerPath.contains("else") || lowerPath.contains("return") ||
-                lowerPath.contains("typeof") || lowerPath.contains("undefined") ||
-                lowerPath.contains("null") || lowerPath.contains("true") ||
-                lowerPath.contains("false") || lowerPath.contains("buttonedit_getcontrol") ||
-                lowerPath.contains("getproperty") || lowerPath.contains("setcontrolvalue") ||
-                lowerPath.contains("setcontrolcaption") || lowerPath.contains("getpage") ||
-                lowerPath.contains("getdom") || lowerPath.contains("this") ||
-                lowerPath.contains("_dom")) {
-            return false;
-        }
-
-        return (path.contains("/") && (path.endsWith(".frm") || path.endsWith(".dfrm"))) ||
-                path.matches("^[A-Za-z0-9_/]+\\.(frm|dfrm)$");
+    private boolean isStopRequested() {
+        return stopCondition.getAsBoolean() || Thread.currentThread().isInterrupted();
     }
+
 }

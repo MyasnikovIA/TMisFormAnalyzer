@@ -15,6 +15,14 @@ public class SettingsModel {
     private String postgresUser;
     private String postgresPassword;
 
+    // Настройки отчета
+    private boolean includeSqlContent;
+    private boolean includeJsForms;
+    private boolean includeTablesViews;
+    private boolean includeViewTables;
+    private boolean includeJsUnitCompositions;
+    private boolean includeViewDetails;
+
     public SettingsModel() {
         loadSettings();
     }
@@ -36,12 +44,23 @@ public class SettingsModel {
                 postgresUser = props.getProperty("postgres.user", "postgres");
                 postgresPassword = props.getProperty("postgres.password", "postgres");
 
+                // Загружаем настройки отчета
+                includeSqlContent = Boolean.parseBoolean(props.getProperty("report.includeSqlContent", "false"));
+                includeJsForms = Boolean.parseBoolean(props.getProperty("report.includeJsForms", "true"));
+                includeTablesViews = Boolean.parseBoolean(props.getProperty("report.includeTablesViews", "true"));
+                includeViewTables = Boolean.parseBoolean(props.getProperty("report.includeViewTables", "true"));
+                includeJsUnitCompositions = Boolean.parseBoolean(props.getProperty("report.includeJsUnitCompositions", "true"));
+                includeViewDetails = Boolean.parseBoolean(props.getProperty("report.includeViewDetails", "false"));
+
             } catch (IOException e) {
                 setDefaultValues();
             }
         } else {
             setDefaultValues();
         }
+
+        // Применяем загруженные настройки к ReportConfig
+        applyReportConfig();
     }
 
     private void setDefaultValues() {
@@ -53,6 +72,41 @@ public class SettingsModel {
         postgresUrl = "jdbc:postgresql://192.168.241.137:5432/med2dev";
         postgresUser = "postgres";
         postgresPassword = "postgres";
+
+        // Настройки отчета по умолчанию
+        includeSqlContent = false;
+        includeJsForms = true;
+        includeTablesViews = true;
+        includeViewTables = true;
+        includeJsUnitCompositions = true;
+        includeViewDetails = false;
+
+        applyReportConfig();
+    }
+
+    /**
+     * Применить настройки к ReportConfig
+     */
+    private void applyReportConfig() {
+        ReportConfig.setIncludeSqlContent(includeSqlContent);
+        ReportConfig.setIncludeJsForms(includeJsForms);
+        ReportConfig.setIncludeTablesViews(includeTablesViews);
+        ReportConfig.setIncludeViewTables(includeViewTables);
+        ReportConfig.setIncludeJsUnitCompositions(includeJsUnitCompositions);
+        ReportConfig.setIncludeViewDetails(includeViewDetails);
+    }
+
+    /**
+     * Сохранить текущие настройки отчета из ReportConfig
+     */
+    public void saveReportConfigFromCurrent() {
+        includeSqlContent = ReportConfig.isIncludeSqlContent();
+        includeJsForms = ReportConfig.isIncludeJsForms();
+        includeTablesViews = ReportConfig.isIncludeTablesViews();
+        includeViewTables = ReportConfig.isIncludeViewTables();
+        includeJsUnitCompositions = ReportConfig.isIncludeJsUnitCompositions();
+        includeViewDetails = ReportConfig.isIncludeViewDetails();
+        saveSettings();
     }
 
     public void saveSettings() {
@@ -65,6 +119,14 @@ public class SettingsModel {
         props.setProperty("postgres.url", postgresUrl);
         props.setProperty("postgres.user", postgresUser);
         props.setProperty("postgres.password", postgresPassword);
+
+        // Сохраняем настройки отчета
+        props.setProperty("report.includeSqlContent", String.valueOf(includeSqlContent));
+        props.setProperty("report.includeJsForms", String.valueOf(includeJsForms));
+        props.setProperty("report.includeTablesViews", String.valueOf(includeTablesViews));
+        props.setProperty("report.includeViewTables", String.valueOf(includeViewTables));
+        props.setProperty("report.includeJsUnitCompositions", String.valueOf(includeJsUnitCompositions));
+        props.setProperty("report.includeViewDetails", String.valueOf(includeViewDetails));
 
         try (FileOutputStream fos = new FileOutputStream(SETTINGS_FILE)) {
             props.store(fos, "TMIS Form Analyzer Settings");
@@ -97,4 +159,38 @@ public class SettingsModel {
 
     public String getPostgresPassword() { return postgresPassword; }
     public void setPostgresPassword(String postgresPassword) { this.postgresPassword = postgresPassword; }
+
+    // Геттеры для настроек отчета
+    public boolean isIncludeSqlContent() { return includeSqlContent; }
+    public boolean isIncludeJsForms() { return includeJsForms; }
+    public boolean isIncludeTablesViews() { return includeTablesViews; }
+    public boolean isIncludeViewTables() { return includeViewTables; }
+    public boolean isIncludeJsUnitCompositions() { return includeJsUnitCompositions; }
+    public boolean isIncludeViewDetails() { return includeViewDetails; }
+
+    // Сеттеры для настроек отчета
+    public void setIncludeSqlContent(boolean value) {
+        this.includeSqlContent = value;
+        ReportConfig.setIncludeSqlContent(value);
+    }
+    public void setIncludeJsForms(boolean value) {
+        this.includeJsForms = value;
+        ReportConfig.setIncludeJsForms(value);
+    }
+    public void setIncludeTablesViews(boolean value) {
+        this.includeTablesViews = value;
+        ReportConfig.setIncludeTablesViews(value);
+    }
+    public void setIncludeViewTables(boolean value) {
+        this.includeViewTables = value;
+        ReportConfig.setIncludeViewTables(value);
+    }
+    public void setIncludeJsUnitCompositions(boolean value) {
+        this.includeJsUnitCompositions = value;
+        ReportConfig.setIncludeJsUnitCompositions(value);
+    }
+    public void setIncludeViewDetails(boolean value) {
+        this.includeViewDetails = value;
+        ReportConfig.setIncludeViewDetails(value);
+    }
 }

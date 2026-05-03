@@ -36,8 +36,80 @@ public class ReportGeneratorService {
         this.allUnknownObjects = new LinkedHashMap<>();
         this.allConstants = new LinkedHashMap<>();
         this.totalSqlQueries = 0;
+        this.loadedViewDependencies = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Получить УНИКАЛЬНЫЕ таблицы из всех вьюх, используемых в форме
+     * (без дубликатов)
+     */
+    private Set<String> getTablesFromViewsForForm(FormInfo formInfo, Map<String, ViewTableDependencies> viewDependencies) {
+        Set<String> allTables = new LinkedHashSet<>();
+
+        if (viewDependencies == null || viewDependencies.isEmpty()) {
+            return allTables;
+        }
+
+        // Собираем все вьюхи, которые используются в этой форме
+        Set<String> viewsUsed = new LinkedHashSet<>();
+        for (String tv : formInfo.getTablesViews()) {
+            if (tv.startsWith("D_V_")) {
+                viewsUsed.add(tv);
+            }
+        }
+
+        // Для каждой вьюхи собираем её таблицы (LinkedHashSet сам удалит дубликаты)
+        for (String viewName : viewsUsed) {
+            ViewTableDependencies deps = viewDependencies.get(viewName);
+            if (deps != null && deps.isExistsInOracle()) {
+                allTables.addAll(deps.getOracleTables());
+            }
+        }
+
+        return allTables;
+    }
+    /**
+     * Очистить основной файл отчета перед началом анализа
+     */
+    public void clearMainReport() throws IOException {
+        Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
+        if (Files.exists(mainReportPath)) {
+            Files.delete(mainReportPath);
+            System.out.println("  Удален старый файл отчета: " + mainReportPath);
+        }
+
+        // Также очищаем кэш зависимостей вьюх
+        loadedViewDependencies.clear();
+        System.out.println("  Очищен кэш зависимостей вьюх");
+    }
+
+    /**
+     * Создать заголовок нового отчета
+     */
+    public void createMainReportHeader() throws IOException {
+        Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
+
+        // Создаем директорию если нужно
+        createOutputDirectory();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(mainReportPath.toFile()))) {
+            writer.println("=".repeat(100));
+            writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS ===");
+            writer.println("Дата создания: " + new Date());
+            writer.println("-".repeat(100));
+            writer.println("КОНФИГУРАЦИЯ ОТЧЕТА:");
+            writer.println("  SQL содержимое: " + (ReportConfig.isIncludeSqlContent() ? "ДА" : "НЕТ"));
+            writer.println("  JS формы: " + (ReportConfig.isIncludeJsForms() ? "ДА" : "НЕТ"));
+            writer.println("  Таблицы/вьюхи: " + (ReportConfig.isIncludeTablesViews() ? "ДА" : "НЕТ"));
+            writer.println("  Таблицы через вьюхи: " + (ReportConfig.isIncludeViewTables() ? "ДА" : "НЕТ"));
+            writer.println("  Композиции JS: " + (ReportConfig.isIncludeJsUnitCompositions() ? "ДА" : "НЕТ"));
+            writer.println("  Детали вьюх: " + (ReportConfig.isIncludeViewDetails() ? "ДА" : "НЕТ"));
+            writer.println("=".repeat(100));
+            writer.println();
+        }
+
+        System.out.println("  Создан новый файл отчета: " + mainReportPath);
+    }
     public ReportGeneratorService() {
         this(new SettingsModel());
     }
@@ -46,6 +118,7 @@ public class ReportGeneratorService {
         analyzedForms.add(formInfo);
         totalSqlQueries += formInfo.getTotalSqlQueries();
 
+        // Очищаем unknown объекты от D_PKG_CONSTANTS
         Set<String> cleanedUnknown = new LinkedHashSet<>();
         for (String unknown : formInfo.getUnknownObjects()) {
             if (!unknown.contains("D_PKG_CONSTANTS")) {
@@ -55,24 +128,33 @@ public class ReportGeneratorService {
         formInfo.getUnknownObjects().clear();
         formInfo.getUnknownObjects().addAll(cleanedUnknown);
 
+        // Добавляем таблицы и вьюхи из формы
         for (String tvName : formInfo.getTablesViews()) {
             allTablesViews.computeIfAbsent(tvName, TableViewInfo::new)
                     .addUsage(formInfo.getFormPath(), getSqlPreview(formInfo, tvName));
         }
 
+        // ========== ВАЖНО: ДОБАВЛЯЕМ ТАБЛИЦЫ ИЗ ВЬЮХ ==========
+        // Здесь нужно добавить таблицы, которые были извлечены из вьюх
+        // Они хранятся в методе formInfo.get... но их нет в formInfo
+        // Поэтому нужно добавить их через другой механизм
+
+        // Добавляем константы
+        for (String constantName : formInfo.getConstants()) {
+            allConstants.computeIfAbsent(constantName, ConstantInfo::new)
+                    .addUsage(formInfo.getFormPath(), getSqlPreviewForConstant(formInfo, constantName));
+        }
+
+        // Добавляем пакеты и функции
         for (String pfName : formInfo.getPackagesFunctions()) {
             allPackagesFunctions.computeIfAbsent(pfName, PackageFunctionInfo::new)
                     .addUsage(formInfo.getFormPath(), getSqlPreview(formInfo, pfName));
         }
 
+        // Добавляем неизвестные объекты
         for (String unknownName : formInfo.getUnknownObjects()) {
             allUnknownObjects.computeIfAbsent(unknownName, UnknownObjectInfo::new)
                     .addUsage(formInfo.getFormPath(), getSqlPreviewForUnknown(formInfo, unknownName));
-        }
-
-        for (String constantName : formInfo.getConstants()) {
-            allConstants.computeIfAbsent(constantName, ConstantInfo::new)
-                    .addUsage(formInfo.getFormPath(), getSqlPreviewForConstant(formInfo, constantName));
         }
     }
 
@@ -306,6 +388,7 @@ public class ReportGeneratorService {
         return result;
     }
 
+
     private void writeFormReportWithConfig(PrintWriter writer, FormInfo formInfo,
                                            Map<String, ViewTableDependencies> viewDependencies) {
         writer.println("-".repeat(100));
@@ -335,7 +418,6 @@ public class ReportGeneratorService {
             writer.println("     (не найдено)");
         } else {
             for (String subForm : formInfo.getSubForms()) {
-                // Очищаем от лишних символов при выводе
                 String cleanPath = subForm.replaceAll("^[\"']|[\"']$|/?>$", "");
                 writer.println("     " + cleanPath);
             }
@@ -362,20 +444,74 @@ public class ReportGeneratorService {
             writer.println();
         }
 
+        // ========== СПИСОК ВСЕХ ИСПОЛЬЗУЕМЫХ ВЬЮХ ==========
         if (ReportConfig.isIncludeTablesViews() && !formInfo.getTablesViews().isEmpty()) {
-            writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
+            writer.println("ИСПОЛЬЗУЕМЫЕ ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
+                if (tv.startsWith("D_V_")) {
+                    writer.println("  - " + tv);
+                }
             }
             writer.println();
         }
 
-        if (ReportConfig.isIncludeViewTables()) {
-            writeViewTablesSection(writer, formInfo);
+        // ========== ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (СТАРАЯ ВЕРСИЯ) ==========
+        if (ReportConfig.isIncludeViewDetails() && viewDependencies != null && !viewDependencies.isEmpty()) {
+            writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):");
+            writer.println();
+
+            for (Map.Entry<String, ViewTableDependencies> entry : viewDependencies.entrySet()) {
+                String viewName = entry.getKey();
+                ViewTableDependencies deps = entry.getValue();
+
+                if (deps != null && deps.isExistsInOracle()) {
+                    writer.println("  " + viewName + ":");
+                    Set<String> tables = deps.getOracleTables();
+                    if (tables.isEmpty()) {
+                        writer.println("      (таблицы не найдены)");
+                    } else {
+                        for (String table : tables) {
+                            writer.println("      - " + table);
+                        }
+                    }
+                    writer.println();
+                } else if (deps != null && deps.getOracleError() != null) {
+                    writer.println("  " + viewName + ":");
+                    writer.println("      Ошибка: " + deps.getOracleError());
+                    writer.println();
+                }
+            }
         }
 
-        if (ReportConfig.isIncludeViewDetails() && viewDependencies != null && !viewDependencies.isEmpty()) {
-            writeViewDetailsSection(writer, formInfo, viewDependencies);
+        // ========== УНИКАЛЬНЫЕ ТАБЛИЦЫ ИЗ ВСЕХ ВЬЮХ (НОВЫЙ БЛОК) ==========
+        if (ReportConfig.isIncludeViewTables()) {
+            Set<String> uniqueTables = getTablesFromViewsForForm(formInfo, viewDependencies);
+            if (!uniqueTables.isEmpty()) {
+                writer.println("УНИКАЛЬНЫЕ ТАБЛИЦЫ ИЗ ВСЕХ ВЬЮХ НА ФОРМЕ (без дубликатов):");
+                for (String table : uniqueTables) {
+                    writer.println("  - " + table);
+                }
+                writer.println();
+                writer.println("  Всего уникальных таблиц из вьюх: " + uniqueTables.size());
+                writer.println();
+            }
+        }
+
+        // ========== ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ НАПРЯМУЮ В SQL ==========
+        if (ReportConfig.isIncludeTablesViews() && !formInfo.getTablesViews().isEmpty()) {
+            Set<String> directTables = new LinkedHashSet<>();
+            for (String tv : formInfo.getTablesViews()) {
+                if (!tv.startsWith("D_V_") && !tv.startsWith("D_PKG_")) {
+                    directTables.add(tv);
+                }
+            }
+            if (!directTables.isEmpty()) {
+                writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ НАПРЯМУЮ В SQL:");
+                for (String table : directTables) {
+                    writer.println("  - " + table);
+                }
+                writer.println();
+            }
         }
 
         if (!formInfo.getPackagesFunctions().isEmpty()) {
@@ -410,7 +546,7 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== КОМПОЗИЦИИ В ТЭГАХ UnitEdit (сначала) ==========
+        // Композиции в тэгах UnitEdit
         if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
             for (String composition : formInfo.getUnitCompositions()) {
@@ -419,7 +555,7 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== КОМПОЗИЦИИ ИЗ JS (UniversalComposition) (после UnitEdit) ==========
+        // Композиции из JS
         if (ReportConfig.isIncludeJsUnitCompositions() &&
                 formInfo.getJsUnitCompositions() != null &&
                 !formInfo.getJsUnitCompositions().isEmpty()) {
@@ -438,41 +574,28 @@ public class ReportGeneratorService {
             writer.println();
         }
     }
-    /**
-     * Добавить информацию об одной форме в основной отчет (инкрементально)
-     */
+
+
+
     public void appendFormToMainReport(FormInfo formInfo) throws IOException {
         createOutputDirectory();
 
-        // Получаем зависимости вьюх если нужно (только для вьюх этой формы)
+        // Получаем зависимости вьюх если нужно
         Map<String, ViewTableDependencies> viewDependencies = null;
         if (ReportConfig.isIncludeViewTables() || ReportConfig.isIncludeViewDetails()) {
             viewDependencies = loadViewDependenciesForForm(formInfo);
         }
 
-        // Основной файл отчета
         Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
-        boolean fileExists = Files.exists(mainReportPath);
 
+        // Проверяем, существует ли файл (если нет - значит что-то пошло не так)
+        if (!Files.exists(mainReportPath)) {
+            System.err.println("  ОШИБКА: Файл отчета не существует! Заголовок не был создан.");
+            return;
+        }
+
+        // Дописываем информацию о форме в конец файла
         try (PrintWriter writer = new PrintWriter(new FileWriter(mainReportPath.toFile(), true))) {
-            // Если файл только создается, пишем заголовок
-            if (!fileExists) {
-                writer.println("=".repeat(100));
-                writer.println("=== ОТЧЕТ ПО ФОРМАМ T-MIS ===");
-                writer.println("Дата создания: " + new Date());
-                writer.println("-".repeat(100));
-                writer.println("КОНФИГУРАЦИЯ ОТЧЕТА:");
-                writer.println("  SQL содержимое: " + (ReportConfig.isIncludeSqlContent() ? "ДА" : "НЕТ"));
-                writer.println("  JS формы: " + (ReportConfig.isIncludeJsForms() ? "ДА" : "НЕТ"));
-                writer.println("  Таблицы/вьюхи: " + (ReportConfig.isIncludeTablesViews() ? "ДА" : "НЕТ"));
-                writer.println("  Таблицы через вьюхи: " + (ReportConfig.isIncludeViewTables() ? "ДА" : "НЕТ"));
-                writer.println("  Композиции JS: " + (ReportConfig.isIncludeJsUnitCompositions() ? "ДА" : "НЕТ"));
-                writer.println("  Детали вьюх: " + (ReportConfig.isIncludeViewDetails() ? "ДА" : "НЕТ"));
-                writer.println("=".repeat(100));
-                writer.println();
-            }
-
-            // Пишем информацию о форме
             writeFormReportWithConfig(writer, formInfo, viewDependencies);
         }
     }
@@ -498,9 +621,32 @@ public class ReportGeneratorService {
         ViewDependencyAnalyzer analyzer = new ViewDependencyAnalyzer();
 
         for (String viewName : viewsUsed) {
-            // Проверяем, не загружали ли уже эту вьюху
+            // Проверяем локальный кэш
             if (loadedViewDependencies.containsKey(viewName)) {
                 result.put(viewName, loadedViewDependencies.get(viewName));
+                // ДОБАВЛЯЕМ ТАБЛИЦЫ ИЗ ВЬЮХИ В ОБЩИЙ СПИСОК
+                ViewTableDependencies deps = loadedViewDependencies.get(viewName);
+                for (String table : deps.getOracleTables()) {
+                    if (!allTablesViews.containsKey(table)) {
+                        allTablesViews.computeIfAbsent(table, TableViewInfo::new)
+                                .addUsage(formInfo.getFormPath(), "Из вьюхи " + viewName);
+                    }
+                }
+                continue;
+            }
+
+            // Проверяем глобальный кэш
+            if (ViewDependencyAnalyzer.isInCache(viewName)) {
+                ViewTableDependencies cached = analyzer.analyzeViewPublic(viewName);
+                result.put(viewName, cached);
+                loadedViewDependencies.put(viewName, cached);
+                // ДОБАВЛЯЕМ ТАБЛИЦЫ ИЗ ВЬЮХИ В ОБЩИЙ СПИСОК
+                for (String table : cached.getOracleTables()) {
+                    if (!allTablesViews.containsKey(table)) {
+                        allTablesViews.computeIfAbsent(table, TableViewInfo::new)
+                                .addUsage(formInfo.getFormPath(), "Из вьюхи " + viewName);
+                    }
+                }
                 continue;
             }
 
@@ -509,6 +655,16 @@ public class ReportGeneratorService {
                 ViewTableDependencies deps = analyzer.analyzeViewPublic(viewName);
                 result.put(viewName, deps);
                 loadedViewDependencies.put(viewName, deps);
+
+                // ДОБАВЛЯЕМ ТАБЛИЦЫ ИЗ ВЬЮХИ В ОБЩИЙ СПИСОК
+                for (String table : deps.getOracleTables()) {
+                    if (!allTablesViews.containsKey(table)) {
+                        allTablesViews.computeIfAbsent(table, TableViewInfo::new)
+                                .addUsage(formInfo.getFormPath(), "Из вьюхи " + viewName);
+                        System.out.println("      Добавлена таблица из вьюхи: " + table);
+                    }
+                }
+
                 System.out.println("OK (таблиц: " + deps.getOracleTables().size() + ")");
             } catch (Exception e) {
                 System.err.println("ОШИБКА: " + e.getMessage());
@@ -526,13 +682,11 @@ public class ReportGeneratorService {
     /**
      * Завершить формирование отчета (добавить итоговую статистику)
      */
-    /**
-     * Завершить формирование отчета (добавить итоговую статистику)
-     */
     public void finishMainReport() throws IOException {
         Path mainReportPath = Paths.get(OUTPUT_DIR, "forms_report.txt");
 
         if (!Files.exists(mainReportPath)) {
+            System.err.println("  ОШИБКА: Файл отчета не существует!");
             return;
         }
 
@@ -568,6 +722,7 @@ public class ReportGeneratorService {
 
         System.out.println("  Отчет завершен: forms_report.txt");
     }
+
 
     private void writeSqlQueriesSectionFull(PrintWriter writer, FormInfo formInfo) {
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
@@ -641,7 +796,7 @@ public class ReportGeneratorService {
             return;
         }
 
-        writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):");
+        writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ:");
         writer.println();
 
         for (String viewName : viewsUsed) {
