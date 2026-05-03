@@ -184,6 +184,9 @@ public class TmisFormAnalyzerService {
     /**
      * Получение списка форм для анализа
      */
+    /**
+     * Получение списка форм для анализа
+     */
     private Set<String> getFormsToAnalyze() {
         Set<String> forms = new LinkedHashSet<>();
         Path listFile = Paths.get(AnalysisConfig.getFormsListFile());
@@ -197,9 +200,11 @@ public class TmisFormAnalyzerService {
                     String trimmed = line.trim();
                     if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
                         hasContent = true;
-                        String formPath = extractBaseFormPath(trimmed);
-                        if (formPath != null) {
-                            forms.add(formPath);
+                        // Нормализуем путь формы в правильный формат
+                        String normalizedPath = normalizeFormPathForAnalysis(trimmed);
+                        if (normalizedPath != null && !normalizedPath.isEmpty()) {
+                            forms.add(normalizedPath);
+                            System.out.println("  Добавлена форма: " + normalizedPath);
                         }
                     }
                 }
@@ -227,6 +232,54 @@ public class TmisFormAnalyzerService {
     }
 
     /**
+     * Нормализация пути формы для анализа
+     * Поддерживает форматы:
+     * 1. /Forms/HospDirAccounting/hospdiraccounting.frm
+     * 2. Forms/HospDirAccounting/hospdiraccounting.frm
+     * 3. HospDirAccounting/hospdiraccounting.frm
+     * 4. HospDirAccounting/hospdiraccounting (без расширения)
+     * 5. UserFormsSaratov/ARMMainDoc/stac_pat_in_hpk_plan.frm (UserForms пути)
+     */
+    private String normalizeFormPathForAnalysis(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            return null;
+        }
+
+        String normalized = path.trim();
+
+        // Убираем ведущий слеш
+        if (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+
+        // UserForms пути - оставляем как есть
+        if (normalized.startsWith("UserForms")) {
+            if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm")) {
+                normalized = normalized + ".frm";
+            }
+            return normalized;
+        }
+
+        // Убираем префикс Forms/ если есть
+        if (normalized.startsWith("Forms/")) {
+            normalized = normalized.substring(6);
+        } else if (normalized.startsWith("Forms")) {
+            normalized = normalized.substring(5);
+        }
+
+        // Добавляем расширение .frm если его нет
+        if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm")) {
+            normalized = normalized + ".frm";
+        }
+
+        // Добавляем префикс Forms/ и ведущий слеш
+        return "/Forms/" + normalized;
+    }
+
+    /**
+     * Сканирование всех форм в проекте (.frm и .dfrm)
+     */
+    /**
      * Сканирование всех форм в проекте (.frm и .dfrm)
      */
     private Set<String> scanAllForms() {
@@ -242,7 +295,8 @@ public class TmisFormAnalyzerService {
                             .filter(p -> p.toString().endsWith(".frm"))
                             .forEach(p -> {
                                 String relativePath = formsPath.relativize(p).toString().replace("\\", "/");
-                                allForms.add(relativePath);
+                                // Нормализуем путь с ведущим слешем и префиксом Forms/
+                                allForms.add("/Forms/" + relativePath);
                             });
                 }
                 System.out.println("  Найдено базовых форм (.frm) в Forms/: " +

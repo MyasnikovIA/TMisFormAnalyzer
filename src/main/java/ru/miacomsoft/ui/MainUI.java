@@ -226,18 +226,28 @@ public class MainUI extends JFrame {
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 5));
         bottomPanel.setBorder(new TitledBorder("Прогресс анализа"));
 
+        // Центральная панель для прогресс-бара и статуса
+        JPanel centerPanel = new JPanel(new BorderLayout(5, 5));
+
+        // Прогресс-бар сверху
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setString("Готов к работе");
+        centerPanel.add(progressBar, BorderLayout.NORTH);
 
+        // Панель для статуса (по центру)
+        JPanel statusPanel = new JPanel(new GridBagLayout());
         statusLabel = new JLabel("Статус: Ожидание");
-        statusLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        statusLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        statusPanel.add(statusLabel);
+        centerPanel.add(statusPanel, BorderLayout.CENTER);
 
-        bottomPanel.add(progressBar, BorderLayout.CENTER);
-        bottomPanel.add(statusLabel, BorderLayout.EAST);
+        bottomPanel.add(centerPanel, BorderLayout.CENTER);
 
         return bottomPanel;
     }
+
 
     private void openSettingsDialog() {
         SettingsDialog dialog = new SettingsDialog(this, settings);
@@ -704,6 +714,24 @@ public class MainUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        // Для Windows настройка Oracle
+        String os = System.getProperty("os.name").toLowerCase();
+        System.out.println(os);
+        if (os.indexOf("windows")!=-1) {
+            System.out.println("lib add ok");
+            // Устанавливаем путь к Instant Client (если установлен)
+            String oracleHome = "C:\\instantclient_19_6";
+            if (new File(oracleHome).exists()) {
+                System.setProperty("java.library.path",
+                        System.getProperty("java.library.path") + ";" + oracleHome);
+            }
+
+            // Настройки для Oracle JDBC на Windows
+            System.setProperty("oracle.jdbc.defaultNChar", "true");
+            System.setProperty("oracle.net.disableOob", "true");
+            System.out.println("lib add ok");
+        }
+
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
