@@ -403,7 +403,7 @@ public class ReportGeneratorService {
             writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
             writer.println("Переопределения:");
             for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
+                writer.println("    " + override.toString());
             }
         } else {
             writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
@@ -449,7 +449,7 @@ public class ReportGeneratorService {
             writer.println("ИСПОЛЬЗУЕМЫЕ ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
                 if (tv.startsWith("D_V_")) {
-                    writer.println("  - " + tv);
+                    writer.println("    " + tv);
                 }
             }
             writer.println();
@@ -461,7 +461,7 @@ public class ReportGeneratorService {
             if (!tablesFromViews.isEmpty()) {
                 writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ (уникальные для этой формы):");
                 for (String table : tablesFromViews) {
-                    writer.println("  - " + table);
+                    writer.println("    " + table);
                 }
                 writer.println();
                 writer.println("  Всего уникальных таблиц из вьюх: " + tablesFromViews.size());
@@ -473,7 +473,7 @@ public class ReportGeneratorService {
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
+                writer.println("    " + pf);
             }
             writer.println();
 
@@ -506,7 +506,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
+                writer.println("    " + proc);
             }
             writer.println();
         }
@@ -527,7 +527,7 @@ public class ReportGeneratorService {
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
-                writer.println("  - " + constant);
+                writer.println("   " + constant);
             }
             writer.println();
         }
@@ -556,7 +556,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
+                writer.println("    " + obj);
             }
             writer.println();
         }
@@ -949,7 +949,7 @@ public class ReportGeneratorService {
             writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
             writer.println("Переопределения:");
             for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
+                writer.println("    " + override.toString());
             }
         } else {
             writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
@@ -1027,7 +1027,7 @@ public class ReportGeneratorService {
             if (!formInfo.getSystemOptions().isEmpty()) {
                 writer.println("СИСТЕМНЫЕ ОПЦИИ:");
                 for (String opt : formInfo.getSystemOptions()) {
-                    writer.println("  - " + opt);
+                    writer.println("    " + opt);
                 }
                 writer.println();
             }
@@ -1044,7 +1044,7 @@ public class ReportGeneratorService {
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
+                writer.println("    " + tv);
             }
             writer.println();
         }
@@ -1052,7 +1052,7 @@ public class ReportGeneratorService {
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
+                writer.println("    " + pf);
             }
             writer.println();
         }
@@ -1060,7 +1060,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
+                writer.println("    " + proc);
             }
             writer.println();
         }
@@ -1068,7 +1068,7 @@ public class ReportGeneratorService {
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
+                writer.println("    " + opt);
             }
             writer.println();
         }
@@ -1092,7 +1092,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
+                writer.println("    " + obj);
             }
             writer.println();
         }
@@ -1134,7 +1134,7 @@ public class ReportGeneratorService {
 
         writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ:");
         for (String table : allTables) {
-            writer.println("  - " + table);
+            writer.println("    " + table);
         }
         writer.println();
     }
@@ -1153,7 +1153,7 @@ public class ReportGeneratorService {
             writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
             writer.println("Переопределения:");
             for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
+                writer.println("    " + override.toString());
             }
         } else {
             writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
@@ -1189,7 +1189,7 @@ public class ReportGeneratorService {
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
+                writer.println("    " + tv);
             }
             writer.println();
         }
@@ -1199,7 +1199,7 @@ public class ReportGeneratorService {
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
+                writer.println("    " + pf);
             }
             writer.println();
         }
@@ -1207,7 +1207,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
+                writer.println("    " + proc);
             }
             writer.println();
         }
@@ -1215,7 +1215,7 @@ public class ReportGeneratorService {
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
+                writer.println("    " + opt);
             }
             writer.println();
         }
@@ -1223,7 +1223,7 @@ public class ReportGeneratorService {
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
-                writer.println("  - " + constant);
+                writer.println("    " + constant);
             }
             writer.println();
         }
@@ -1247,7 +1247,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
+                writer.println("    " + obj);
             }
             writer.println();
         }
@@ -1307,7 +1307,7 @@ public class ReportGeneratorService {
             writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
             writer.println("Переопределения:");
             for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
+                writer.println("    " + override.toString());
             }
         } else {
             writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
@@ -1339,7 +1339,7 @@ public class ReportGeneratorService {
         if (!formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ (D_PKG_CONSTANTS.SEARCH_*):");
             for (String constant : formInfo.getConstants()) {
-                writer.println("  - " + constant);
+                writer.println("    " + constant);
             }
             writer.println();
         }
@@ -1425,7 +1425,7 @@ public class ReportGeneratorService {
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
+                writer.println("    " + tv);
             }
             writer.println();
         }
@@ -1433,7 +1433,7 @@ public class ReportGeneratorService {
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
+                writer.println("    " + pf);
             }
             writer.println();
         }
@@ -1441,7 +1441,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
+                writer.println("    " + obj);
             }
             writer.println();
         }
@@ -1449,7 +1449,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
+                writer.println("   " + proc);
             }
             writer.println();
         }
@@ -1457,7 +1457,7 @@ public class ReportGeneratorService {
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
+                writer.println("    " + opt);
             }
             writer.println();
         }
@@ -1965,7 +1965,7 @@ public class ReportGeneratorService {
             writer.println("СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА");
             writer.println("Переопределения:");
             for (FormInfo.OverrideInfo override : formInfo.getOverrides()) {
-                writer.println("  - " + override.toString());
+                writer.println("    " + override.toString());
             }
         } else {
             writer.println("СТАТУС: БАЗОВАЯ ФОРМА (без переопределений)");
@@ -2001,7 +2001,7 @@ public class ReportGeneratorService {
         if (!formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ТАБЛИЦЫ И ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
-                writer.println("  - " + tv);
+                writer.println("    " + tv);
             }
             writer.println();
         }
@@ -2011,7 +2011,7 @@ public class ReportGeneratorService {
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
-                writer.println("  - " + pf);
+                writer.println("    " + pf);
             }
             writer.println();
         }
@@ -2019,7 +2019,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
-                writer.println("  - " + proc);
+                writer.println("    " + proc);
             }
             writer.println();
         }
@@ -2027,7 +2027,7 @@ public class ReportGeneratorService {
         if (!formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
+                writer.println("    " + opt);
             }
             writer.println();
         }
@@ -2035,7 +2035,7 @@ public class ReportGeneratorService {
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
-                writer.println("  - " + constant);
+                writer.println("    " + constant);
             }
             writer.println();
         }
@@ -2059,7 +2059,7 @@ public class ReportGeneratorService {
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
-                writer.println("  - " + obj);
+                writer.println("    " + obj);
             }
             writer.println();
         }

@@ -710,6 +710,13 @@ public class MainUI extends JFrame {
         appendLog("  ✓ При пустом списке анализируется весь проект");
         appendLog("  ✓ Для остановки анализа нажмите кнопку 'Остановка'");
         appendLog("");
+        // Проверка подключения к БД
+        appendLog("Проверка подключений к БД:");
+        boolean oracleOk = ViewDependencyAnalyzer.testOracleConnection();
+        boolean postgresOk = ViewDependencyAnalyzer.testPostgresConnection();
+        appendLog("  Oracle: " + (oracleOk ? "✓ ДОСТУПНО" : "✗ НЕТ ДОСТУПА"));
+        appendLog("  PostgreSQL: " + (postgresOk ? "✓ ДОСТУПНО" : "✗ НЕТ ДОСТУПА"));
+        appendLog("");
         appendLog("Готов к работе. Нажмите 'Запуск анализа' для начала.");
     }
 
