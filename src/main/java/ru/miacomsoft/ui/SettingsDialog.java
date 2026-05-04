@@ -16,6 +16,7 @@ public class SettingsDialog extends JDialog {
     private SettingsModel settings;
     private boolean saved = false;
 
+
     // Connection fields
     private JTextField projectPathField;
     private JTextField outputDirField;
@@ -25,12 +26,15 @@ public class SettingsDialog extends JDialog {
     private JTextField postgresUrlField;
     private JTextField postgresUserField;
     private JPasswordField postgresPasswordField;
+    private JCheckBox checkPostgresPackagesCheckbox;  // <-- ДОБАВИТЬ ЭТУ СТРОКУ
 
     // Status labels and details
     private JLabel oracleStatusLabel;
     private JTextArea oracleDetailsArea;
     private JLabel postgresStatusLabel;
     private JTextArea postgresDetailsArea;
+    private JCheckBox checkDbObjectsCheckbox;
+    private JCheckBox checkDbDataCheckbox;
 
     // Report config checkboxes
     private JCheckBox includeSqlContentCheckbox;
@@ -626,6 +630,11 @@ public class SettingsDialog extends JDialog {
         includeJsUnitCompositionsCheckbox = new JCheckBox("Композиции из JS (UniversalComposition)");
         includeViewDetailsCheckbox = new JCheckBox("Детальное содержимое вьюх");
 
+        // Checkboxes for DB checks
+        checkDbObjectsCheckbox = new JCheckBox("Проверять наличие таблиц/вьюх в БД");
+        checkDbDataCheckbox = new JCheckBox("Проверять наличие данных в таблицах/вьюхах");
+        checkPostgresPackagesCheckbox = new JCheckBox("Проверять наличие пакетов/функций в PostgreSQL");
+
         // Add checkboxes with descriptions
         checkboxesPanel.add(createCheckboxWithDescription(includeSqlContentCheckbox,
                 "Выводить полное содержимое SQL запросов в отчете.\n" +
@@ -657,6 +666,32 @@ public class SettingsDialog extends JDialog {
         checkboxesPanel.add(createCheckboxWithDescription(includeViewDetailsCheckbox,
                 "Выводить полный список таблиц для каждой вьюхи\n" +
                         "(требуется подключение к Oracle БД)"));
+        checkboxesPanel.add(Box.createVerticalStrut(10));
+
+        // Separator for DB checks
+        JPanel dbSeparator = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel dbLabel = new JLabel("Проверка базы данных:");
+        dbLabel.setFont(dbLabel.getFont().deriveFont(Font.BOLD));
+        dbLabel.setForeground(new Color(0, 100, 200));
+        dbSeparator.add(dbLabel);
+        checkboxesPanel.add(dbSeparator);
+        checkboxesPanel.add(Box.createVerticalStrut(5));
+
+        checkboxesPanel.add(createCheckboxWithDescription(checkDbObjectsCheckbox,
+                "Проверять существование таблиц и представлений в Oracle и PostgreSQL.\n" +
+                        "Для каждого объекта будет отображено: существует/не существует"));
+        checkboxesPanel.add(Box.createVerticalStrut(5));
+
+        checkboxesPanel.add(createCheckboxWithDescription(checkDbDataCheckbox,
+                "Проверять наличие данных в таблицах и представлениях (COUNT).\n" +
+                        "Для каждого объекта будет отображено количество записей.\n" +
+                        "Требует включенной опции 'Проверять наличие таблиц/вьюх в БД'"));
+        checkboxesPanel.add(Box.createVerticalStrut(5));
+
+        checkboxesPanel.add(createCheckboxWithDescription(checkPostgresPackagesCheckbox,
+                "Проверять существование пакетов и функций D_PKG_* в PostgreSQL.\n" +
+                        "Для каждого пакета/функции будет отображено: существует/не существует\n" +
+                        "Требуется подключение к PostgreSQL БД"));
 
         // Add to scroll pane
         JScrollPane scrollPane = new JScrollPane(checkboxesPanel);
@@ -667,6 +702,8 @@ public class SettingsDialog extends JDialog {
 
         return panel;
     }
+
+
 
     private JPanel createCheckboxWithDescription(JCheckBox checkBox, String description) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
@@ -728,17 +765,20 @@ public class SettingsDialog extends JDialog {
         includeJsUnitCompositionsCheckbox.setSelected(settings.isIncludeJsUnitCompositions());
         includeViewDetailsCheckbox.setSelected(settings.isIncludeViewDetails());
 
+        // Load DB check settings
+        checkDbObjectsCheckbox.setSelected(settings.isCheckDbObjects());
+        checkDbDataCheckbox.setSelected(settings.isCheckDbData());
+        checkPostgresPackagesCheckbox.setSelected(settings.isCheckPostgresPackages());
+
         // Reset status labels
         oracleStatusLabel.setText("Не проверено");
         oracleStatusLabel.setForeground(Color.GRAY);
         oracleDetailsArea.setText("");
-        oracleDetailsArea.setBackground(new Color(255, 255, 245));
-
         postgresStatusLabel.setText("Не проверено");
         postgresStatusLabel.setForeground(Color.GRAY);
         postgresDetailsArea.setText("");
-        postgresDetailsArea.setBackground(new Color(255, 255, 245));
     }
+
 
     private void saveSettings() {
         // Save connection settings
@@ -758,6 +798,11 @@ public class SettingsDialog extends JDialog {
         settings.setIncludeViewTables(includeViewTablesCheckbox.isSelected());
         settings.setIncludeJsUnitCompositions(includeJsUnitCompositionsCheckbox.isSelected());
         settings.setIncludeViewDetails(includeViewDetailsCheckbox.isSelected());
+
+        // Save DB check settings
+        settings.setCheckDbObjects(checkDbObjectsCheckbox.isSelected());
+        settings.setCheckDbData(checkDbDataCheckbox.isSelected());
+        settings.setCheckPostgresPackages(checkPostgresPackagesCheckbox.isSelected());
 
         // Save to file
         settings.saveSettings();
@@ -787,5 +832,16 @@ public class SettingsDialog extends JDialog {
         includeViewTablesCheckbox.setSelected(ReportConfig.isIncludeViewTables());
         includeJsUnitCompositionsCheckbox.setSelected(ReportConfig.isIncludeJsUnitCompositions());
         includeViewDetailsCheckbox.setSelected(ReportConfig.isIncludeViewDetails());
+
+        // Для пресетов устанавливаем новые настройки
+        if (preset == ReportConfig.Preset.FULL || preset == ReportConfig.Preset.DEBUG) {
+            checkDbObjectsCheckbox.setSelected(true);
+            checkDbDataCheckbox.setSelected(true);
+            checkPostgresPackagesCheckbox.setSelected(true);
+        } else {
+            checkDbObjectsCheckbox.setSelected(false);
+            checkDbDataCheckbox.setSelected(false);
+            checkPostgresPackagesCheckbox.setSelected(false);
+        }
     }
 }

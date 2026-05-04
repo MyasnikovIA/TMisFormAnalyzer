@@ -444,7 +444,7 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== СПИСОК ВСЕХ ИСПОЛЬЗУЕМЫХ ВЬЮХ ==========
+        // ========== ВЬЮХИ, ИСПОЛЬЗУЕМЫЕ В ФОРМЕ ==========
         if (ReportConfig.isIncludeTablesViews() && !formInfo.getTablesViews().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ВЬЮХИ:");
             for (String tv : formInfo.getTablesViews()) {
@@ -455,73 +455,54 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // ========== ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (СТАРАЯ ВЕРСИЯ) ==========
-        if (ReportConfig.isIncludeViewDetails() && viewDependencies != null && !viewDependencies.isEmpty()) {
-            writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):");
-            writer.println();
-
-            for (Map.Entry<String, ViewTableDependencies> entry : viewDependencies.entrySet()) {
-                String viewName = entry.getKey();
-                ViewTableDependencies deps = entry.getValue();
-
-                if (deps != null && deps.isExistsInOracle()) {
-                    writer.println("  " + viewName + ":");
-                    Set<String> tables = deps.getOracleTables();
-                    if (tables.isEmpty()) {
-                        writer.println("      (таблицы не найдены)");
-                    } else {
-                        for (String table : tables) {
-                            writer.println("      - " + table);
-                        }
-                    }
-                    writer.println();
-                } else if (deps != null && deps.getOracleError() != null) {
-                    writer.println("  " + viewName + ":");
-                    writer.println("      Ошибка: " + deps.getOracleError());
-                    writer.println();
-                }
-            }
-        }
-
-        // ========== УНИКАЛЬНЫЕ ТАБЛИЦЫ ИЗ ВСЕХ ВЬЮХ (НОВЫЙ БЛОК) ==========
+        // ========== ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ ==========
         if (ReportConfig.isIncludeViewTables()) {
-            Set<String> uniqueTables = getTablesFromViewsForForm(formInfo, viewDependencies);
-            if (!uniqueTables.isEmpty()) {
-                writer.println("УНИКАЛЬНЫЕ ТАБЛИЦЫ ИЗ ВСЕХ ВЬЮХ НА ФОРМЕ (без дубликатов):");
-                for (String table : uniqueTables) {
+            Set<String> tablesFromViews = getTablesFromViewsForForm(formInfo, viewDependencies);
+            if (!tablesFromViews.isEmpty()) {
+                writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ (уникальные для этой формы):");
+                for (String table : tablesFromViews) {
                     writer.println("  - " + table);
                 }
                 writer.println();
-                writer.println("  Всего уникальных таблиц из вьюх: " + uniqueTables.size());
+                writer.println("  Всего уникальных таблиц из вьюх: " + tablesFromViews.size());
                 writer.println();
             }
         }
 
-        // ========== ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ НАПРЯМУЮ В SQL ==========
-        if (ReportConfig.isIncludeTablesViews() && !formInfo.getTablesViews().isEmpty()) {
-            Set<String> directTables = new LinkedHashSet<>();
-            for (String tv : formInfo.getTablesViews()) {
-                if (!tv.startsWith("D_V_") && !tv.startsWith("D_PKG_")) {
-                    directTables.add(tv);
-                }
-            }
-            if (!directTables.isEmpty()) {
-                writer.println("ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ НАПРЯМУЮ В SQL:");
-                for (String table : directTables) {
-                    writer.println("  - " + table);
-                }
-                writer.println();
-            }
-        }
-
+        // ========== ПАКЕТЫ И ФУНКЦИИ ==========
         if (!formInfo.getPackagesFunctions().isEmpty()) {
             writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
             for (String pf : formInfo.getPackagesFunctions()) {
                 writer.println("  - " + pf);
             }
             writer.println();
+
+            // ========== ПРОВЕРКА НАЛИЧИЯ ПАКЕТОВ В POSTGRESQL ==========
+            if (settings != null && settings.isCheckPostgresPackages()) {
+                writer.println("ПРОВЕРКА НАЛИЧИЯ ПАКЕТОВ/ФУНКЦИЙ В PostgreSQL:");
+                writer.println();
+
+                DatabaseObjectChecker checker = new DatabaseObjectChecker(settings);
+                Map<String, Map<String, Object>> packageResults = checker.checkPackages(formInfo.getPackagesFunctions());
+
+                for (Map.Entry<String, Map<String, Object>> entry : packageResults.entrySet()) {
+                    String packageName = entry.getKey();
+                    Map<String, Object> result = entry.getValue();
+
+                    boolean existsInPostgres = (boolean) result.get("postgres_exists");
+
+                    writer.println("  " + packageName + ":");
+                    writer.println("    PostgreSQL: " + (existsInPostgres ? "СУЩЕСТВУЕТ" : "НЕ СУЩЕСТВУЕТ"));
+                    writer.println();
+                }
+            }
+        } else {
+            writer.println("ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:");
+            writer.println("     (не найдено)");
+            writer.println();
         }
 
+        // ========== ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ ==========
         if (!formInfo.getUserProcedures().isEmpty()) {
             writer.println("ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ:");
             for (String proc : formInfo.getUserProcedures()) {
@@ -530,14 +511,19 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        if (!formInfo.getSystemOptions().isEmpty()) {
+        // ========== СИСТЕМНЫЕ ОПЦИИ ==========
+        if (formInfo.getSystemOptions() != null && !formInfo.getSystemOptions().isEmpty()) {
             writer.println("СИСТЕМНЫЕ ОПЦИИ:");
             for (String opt : formInfo.getSystemOptions()) {
-                writer.println("  - " + opt);
+                writer.println("     " + opt + ";");
             }
             writer.println();
+        } else {
+            writer.println("СИСТЕМНЫЕ ОПЦИИ:");
+            writer.println("     (не найдено)");
+            writer.println();
         }
-
+        // ========== КОНСТАНТЫ ==========
         if (formInfo.getConstants() != null && !formInfo.getConstants().isEmpty()) {
             writer.println("КОНСТАНТЫ:");
             for (String constant : formInfo.getConstants()) {
@@ -546,7 +532,7 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Композиции в тэгах UnitEdit
+// ========== КОМПОЗИЦИИ В ТЭГАХ UnitEdit ==========
         if (formInfo.getUnitCompositions() != null && !formInfo.getUnitCompositions().isEmpty()) {
             writer.println("КОМПОЗИЦИИ В ТЭГАХ UnitEdit:");
             for (String composition : formInfo.getUnitCompositions()) {
@@ -555,7 +541,7 @@ public class ReportGeneratorService {
             writer.println();
         }
 
-        // Композиции из JS
+// ========== КОМПОЗИЦИИ ИЗ JS ==========
         if (ReportConfig.isIncludeJsUnitCompositions() &&
                 formInfo.getJsUnitCompositions() != null &&
                 !formInfo.getJsUnitCompositions().isEmpty()) {
@@ -566,12 +552,61 @@ public class ReportGeneratorService {
             writer.println();
         }
 
+// ========== НЕИЗВЕСТНЫЕ ОБЪЕКТЫ ==========
         if (!formInfo.getUnknownObjects().isEmpty()) {
             writer.println("РАЗОБРАТЬ АНАЛИТИКОМ:");
             for (String obj : formInfo.getUnknownObjects()) {
                 writer.println("  - " + obj);
             }
             writer.println();
+        }
+
+// ========== ПРОВЕРКА НАЛИЧИЯ ОБЪЕКТОВ В БД (ТАБЛИЦЫ И ВЬЮХИ) ==========
+        if (settings != null && settings.isCheckDbObjects()) {
+            // Собираем все объекты (таблицы и вьюхи) для проверки
+            Set<String> allObjects = new LinkedHashSet<>();
+            for (String tv : formInfo.getTablesViews()) {
+                if (!tv.startsWith("D_PKG_")) {
+                    allObjects.add(tv);
+                }
+            }
+
+            if (!allObjects.isEmpty()) {
+                writer.println("ПРОВЕРКА НАЛИЧИЯ ОБЪЕКТОВ В БД:");
+                writer.println();
+
+                DatabaseObjectChecker checker = new DatabaseObjectChecker(settings);
+                Map<String, Map<String, Object>> objectResults = checker.checkObjects(allObjects);
+
+                for (Map.Entry<String, Map<String, Object>> entry : objectResults.entrySet()) {
+                    String objectName = entry.getKey();
+                    Map<String, Object> result = entry.getValue();
+
+                    boolean existsInOracle = (boolean) result.get("oracle_exists");
+                    boolean existsInPostgres = (boolean) result.get("postgres_exists");
+                    long oracleCount = (long) result.get("oracle_count");
+                    long postgresCount = (long) result.get("postgres_count");
+
+                    writer.println("  " + objectName + ":");
+                    writer.print("    Oracle: " + (existsInOracle ? "СУЩЕСТВУЕТ" : "НЕ СУЩЕСТВУЕТ"));
+                    if (settings.isCheckDbData() && existsInOracle && oracleCount >= 0) {
+                        writer.print(" (записей: " + oracleCount + ")");
+                    }
+                    writer.println();
+
+                    writer.print("    PostgreSQL: " + (existsInPostgres ? "СУЩЕСТВУЕТ" : "НЕ СУЩЕСТВУЕТ"));
+                    if (settings.isCheckDbData() && existsInPostgres && postgresCount >= 0) {
+                        writer.print(" (записей: " + postgresCount + ")");
+                    }
+                    writer.println();
+                    writer.println();
+                }
+            }
+        }
+        if (ReportConfig.isIncludeViewDetails() && viewDependencies != null && !viewDependencies.isEmpty()) {
+            writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):");
+            writer.println();
+            writeViewDetailsSection(writer, formInfo, viewDependencies);
         }
     }
 
@@ -723,6 +758,55 @@ public class ReportGeneratorService {
         System.out.println("  Отчет завершен: forms_report.txt");
     }
 
+    // Добавьте метод для вывода информации о проверке объектов БД
+    private void writeDbObjectCheckSection(PrintWriter writer, Set<String> objectNames) {
+        if (objectNames == null || objectNames.isEmpty()) {
+            return;
+        }
+
+        DatabaseObjectChecker checker = new DatabaseObjectChecker(settings);
+        Map<String, Map<String, Object>> results = checker.checkObjects(objectNames);
+
+        writer.println("ПРОВЕРКА НАЛИЧИЯ ОБЪЕКТОВ В БД:");
+        writer.println();
+
+        for (Map.Entry<String, Map<String, Object>> entry : results.entrySet()) {
+            String objectName = entry.getKey();
+            Map<String, Object> result = entry.getValue();
+
+            boolean oracleExists = (boolean) result.get("oracle_exists");
+            boolean postgresExists = (boolean) result.get("postgres_exists");
+            long oracleCount = (long) result.get("oracle_count");
+            long postgresCount = (long) result.get("postgres_count");
+
+            writer.println("  " + objectName + ":");
+
+            // Oracle
+            writer.print("    Oracle: ");
+            if (oracleExists) {
+                writer.print("СУЩЕСТВУЕТ");
+                if (settings.isCheckDbData() && oracleCount >= 0) {
+                    writer.print(" (записей: " + oracleCount + ")");
+                }
+            } else {
+                writer.print("НЕ СУЩЕСТВУЕТ");
+            }
+            writer.println();
+
+            // PostgreSQL
+            writer.print("    PostgreSQL: ");
+            if (postgresExists) {
+                writer.print("СУЩЕСТВУЕТ");
+                if (settings.isCheckDbData() && postgresCount >= 0) {
+                    writer.print(" (записей: " + postgresCount + ")");
+                }
+            } else {
+                writer.print("НЕ СУЩЕСТВУЕТ");
+            }
+            writer.println();
+            writer.println();
+        }
+    }
 
     private void writeSqlQueriesSectionFull(PrintWriter writer, FormInfo formInfo) {
         writer.println("SQL ЗАПРОСЫ (" + formInfo.getSqlQueries().size() + "):");
@@ -793,11 +877,10 @@ public class ReportGeneratorService {
         }
 
         if (viewsUsed.isEmpty()) {
+            writer.println("  (нет вьюх для детального анализа)");
+            writer.println();
             return;
         }
-
-        writer.println("ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ:");
-        writer.println();
 
         for (String viewName : viewsUsed) {
             ViewTableDependencies deps = viewDependencies.get(viewName);
@@ -816,7 +899,40 @@ public class ReportGeneratorService {
                 writer.println("  " + viewName + ":");
                 writer.println("      Ошибка: " + deps.getOracleError());
                 writer.println();
+            } else if (deps == null) {
+                writer.println("  " + viewName + ":");
+                writer.println("      (данные не загружены)");
+                writer.println();
             }
+        }
+    }
+    /**
+     * Добавить проверку пакетов/функций в отчет
+     */
+    private void writePackagesCheckSection(PrintWriter writer, Set<String> packageNames, boolean checkPostgres) {
+        if (packageNames == null || packageNames.isEmpty()) {
+            return;
+        }
+
+        DatabaseObjectChecker checker = new DatabaseObjectChecker(settings);
+
+        writer.println("ПРОВЕРКА НАЛИЧИЯ ПАКЕТОВ/ФУНКЦИЙ В БД:");
+        writer.println();
+
+        for (String packageName : packageNames) {
+            writer.println("  " + packageName + ":");
+
+            // Проверка в Oracle
+            boolean existsInOracle = checker.checkPackageExistsInOracle(packageName);
+            writer.println("    Oracle: " + (existsInOracle ? "СУЩЕСТВУЕТ" : "НЕ СУЩЕСТВУЕТ"));
+
+            // Проверка в PostgreSQL (если включено)
+            if (checkPostgres) {
+                boolean existsInPostgres = checker.checkPackageExistsInPostgres(packageName);
+                writer.println("    PostgreSQL: " + (existsInPostgres ? "СУЩЕСТВУЕТ" : "НЕ СУЩЕСТВУЕТ"));
+            }
+
+            writer.println();
         }
     }
 

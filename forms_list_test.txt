@@ -11,12 +11,16 @@
 /Forms/HospPlan/hp_directions_edit.frm
 /Forms/ARMMainDoc/arm_director.frm
 /Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
-
+/Forms/ArmPatientsInDep/pat_in_dep_head_nurse.frm
 
 
 /Forms/components_d3.frm
 /Forms/DBTest.frm
 
+
+константы
+Forms/Lis/Reports/Statistic/journal_pcr_covid_call.frm
+Forms/Agents/agent_palliative/palliative_edit.frm
 
 
 /Forms/NR/subforms/patient_data.frm

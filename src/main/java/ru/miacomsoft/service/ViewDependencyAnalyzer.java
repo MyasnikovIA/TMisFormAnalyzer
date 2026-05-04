@@ -17,7 +17,6 @@ public class ViewDependencyAnalyzer {
     private static String ORACLE_URL = "jdbc:oracle:thin:@192.168.241.141:1521/med2dev";
     private static String ORACLE_USER = "dev";
     private static String ORACLE_PASSWORD = "def";
-    private static String ORACLE_URL_FORMAT = "auto"; // auto, sid, service, tns
 
     // Конфигурация PostgreSQL
     private static String POSTGRES_URL = "jdbc:postgresql://192.168.241.137:5432/med2dev";
@@ -29,8 +28,16 @@ public class ViewDependencyAnalyzer {
     private static final Map<String, String> oracleDDLCache = new ConcurrentHashMap<>();
     private static final Map<String, String> postgresDDLCache = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> parsedTablesCache = new ConcurrentHashMap<>();
+    private static final Map<String, Boolean> objectExistsCache = new ConcurrentHashMap<>();
+    private static final Map<String, Long> dataCountCache = new ConcurrentHashMap<>();
+
+    // Статистика кэша
     private static int cacheHits = 0;
     private static int cacheMisses = 0;
+    private static int ddlCacheHits = 0;
+    private static int ddlCacheMisses = 0;
+    private static int parsedCacheHits = 0;
+    private static int parsedCacheMisses = 0;
 
     // Флаги для управления процессом
     private AtomicBoolean isPaused = new AtomicBoolean(false);
@@ -43,87 +50,6 @@ public class ViewDependencyAnalyzer {
         void onProgress(int current, int total, String viewName, int oracleTables, int postgresTables);
         void onLog(String message);
         void onCancelled();
-    }
-
-    static {
-        // Определяем ОС и настраиваем формат URL
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            // Для Windows используем формат с двоеточием (SID)
-            ORACLE_URL_FORMAT = "sid";
-            System.out.println("Обнаружена Windows, используем формат Oracle URL с SID");
-        } else {
-            // Для Linux используем формат с слешем (Service Name)
-            ORACLE_URL_FORMAT = "service";
-            System.out.println("Обнаружен Linux, используем формат Oracle URL с Service Name");
-        }
-    }
-
-    /**
-     * Получить правильный URL для Oracle в зависимости от ОС
-     */
-    public static String getOracleConnectionUrl() {
-        String host = "192.168.241.141";
-        String port = "1521";
-        String database = "med2dev";
-
-        // Извлекаем параметры из текущего URL если он уже установлен
-        String currentUrl = ORACLE_URL;
-        if (currentUrl != null && !currentUrl.isEmpty()) {
-            try {
-                if (currentUrl.contains("@")) {
-                    String afterAt = currentUrl.substring(currentUrl.indexOf("@") + 1);
-                    if (afterAt.contains(":")) {
-                        String[] parts = afterAt.split(":");
-                        if (parts.length >= 2) {
-                            host = parts[0];
-                            String portAndDb = parts[1];
-                            if (portAndDb.contains("/")) {
-                                port = portAndDb.substring(0, portAndDb.indexOf("/"));
-                                database = portAndDb.substring(portAndDb.indexOf("/") + 1);
-                            } else if (portAndDb.contains(":")) {
-                                port = portAndDb.substring(0, portAndDb.indexOf(":"));
-                                database = portAndDb.substring(portAndDb.indexOf(":") + 1);
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // Используем значения по умолчанию
-            }
-        }
-
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("win")) {
-            // Windows: формат с двоеточием (SID)
-            return String.format("jdbc:oracle:thin:@%s:%s:%s", host, port, database);
-        } else {
-            // Linux: формат с слешем (Service Name)
-            return String.format("jdbc:oracle:thin:@%s:%s/%s", host, port, database);
-        }
-    }
-
-    /**
-     * Попробовать все возможные форматы подключения к Oracle
-     */
-    private static String[] getAllOracleUrlFormats() {
-        String host = "192.168.241.141";
-        String port = "1521";
-        String database = "med2dev";
-
-        return new String[]{
-                // Формат 1: Service Name (Linux)
-                String.format("jdbc:oracle:thin:@%s:%s/%s", host, port, database),
-                // Формат 2: SID (Windows)
-                String.format("jdbc:oracle:thin:@%s:%s:%s", host, port, database),
-                // Формат 3: Полный TNS формат
-                String.format("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=%s))(CONNECT_DATA=(SERVICE_NAME=%s)))",
-                        host, port, database),
-                // Формат 4: TNS формат с SID
-                String.format("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=%s)(PORT=%s))(CONNECT_DATA=(SID=%s)))",
-                        host, port, database)
-        };
     }
 
     public void setProgressCallback(ProgressCallback callback) {
@@ -159,15 +85,32 @@ public class ViewDependencyAnalyzer {
         oracleDDLCache.clear();
         postgresDDLCache.clear();
         parsedTablesCache.clear();
+        objectExistsCache.clear();
+        dataCountCache.clear();
+
         cacheHits = 0;
         cacheMisses = 0;
-        System.out.println("Кэш вьюх очищен");
+        ddlCacheHits = 0;
+        ddlCacheMisses = 0;
+        parsedCacheHits = 0;
+        parsedCacheMisses = 0;
+
+        System.out.println("Кэш вьюх полностью очищен");
     }
 
     public static String getCacheStats() {
-        return String.format("Кэш: просмотров=%d, попаданий=%d, промахов=%d, процент попаданий=%.1f%%",
-                cacheHits + cacheMisses, cacheHits, cacheMisses,
-                (cacheHits + cacheMisses) > 0 ? (cacheHits * 100.0 / (cacheHits + cacheMisses)) : 0);
+        return String.format(
+                "Кэш:\n" +
+                        "  Результаты вьюх: %d (попаданий=%d, промахов=%d, попаданий=%.1f%%)\n" +
+                        "  DDL Oracle: %d (попаданий=%d, промахов=%d)\n" +
+                        "  DDL PostgreSQL: %d (попаданий=%d, промахов=%d)\n" +
+                        "  Распарсенные таблицы: %d (попаданий=%d, промахов=%d)",
+                viewCache.size(), cacheHits, cacheMisses,
+                (cacheHits + cacheMisses) > 0 ? (cacheHits * 100.0 / (cacheHits + cacheMisses)) : 0,
+                oracleDDLCache.size(), ddlCacheHits, ddlCacheMisses,
+                postgresDDLCache.size(), ddlCacheHits, ddlCacheMisses,
+                parsedTablesCache.size(), parsedCacheHits, parsedCacheMisses
+        );
     }
 
     public static int getCacheSize() {
@@ -178,52 +121,69 @@ public class ViewDependencyAnalyzer {
         return viewCache.containsKey(viewName.toUpperCase());
     }
 
-    /**
-     * Проверка подключения к Oracle с автоматическим определением формата
-     */
-    public static boolean testOracleConnection() {
-        String[] urls = getAllOracleUrlFormats();
-        String user = ORACLE_USER;
-        String password = ORACLE_PASSWORD;
+    public static boolean isDdlInCache(String viewName, String dbType) {
+        if ("oracle".equalsIgnoreCase(dbType)) {
+            return oracleDDLCache.containsKey(viewName.toUpperCase());
+        } else {
+            return postgresDDLCache.containsKey(viewName.toLowerCase());
+        }
+    }
 
+    public static boolean testOracleConnection() {
         Properties props = new Properties();
-        props.setProperty("user", user);
-        props.setProperty("password", password);
+        props.setProperty("user", ORACLE_USER);
+        props.setProperty("password", ORACLE_PASSWORD);
         props.setProperty("oracle.net.CONNECT_TIMEOUT", "10000");
         props.setProperty("oracle.jdbc.ReadTimeout", "30000");
 
-        for (String url : urls) {
-            try {
-                Class.forName("oracle.jdbc.OracleDriver");
-                try (Connection conn = DriverManager.getConnection(url, props)) {
-                    // Успешное подключение - сохраняем правильный URL
-                    ORACLE_URL = url;
-                    System.out.println("Oracle подключение успешно! Использован URL: " + url);
-                    return true;
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+            try (Connection conn = DriverManager.getConnection(ORACLE_URL, props)) {
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT 1 FROM DUAL")) {
+                    if (rs.next()) {
+                        System.out.println("Oracle подключение успешно!");
+                        return true;
+                    }
                 }
-            } catch (Exception e) {
-                // Пробуем следующий формат
-                System.out.println("Не удалось подключиться по URL: " + url + " - " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.err.println("Oracle ошибка подключения: " + e.getMessage());
         }
         return false;
     }
 
-    /**
-     * Проверка подключения к PostgreSQL
-     */
     public static boolean testPostgresConnection() {
         try {
             Class.forName("org.postgresql.Driver");
-            DriverManager.setLoginTimeout(5);
+            DriverManager.setLoginTimeout(10);
             try (Connection conn = DriverManager.getConnection(POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD)) {
-                System.out.println("PostgreSQL подключение успешно!");
-                return true;
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT 1")) {
+                    if (rs.next()) {
+                        System.out.println("PostgreSQL подключение успешно!");
+                        return true;
+                    }
+                }
             }
         } catch (Exception e) {
             System.err.println("PostgreSQL ошибка подключения: " + e.getMessage());
-            return false;
         }
+        return false;
+    }
+
+    public static void setOracleConfig(String url, String user, String password) {
+        ORACLE_URL = url;
+        ORACLE_USER = user;
+        ORACLE_PASSWORD = password;
+        clearCache();
+    }
+
+    public static void setPostgresConfig(String url, String user, String password) {
+        POSTGRES_URL = url;
+        POSTGRES_USER = user;
+        POSTGRES_PASSWORD = password;
+        clearCache();
     }
 
     private void checkPauseAndCancel() throws InterruptedException {
@@ -251,9 +211,6 @@ public class ViewDependencyAnalyzer {
             "WHEN", "THEN", "ELSE", "END", "DISTINCT", "ALL", "ANY", "SOME"
     ));
 
-    /**
-     * Анализ всех вьюх с поддержкой кэширования
-     */
     public Map<String, ViewTableDependencies> analyzeAllViews(Map<String, TableViewInfo> viewsInfo) throws InterruptedException {
         Map<String, ViewTableDependencies> result = new LinkedHashMap<>();
 
@@ -364,6 +321,9 @@ public class ViewDependencyAnalyzer {
             }
         } else {
             cacheMisses++;
+            if (progressCallback != null) {
+                progressCallback.onLog("    Кэш MISS для " + viewName);
+            }
         }
 
         return cached;
@@ -372,6 +332,9 @@ public class ViewDependencyAnalyzer {
     private void putInCache(String viewName, ViewTableDependencies dependencies) {
         String key = viewName.toUpperCase();
         viewCache.put(key, dependencies);
+        if (progressCallback != null) {
+            progressCallback.onLog("    Результат для " + viewName + " сохранен в кэш");
+        }
     }
 
     private ViewTableDependencies analyzeViewWithCache(String viewName) {
@@ -407,6 +370,7 @@ public class ViewDependencyAnalyzer {
         String ddl = oracleDDLCache.get(key);
 
         if (ddl == null) {
+            ddlCacheMisses++;
             if (progressCallback != null) {
                 progressCallback.onLog("    Загрузка Oracle DDL для " + viewName + " ...");
             }
@@ -418,6 +382,7 @@ public class ViewDependencyAnalyzer {
                 }
             }
         } else {
+            ddlCacheHits++;
             if (progressCallback != null) {
                 progressCallback.onLog("    Oracle DDL для " + viewName + " взят из кэша");
             }
@@ -437,11 +402,19 @@ public class ViewDependencyAnalyzer {
 
         dependencies.setExistsInOracle(true);
 
-        // Пытаемся получить распарсенные таблицы из кэша
         Set<String> tables = getParsedTablesFromCache(key + "_ORACLE");
         if (tables == null) {
+            parsedCacheMisses++;
             tables = extractTablesFromDDL(ddl);
             putParsedTablesToCache(key + "_ORACLE", tables);
+            if (progressCallback != null) {
+                progressCallback.onLog("    Распарсенные таблицы для " + viewName + " сохранены в кэш");
+            }
+        } else {
+            parsedCacheHits++;
+            if (progressCallback != null) {
+                progressCallback.onLog("    Распарсенные таблицы для " + viewName + " взяты из кэша");
+            }
         }
 
         dependencies.addAllOracleTables(tables);
@@ -458,6 +431,7 @@ public class ViewDependencyAnalyzer {
         String ddl = postgresDDLCache.get(key);
 
         if (ddl == null) {
+            ddlCacheMisses++;
             if (progressCallback != null) {
                 progressCallback.onLog("    Загрузка PostgreSQL DDL для " + viewName + " ...");
             }
@@ -469,6 +443,7 @@ public class ViewDependencyAnalyzer {
                 }
             }
         } else {
+            ddlCacheHits++;
             if (progressCallback != null) {
                 progressCallback.onLog("    PostgreSQL DDL для " + viewName + " взят из кэша");
             }
@@ -488,22 +463,26 @@ public class ViewDependencyAnalyzer {
 
         dependencies.setExistsInPostgres(true);
 
-        // Пытаемся получить распарсенные таблицы из кэша
         Set<String> tables = getParsedTablesFromCache(key + "_POSTGRES");
         if (tables == null) {
+            parsedCacheMisses++;
             tables = extractTablesFromDDL(ddl);
             putParsedTablesToCache(key + "_POSTGRES", tables);
+            if (progressCallback != null) {
+                progressCallback.onLog("    Распарсенные таблицы для " + viewName + " сохранены в кэш");
+            }
+        } else {
+            parsedCacheHits++;
+            if (progressCallback != null) {
+                progressCallback.onLog("    Распарсенные таблицы для " + viewName + " взяты из кэша");
+            }
         }
 
         dependencies.addAllPostgresTables(tables);
     }
 
     private Set<String> getParsedTablesFromCache(String key) {
-        Set<String> cached = parsedTablesCache.get(key);
-        if (cached != null && progressCallback != null) {
-            progressCallback.onLog("    Распарсенные таблицы для " + key + " взяты из кэша");
-        }
-        return cached;
+        return parsedTablesCache.get(key);
     }
 
     private void putParsedTablesToCache(String key, Set<String> tables) {
@@ -522,96 +501,43 @@ public class ViewDependencyAnalyzer {
         return dependencies;
     }
 
+    public ViewTableDependencies analyzeViewPublic(String viewName) {
+        return analyzeView(viewName);
+    }
+
     private String getOracleViewDDL(String viewName) {
         if (isCancelled()) {
             return null;
         }
 
-        // Пробуем разные форматы URL для Oracle
-        String[] urls = getAllOracleUrlFormats();
-        String user = ORACLE_USER;
-        String password = ORACLE_PASSWORD;
-
-        Properties props = new Properties();
-        props.setProperty("user", user);
-        props.setProperty("password", password);
-
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) {
-            props.setProperty("oracle.net.CONNECT_TIMEOUT", "30000");
-            props.setProperty("oracle.jdbc.ReadTimeout", "60000");
-            props.setProperty("oracle.net.disableOob", "true");
-        } else {
-            props.setProperty("oracle.net.CONNECT_TIMEOUT", "10000");
-            props.setProperty("oracle.jdbc.ReadTimeout", "30000");
-        }
-
         String sql = "SELECT TEXT FROM ALL_VIEWS WHERE VIEW_NAME = ?";
 
-        for (String url : urls) {
-            if (isCancelled()) {
-                return null;
+        Properties props = new Properties();
+        props.setProperty("user", ORACLE_USER);
+        props.setProperty("password", ORACLE_PASSWORD);
+        props.setProperty("oracle.net.CONNECT_TIMEOUT", "10000");
+        props.setProperty("oracle.jdbc.ReadTimeout", "30000");
+
+        final String[] result = {null};
+
+        try (Connection conn = DriverManager.getConnection(ORACLE_URL, props);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, viewName.toUpperCase());
+            pstmt.setQueryTimeout(30);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next() && !isCancelled()) {
+                result[0] = rs.getString("TEXT");
             }
 
-            final String currentUrl = url;
-            final String[] result = {null};
-            final Exception[] exception = {null};
-
-            Thread queryThread = new Thread(() -> {
-                try {
-                    Class.forName("oracle.jdbc.OracleDriver");
-                    try (Connection conn = DriverManager.getConnection(currentUrl, props);
-                         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-                        if (isCancelled()) {
-                            return;
-                        }
-
-                        pstmt.setString(1, viewName.toUpperCase());
-                        pstmt.setQueryTimeout(30);
-                        ResultSet rs = pstmt.executeQuery();
-
-                        if (rs.next() && !isCancelled()) {
-                            result[0] = rs.getString("TEXT");
-                            // Если подключились успешно, сохраняем правильный URL
-                            ORACLE_URL = currentUrl;
-                        }
-                    }
-                } catch (Exception e) {
-                    exception[0] = e;
-                }
-            });
-
-            int timeout = os.contains("win") ? 30000 : 15000;
-            queryThread.start();
-
-            try {
-                queryThread.join(timeout);
-                if (queryThread.isAlive()) {
-                    queryThread.interrupt();
-                    if (progressCallback != null) {
-                        progressCallback.onLog("    Oracle запрос для " + viewName + " прерван по таймауту");
-                    }
-                    continue; // Пробуем следующий URL
-                }
-            } catch (InterruptedException e) {
-                queryThread.interrupt();
-                Thread.currentThread().interrupt();
-                return null;
-            }
-
-            if (result[0] != null) {
-                if (progressCallback != null) {
-                    progressCallback.onLog("    Oracle DDL для " + viewName + " получен (URL: " + currentUrl + ")");
-                }
-                return result[0];
+        } catch (SQLException e) {
+            if (progressCallback != null && !isCancelled()) {
+                progressCallback.onLog("  Oracle ошибка: " + e.getMessage());
             }
         }
 
-        if (progressCallback != null && !isCancelled()) {
-            progressCallback.onLog("    Вьюха " + viewName + " не найдена в Oracle ни по одному URL");
-        }
-        return null;
+        return result[0];
     }
 
     private String getPostgresViewDDL(String viewName) {
@@ -620,66 +546,34 @@ public class ViewDependencyAnalyzer {
         }
 
         final String[] result = {null};
-        final Exception[] exception = {null};
 
-        Thread queryThread = new Thread(() -> {
-            try {
-                Class.forName("org.postgresql.Driver");
-                DriverManager.setLoginTimeout(10);
+        try (Connection conn = DriverManager.getConnection(POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD)) {
 
-                try (Connection conn = DriverManager.getConnection(POSTGRES_URL, POSTGRES_USER, POSTGRES_PASSWORD)) {
+            String getOidSql = "SELECT oid FROM pg_class WHERE relname = ? AND relkind = 'v'";
+            try (PreparedStatement oidStmt = conn.prepareStatement(getOidSql)) {
+                oidStmt.setString(1, viewName.toLowerCase());
+                oidStmt.setQueryTimeout(30);
+                ResultSet oidRs = oidStmt.executeQuery();
 
-                    if (isCancelled()) {
-                        return;
-                    }
+                if (oidRs.next() && !isCancelled()) {
+                    int oid = oidRs.getInt("oid");
 
-                    String getOidSql = "SELECT oid FROM pg_class WHERE relname = ? AND relkind = 'v'";
-                    try (PreparedStatement oidStmt = conn.prepareStatement(getOidSql)) {
-                        oidStmt.setString(1, viewName.toLowerCase());
-                        oidStmt.setQueryTimeout(30);
-                        ResultSet oidRs = oidStmt.executeQuery();
+                    String sql = "SELECT pg_get_viewdef(?, true) as viewdef";
+                    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                        pstmt.setInt(1, oid);
+                        pstmt.setQueryTimeout(30);
+                        ResultSet rs = pstmt.executeQuery();
 
-                        if (oidRs.next() && !isCancelled()) {
-                            int oid = oidRs.getInt("oid");
-
-                            String sql = "SELECT pg_get_viewdef(?, true) as viewdef";
-                            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                                pstmt.setInt(1, oid);
-                                pstmt.setQueryTimeout(30);
-                                ResultSet rs = pstmt.executeQuery();
-
-                                if (rs.next() && !isCancelled()) {
-                                    result[0] = rs.getString("viewdef");
-                                }
-                            }
+                        if (rs.next() && !isCancelled()) {
+                            result[0] = rs.getString("viewdef");
                         }
                     }
                 }
-            } catch (Exception e) {
-                exception[0] = e;
             }
-        });
-
-        int timeout = System.getProperty("os.name").toLowerCase().contains("win") ? 30000 : 15000;
-        queryThread.start();
-
-        try {
-            queryThread.join(timeout);
-            if (queryThread.isAlive()) {
-                queryThread.interrupt();
-                if (progressCallback != null) {
-                    progressCallback.onLog("    PostgreSQL запрос для " + viewName + " прерван по таймауту");
-                }
-                return null;
+        } catch (SQLException e) {
+            if (progressCallback != null && !isCancelled()) {
+                progressCallback.onLog("  PostgreSQL ошибка: " + e.getMessage());
             }
-        } catch (InterruptedException e) {
-            queryThread.interrupt();
-            Thread.currentThread().interrupt();
-            return null;
-        }
-
-        if (exception[0] != null && progressCallback != null && !isCancelled()) {
-            progressCallback.onLog("    PostgreSQL ошибка: " + exception[0].getMessage());
         }
 
         return result[0];
@@ -770,7 +664,7 @@ public class ViewDependencyAnalyzer {
             writer.println("Дата создания: " + new Date());
             writer.println("Всего проанализировано вьюх: " + dependencies.size());
             writer.println("Размер кэша: " + viewCache.size());
-            writer.println("Статистика кэша: " + getCacheStats());
+            writer.println("Статистика кэша:\n" + getCacheStats());
             writer.println("=".repeat(100));
             writer.println();
 
@@ -846,25 +740,7 @@ public class ViewDependencyAnalyzer {
 
         if (progressCallback != null) {
             progressCallback.onLog("  Создан: " + outputPath);
-            progressCallback.onLog("  " + getCacheStats());
+            progressCallback.onLog(getCacheStats());
         }
-    }
-
-    public static void setOracleConfig(String url, String user, String password) {
-        ORACLE_URL = url;
-        ORACLE_USER = user;
-        ORACLE_PASSWORD = password;
-        clearCache();
-    }
-
-    public static void setPostgresConfig(String url, String user, String password) {
-        POSTGRES_URL = url;
-        POSTGRES_USER = user;
-        POSTGRES_PASSWORD = password;
-        clearCache();
-    }
-
-    public ViewTableDependencies analyzeViewPublic(String viewName) {
-        return analyzeView(viewName);
     }
 }

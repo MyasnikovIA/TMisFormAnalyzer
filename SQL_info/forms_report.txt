@@ -1,6 +1,6 @@
 ====================================================================================================
 === ОТЧЕТ ПО ФОРМАМ T-MIS ===
-Дата создания: Sun May 03 21:10:51 NOVT 2026
+Дата создания: Mon May 04 09:39:30 NOVT 2026
 ----------------------------------------------------------------------------------------------------
 КОНФИГУРАЦИЯ ОТЧЕТА:
   SQL содержимое: НЕТ
@@ -12,40 +12,518 @@
 ====================================================================================================
 
 ----------------------------------------------------------------------------------------------------
-ФОРМА: ARMMainDoc/neotl_patients.frm
+ФОРМА: HospPlan/hospitalisation.frm
 ----------------------------------------------------------------------------------------------------
-Базовая форма: /var/www/t-mis/mis/Forms/ARMMainDoc/neotl_patients.frm
-СТАТУС: ЧАСТИЧНО ПЕРЕОПРЕДЕЛЕНА
-Переопределения:
-  - [UserFormsEgis3Tomsk] .d/*.dfrm - переопределение из каталога .d -> /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/neotl_patients.d/neotl_patients.dfrm
+Базовая форма: /var/www/t-mis/mis/Forms/HospPlan/hospitalisation.frm
+СТАТУС: ПОЛНОСТЬЮ ЗАМЕНЕНА
+Файл замены: /var/www/t-mis/mis/UserFormsFNKC/HospPlan/hospitalisation.frm
 
 ЮЗЕРФОРМЫ:
+     ===== UserFormsChechnya =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsChechnya/HospPlan/hospitalisation.d
+            └── script.dfrm
+
+     ===== UserFormsEgis3Novosib =====
+        ПОЛНАЯ ЗАМЕНА: /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hospitalisation.frm
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Novosib/HospPlan/hospitalisation.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
      ===== UserFormsEgis3Tomsk =====
-        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/ARMMainDoc/neotl_patients.d
-            └── neotl_patients.dfrm
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsEgis3Tomsk/HospPlan/hospitalisation.d
+            └── data.dfrm
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsFNKC =====
+        ПОЛНАЯ ЗАМЕНА: /var/www/t-mis/mis/UserFormsFNKC/HospPlan/hospitalisation.frm
+
+     ===== UserFormsKaliningrad =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsKaliningrad/HospPlan/hospitalisation.d
+            └── script.dfrm
+
+     ===== UserFormsMoscowNIIBlohina =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsMoscowNIIBlohina/HospPlan/hospitalisation.d
+            └── data.dfrm
+
+     ===== UserFormsRKB3 =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRKB3/HospPlan/hospitalisation.d
+            └── hospitalisation.dfrm
+
+     ===== UserFormsRkob =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRkob/HospPlan/hospitalisation.d
+            └── script.dfrm
+            └── view.dfrm
+
+     ===== UserFormsRostov =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsRostov/HospPlan/hospitalisation.d
+            └── data.dfrm
+            └── script.dfrm
+
+     ===== UserFormsSamRMC =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsSamRMC/HospPlan/hospitalisation.d
+            └── data.dfrm
+            └── script.dfrm
+
+     ===== UserFormsSaratov =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsSaratov/HospPlan/hospitalisation.d
+            └── hospitalisation.dfrm
+
+     ===== UserFormsTver =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsTver/HospPlan/hospitalisation.d
+            └── script.dfrm
+
+     ===== UserFormsVOKOD =====
+        КАТАЛОГ: /var/www/t-mis/mis/UserFormsVOKOD/HospPlan/hospitalisation.d
+            └── hospitalisation.dfrm
 
 
 Список подключаемых форм subForm:
-     (не найдено)
+     NosRegistrs/SubForms/check_in_registrs
 
 Список вызываемых форм в JS:
-     Persmedcard/persmedcard_edit
-     DiseaseCase/diseasecase
+     System/alert.frm
+     HospPlan/SubForms/visits_before_hosp.frm
+     HospPlan/departments.frm
+     Persmedcard/persmedcard_edit.frm
+     ArmPatientsInDep/SubForms/select_mkb_exact.frm
+     ArmPatientsInDep/SubForms/select_dep_bed.frm
+     HospPlan/hp_relativechoise.frm
 
-SQL ЗАПРОСЫ (2):
+SQL ЗАПРОСЫ (37):
      (содержимое SQL запросов исключено для краткости)
 
 ИСПОЛЬЗУЕМЫЕ ВЬЮХИ:
-  - D_V_HOSP_HISTORIES
-  - D_V_VISITS
-  - D_V_SYS_EMERGENCYJOURNAL
-  - D_V_VIS_TEMPLATE_REPORTS
-  - D_V_VIS_TEMP_SERVICES
-  - D_V_DIRECTION_SERVICES
-  - D_V_VISIT_TEMPLATES
+  - D_V_HOSP_REASONS
+  - D_V_HOSPITALIZATION_TYPES
+  - D_V_TRANSPORTATION_KINDS
+  - D_V_DEPS_BASE
+  - D_V_HOSP_PLAN_DEPS
+  - D_V_FACIAL_ACCOUNTS
+  - D_V_AGENTS_BASE
+  - D_V_CONTRACTS_BASE
+  - D_V_CONTR_AMI_DIRECTS
+  - D_V_PAYMENT_KIND
+  - D_V_HOSP_PLAN_KINDS
+  - D_V_HPK_PAYMENT_KINDS
+  - D_V_HOSP_HOURS
+  - D_V_VIS_DIAGNOSISES
+  - D_V_HOSP_HISTORY_DIAGNS
+  - D_V_LPUDICT_BASE
+  - D_V_HPK_PLAN_JOURNALS_BASE
+  - D_V_DIRECTION_SERVICES_BASE
+  - D_V_VISITS_BASE
+  - D_V_REESTR_MANIPUL_LIST
+  - D_V_DEPS
+  - D_V_MKB10_BASE
+  - D_V_HOSP_HISTORIES_BASE
+  - D_V_PERSMEDCARD_BASE
   - D_V_HOSP_HISTORY_DEPS
+  - D_V_HOSP_HISTORY_DEPS_BASE
+  - D_V_HH_DEP_BEDS
+  - D_V_DIRECTIONS_BASE
+  - D_V_EMPLOYERS
+  - D_V_HOSP_HISTORIES
+  - D_V_HPK_PLAN_JOURNALS
+  - D_V_HPK_PLANS
+  - D_V_DIRECTIONS
+  - D_V_OUTER_DIRECTIONS
+  - D_V_DISEASECASES
+  - D_V_VIS_DIAGNOSISES_MAIN
+  - D_V_DIRECTIONS_ACC
+  - D_V_AGENT_PREGNANCY_BASE
+  - D_V_DISEASECASES_BASE
+  - D_V_HOSP_HISTORIES_RELATIVE
+  - D_V_AGENT_RELATIVES
+  - D_V_OUTER_DIRECTIONS_BASE
+  - D_V_VISITS
+  - D_V_PERSMEDCARD
+  - D_V_PAYMENT_KIND_BASE
+  - D_V_LPU_BASE
+  - D_V_HPK_PLAN_JOURNALS_ADD
+  - D_V_HOSP_HISTORY_DIAGNS_BASE
+  - D_V_MKB10_COVID
+  - D_V_NR_PATIENTS_BASE
+  - D_V_NOS_REGISTRS_BASE
+  - D_V_INFECTIUS_CASES_BASE
+  - D_V_IC_STAGES
+  - D_V_VMP_APPLICATIONS
+
+ТАБЛИЦЫ, ИСПОЛЬЗУЕМЫЕ ЧЕРЕЗ ВЬЮХИ (уникальные для этой формы):
+  - D_HOSP_REASONS
+  - D_V_URPRIVS
+  - D_HOSPITALIZATION_TYPES
+  - D_TRANSPORTATION_KINDS
+  - D_DEPS
+  - D_HOSP_PLAN_DEPS
+  - D_FACIAL_ACCOUNTS
+  - D_AGENTS
+  - D_CONTRACTS
+  - D_AGENT_POLIS
+  - D_CONTR_AMI_DIRECTS
+  - D_PAYMENT_KIND
+  - D_HOSP_PLAN_KINDS
+  - D_HPK_PAYMENT_KINDS
+  - D_HOSP_HOURS
+  - D_VIS_DIAGNOSISES
+  - D_MKB10
+  - D_DISEASECHARACTERS
+  - D_INJURE_KINDS
+  - D_DISEASE_STAGES
+  - D_CL_OBSERV_CATEGORIES
+  - D_PATIENTS_DGROUP
+  - D_DIAGNOSIS_TYPES
+  - D_DIAGNOSIS_STAGES
+  - D_RISAR_STAGES
+  - D_HOSP_HISTORY_DIAGNS
+  - D_HOSP_DIAGN_TYPES
+  - D_LPUDICT
+  - D_HPK_PLAN_JOURNALS
+  - D_DIRECTION_SERVICES
+  - D_VISITS
+  - D_REESTR_MANIPUL_LIST
+  - D_HEAD_DEP
+  - D_EMPLOYERS
+  - D_DEPS_KINDS
+  - D_DEPS_TYPES
+  - D_DIVISIONS
+  - D_MED_CARE_PROFILES
+  - D_HOSP_HISTORIES
+  - D_PERSMEDCARD
+  - D_AGENT_NAMES
+  - D_HOSP_HISTORY_DEPS
+  - D_HOSP_RESULTS
+  - D_KSGCODES
+  - D_BED_TYPES
+  - D_VMP
+  - D_HOSP_OUTCOMES
+  - D_MED_THERAPY_SCHEMES_DESC
+  - D_MED_THERAPY_SCHEMES
+  - D_ALV
+  - D_SCALE_REHAB
+  - D_DEP_BEDS
+  - D_HH_DEP_BEDS
+  - D_DEP_POSTS
+  - D_DIRECTIONS
+  - D_JOBTITLES
+  - D_SPECIALITIES
+  - D_SPECIALITIES_ED
+  - D_USERS
+  - D_AGENT_ESIA
+  - D_EMP_SKILL
+  - D_SKILL_CATEGORIES
+  - D_LPU
+  - D_AGENT_RELATIVES
+  - D_HPKPJ_VMP_STATES
+  - D_HH_TRANSFER_REASONS
+  - D_ABILITY_STATUS
+  - D_DIRECTORIES_DATA_VER
+  - D_HOSP_INCOMES
+  - D_DIRECTION_HOSP
+  - D_HPK_PLANS
+  - D_VISITPLACES
+  - D_DIR_REG_TYPES
+  - D_MESES
+  - D_OUTER_DIRECTIONS
+  - D_HOSPITALIZATIONKINDS
+  - D_DIRECTION_KINDS
+  - D_DIR_CANC_REASONS
+  - D_DEPDICT
+  - D_HOSP_DIRECT_TYPES
+  - D_DIRECTION_FORMS
+  - D_TYPE_MED_HELP
+  - D_DIRECTION_CONDITIONS
+  - D_REASON_DIRECTION
+  - D_EX_SYSTEMS
+  - D_SERVICES
+  - D_ER_PROFILES
+  - D_CABLAB
+  - D_DISEASECASES
+  - D_DISEASECASE_TYPES
+  - D_DC_SOURCES
+  - D_V_VIS_DIAGNOSISES
+  - D_AGENT_PREGNANCY
+  - D_FN_RELATIVES_OTHER
+  - D_FED_NSI_VERS
+  - D_FED_NSI
+  - D_LPUVERLIST_MAIN
+  - D_RELATIONSHIPS
+  - D_REPRESENT_LSTATUSES
+  - D_BLOODGROUPE
+  - D_RHESUS
+  - D_AGENT_CONTACTS
+  - D_AGENT_ADDRS
+  - D_AGENT_SOCIAL_STATES
+  - D_AGENT_WORK_PLACES
+  - D_AGENT_CATEGORIES
+  - D_AGENT_PERSDOCS
+  - D_MKB10_COVID
+  - D_NR_PATIENTS
+  - D_NOS_REGISTRS
+  - D_INFECTIUS_CASES
+  - D_IC_STAGES
+  - D_IC_OUTCOMES_TYPES
+  - D_VMP_APPLICATIONS
+
+  Всего уникальных таблиц из вьюх: 114
+
+ИСПОЛЬЗУЕМЫЕ ПАКЕТЫ И ФУНКЦИИ:
+  - D_PKG_VERSIONS.GET_VERSION_BY_LPU
+  - D_PKG_CSE_ACCESSES.CHECK_RIGHT
+  - D_PKG_DEP_REQUISITES.GET_ACTUAL
+  - D_PKG_ROLES.CHECK_EMP_ROLES
+  - D_PKG_PERSMEDCARD.CHECK_FOR_OMS
+  - D_PKG_HPK_PLAN_JOURNALS.UPD
+  - D_PKG_HH_DEP_BEDS.DEL
+  - D_PKG_HOSP_HISTORY_DEPS.UPD
+  - D_PKG_HOSP_HISTORY_DEPS.ADD
+  - D_PKG_HH_DEP_BEDS.ADD
+  - D_PKG_DIRECTIONS.UPD
+  - D_PKG_HOSP_HISTORIES.GET_HH_PREF
+  - D_PKG_HOSP_HISTORIES.UPD
+  - D_PKG_URPRIVS.CHECK_BPPRIV
+  - D_PKG_HOSP_HISTORIES.SET_HH_TYPE
+  - D_PKG_HOSP_HISTORIES.GET_NEW_NUMB
+  - D_PKG_DAT_TOOLS.FULL_YEARS
+  - D_PKG_HH_NUMB_RESERVATION.LOCK_CHECK_ADD
+  - D_PKG_AGENT_PREGNANCY.CALC_AND_ADD
+  - D_PKG_HOSP_HISTORIES.ADD
+  - D_PKG_EMPLOYERS.GET_ID
+  - D_PKG_HOSP_HISTORIES.CREATE_HH_FOR_RELATIVE
+  - D_PKG_CMP.NUM
+  - D_PKG_HOSP_HISTORIES.DEL
+  - D_PKG_NR_PATIENTS.ADD
+  - D_PKG_INFECTIUS_CASES.ADD
+  - D_PKG_IC_ANAMNES.ADD
+  - D_PKG_IC_STAGES.ADD
+  - D_PKG_IC_COMP_DIAGNOSISES.ADD
+  - D_PKG_BPENV.AFTERBP
+  - D_PKG_PERSMEDCARD.GET_AGENT
+  - D_PKG_EMERGENCY_NOTIFICATIONS.CHECK_ADD_EN_HOSP_HISTORY
+
+СИСТЕМНЫЕ ОПЦИИ:
+     RolesEditHH_Number;
+     HospTimesQuant;
+     HHDiagnInheritType;
+     OksIncludeFromEmergencyRoom;
+     StrokeIncludeFromEmergencyRoom;
+     VmpFromWaitingList;
+     HHD_EDIT_PAYMENT_KIND;
+     RecFillNumHourEmerPat;
+     HHNumerationPrefDefault;
+     HHLPUDICT;
+     HH_HOSP_REASON_DEFAULT;
+     HH_HOSP_TYPE_DEFAULT;
+     HH_TRANSP_TYPE_DEFAULT;
+     HHNumerationMask;
+     HpkAgeChildForReq;
+     HospTimeIsAddTime;
+     HospTypesForHospTimeDefinition;
+     SpecLpuTypeProfile;
+     HPJDiagnHosp;
+     HH_PREGNANCY;
+     SpecLpuType;
+     CheckForOMS;
+     PKOMS;
+     HospDateRestriction;
+     DSDeathDateCheck;
+     CheckLPUForHospitalisation;
+     AutoIncludeInRegistr;
+     PKVMP;
+     EmergNotifyFromEmergRoom;
+
+КОМПОЗИЦИИ В ТЭГАХ UnitEdit:
+        unit="PERSMEDCARD"  composition="BUTTON_EDIT_DEFAULT";
+        unit="LPUDICT"  composition="LD_GRID";
+        unit="MKB10"  composition="DEFAULT";
+        unit="MKB10"  composition="MKB10_INJURY";
+        unit="HOSP_INCOMES"  composition="DEFAULT";
+        unit="EMPLOYERS"  composition="EMP_ID_FILTER_DEP";
+
+РАЗОБРАТЬ АНАЛИТИКОМ:
+  - D_PKG_STD.FRM_D
+  - D_STRAGG
+  - D_P_EXC
+  - D_PKG_STD.FRM_DT
+  - D_PKG_STD.FRM_T
+  - D_DEPARTURE
+  - D_P_HH_NUMB_RES_DEL
+  - D_CL_ID
 
 ДЕТАЛЬНОЕ СОДЕРЖИМОЕ ВЬЮХ (таблицы):
+
+  D_V_HOSP_REASONS:
+      - D_HOSP_REASONS
+      - D_V_URPRIVS
+
+  D_V_HOSPITALIZATION_TYPES:
+      - D_HOSPITALIZATION_TYPES
+      - D_V_URPRIVS
+
+  D_V_TRANSPORTATION_KINDS:
+      - D_TRANSPORTATION_KINDS
+      - D_V_URPRIVS
+
+  D_V_DEPS_BASE:
+      - D_DEPS
+      - D_V_URPRIVS
+
+  D_V_HOSP_PLAN_DEPS:
+      - D_HOSP_PLAN_DEPS
+      - D_V_URPRIVS
+
+  D_V_FACIAL_ACCOUNTS:
+      - D_FACIAL_ACCOUNTS
+      - D_V_URPRIVS
+
+  D_V_AGENTS_BASE:
+      - D_AGENTS
+      - D_V_URPRIVS
+
+  D_V_CONTRACTS_BASE:
+      - D_CONTRACTS
+      - D_AGENTS
+      - D_V_URPRIVS
+
+  D_V_CONTR_AMI_DIRECTS:
+      - D_AGENT_POLIS
+      - D_CONTR_AMI_DIRECTS
+      - D_V_URPRIVS
+
+  D_V_PAYMENT_KIND:
+      - D_PAYMENT_KIND
+      - D_V_URPRIVS
+
+  D_V_HOSP_PLAN_KINDS:
+      - D_HOSP_PLAN_KINDS
+      - D_V_URPRIVS
+
+  D_V_HPK_PAYMENT_KINDS:
+      - D_HPK_PAYMENT_KINDS
+      - D_V_URPRIVS
+
+  D_V_HOSP_HOURS:
+      - D_HOSP_HOURS
+      - D_V_URPRIVS
+
+  D_V_VIS_DIAGNOSISES:
+      - D_VIS_DIAGNOSISES
+      - D_MKB10
+      - D_DISEASECHARACTERS
+      - D_INJURE_KINDS
+      - D_AGENTS
+      - D_DISEASE_STAGES
+      - D_CL_OBSERV_CATEGORIES
+      - D_PATIENTS_DGROUP
+      - D_DIAGNOSIS_TYPES
+      - D_DIAGNOSIS_STAGES
+      - D_RISAR_STAGES
+      - D_V_URPRIVS
+
+  D_V_HOSP_HISTORY_DIAGNS:
+      - D_HOSP_HISTORY_DIAGNS
+      - D_HOSP_DIAGN_TYPES
+      - D_MKB10
+      - D_DISEASECHARACTERS
+      - D_V_URPRIVS
+
+  D_V_LPUDICT_BASE:
+      - D_LPUDICT
+      - D_V_URPRIVS
+
+  D_V_HPK_PLAN_JOURNALS_BASE:
+      - D_HPK_PLAN_JOURNALS
+      - D_V_URPRIVS
+
+  D_V_DIRECTION_SERVICES_BASE:
+      - D_DIRECTION_SERVICES
+      - D_V_URPRIVS
+
+  D_V_VISITS_BASE:
+      - D_VISITS
+      - D_V_URPRIVS
+
+  D_V_REESTR_MANIPUL_LIST:
+      - D_REESTR_MANIPUL_LIST
+
+  D_V_DEPS:
+      - D_HEAD_DEP
+      - D_EMPLOYERS
+      - D_AGENTS
+      - D_DEPS
+      - D_DEPS_KINDS
+      - D_DEPS_TYPES
+      - D_DIVISIONS
+      - D_MED_CARE_PROFILES
+      - D_V_URPRIVS
+
+  D_V_MKB10_BASE:
+      - D_MKB10
+
+  D_V_HOSP_HISTORIES_BASE:
+      - D_HOSP_HISTORIES
+      - D_V_URPRIVS
+
+  D_V_PERSMEDCARD_BASE:
+      - D_EMPLOYERS
+      - D_AGENTS
+      - D_PERSMEDCARD
+      - D_V_URPRIVS
+
+  D_V_HOSP_HISTORY_DEPS:
+      - D_AGENT_NAMES
+      - D_HOSP_HISTORY_DEPS
+      - D_HOSP_HISTORIES
+      - D_DEPS
+      - D_DEPS_TYPES
+      - D_PAYMENT_KIND
+      - D_MKB10
+      - D_HOSP_RESULTS
+      - D_KSGCODES
+      - D_BED_TYPES
+      - D_EMPLOYERS
+      - D_AGENTS
+      - D_VMP
+      - D_HOSP_OUTCOMES
+      - D_MED_THERAPY_SCHEMES_DESC
+      - D_MED_THERAPY_SCHEMES
+      - D_ALV
+      - D_SCALE_REHAB
+      - D_V_URPRIVS
+
+  D_V_HOSP_HISTORY_DEPS_BASE:
+      - D_HOSP_HISTORY_DEPS
+      - D_V_URPRIVS
+
+  D_V_HH_DEP_BEDS:
+      - D_DEP_BEDS
+      - D_HH_DEP_BEDS
+      - D_HOSP_HISTORY_DEPS
+      - D_HOSP_HISTORIES
+      - D_DEPS
+      - D_DEP_POSTS
+      - D_V_URPRIVS
+
+  D_V_DIRECTIONS_BASE:
+      - D_DIRECTIONS
+      - D_V_URPRIVS
+
+  D_V_EMPLOYERS:
+      - D_EMPLOYERS
+      - D_JOBTITLES
+      - D_SPECIALITIES
+      - D_SPECIALITIES_ED
+      - D_DEPS
+      - D_DEPS_KINDS
+      - D_USERS
+      - D_AGENTS
+      - D_AGENT_ESIA
+      - D_EMP_SKILL
+      - D_SKILL_CATEGORIES
+      - D_LPU
+      - D_LPUDICT
+      - D_V_URPRIVS
 
   D_V_HOSP_HISTORIES:
       - D_AGENT_RELATIVES
@@ -70,147 +548,226 @@ SQL ЗАПРОСЫ (2):
       - D_DIRECTION_HOSP
       - D_V_URPRIVS
 
+  D_V_HPK_PLAN_JOURNALS:
+      - D_HPK_PLAN_JOURNALS
+      - D_HOSP_HISTORIES
+      - D_V_URPRIVS
+
+  D_V_HPK_PLANS:
+      - D_HPK_PLANS
+      - D_V_URPRIVS
+
+  D_V_DIRECTIONS:
+      - D_VISITPLACES
+      - D_VISITS
+      - D_DIR_REG_TYPES
+      - D_SPECIALITIES
+      - D_HPK_PLAN_JOURNALS
+      - D_MKB10
+      - D_MESES
+      - D_HOSP_HOURS
+      - D_DIRECTIONS
+      - D_PERSMEDCARD
+      - D_AGENTS
+      - D_OUTER_DIRECTIONS
+      - D_LPUDICT
+      - D_EMPLOYERS
+      - D_DEPS
+      - D_HOSPITALIZATIONKINDS
+      - D_INJURE_KINDS
+      - D_DIRECTION_KINDS
+      - D_BED_TYPES
+      - D_HOSP_REASONS
+      - D_DIR_CANC_REASONS
+      - D_DEPDICT
+      - D_HOSPITALIZATION_TYPES
+      - D_HOSP_DIRECT_TYPES
+      - D_TRANSPORTATION_KINDS
+      - D_MED_THERAPY_SCHEMES
+      - D_DIRECTION_FORMS
+      - D_TYPE_MED_HELP
+      - D_DIRECTION_CONDITIONS
+      - D_V_URPRIVS
+
+  D_V_OUTER_DIRECTIONS:
+      - D_DIRECTIONS
+      - D_OUTER_DIRECTIONS
+      - D_PERSMEDCARD
+      - D_AGENTS
+      - D_MKB10
+      - D_LPUDICT
+      - D_SPECIALITIES
+      - D_REASON_DIRECTION
+      - D_EX_SYSTEMS
+      - D_SERVICES
+      - D_JOBTITLES
+      - D_ER_PROFILES
+      - D_DIRECTION_FORMS
+      - D_TYPE_MED_HELP
+      - D_DIRECTION_CONDITIONS
+      - D_CABLAB
+      - D_V_URPRIVS
+
+  D_V_DISEASECASES:
+      - D_DISEASECASES
+      - D_DISEASECASE_TYPES
+      - D_DC_SOURCES
+      - D_PERSMEDCARD
+      - D_AGENTS
+      - D_MKB10
+      - D_MESES
+      - D_EMPLOYERS
+      - D_V_URPRIVS
+
+  D_V_VIS_DIAGNOSISES_MAIN:
+      - D_V_VIS_DIAGNOSISES
+
+  D_V_DIRECTIONS_ACC:
+      - D_VISITS
+      - D_DIRECTIONS
+      - D_V_URPRIVS
+
+  D_V_AGENT_PREGNANCY_BASE:
+      - D_AGENT_PREGNANCY
+      - D_V_URPRIVS
+
+  D_V_DISEASECASES_BASE:
+      - D_DISEASECASES
+      - D_V_URPRIVS
+
+  D_V_HOSP_HISTORIES_RELATIVE:
+      - D_AGENT_RELATIVES
+      - D_AGENTS
+      - D_HOSP_HISTORIES
+      - D_PERSMEDCARD
+      - D_HOSP_REASONS
+      - D_HOSPITALIZATION_TYPES
+      - D_TRANSPORTATION_KINDS
+      - D_LPUDICT
+      - D_MKB10
+      - D_HOSP_RESULTS
+      - D_HPK_PLAN_JOURNALS
+      - D_DEPS
+      - D_HPKPJ_VMP_STATES
+      - D_HOSP_OUTCOMES
+      - D_HOSP_HOURS
+      - D_HH_TRANSFER_REASONS
+      - D_ABILITY_STATUS
+      - D_V_URPRIVS
+
+  D_V_AGENT_RELATIVES:
+      - D_FN_RELATIVES_OTHER
+      - D_FED_NSI_VERS
+      - D_FED_NSI
+      - D_LPUVERLIST_MAIN
+      - D_AGENT_RELATIVES
+      - D_RELATIONSHIPS
+      - D_AGENTS
+      - D_REPRESENT_LSTATUSES
+      - D_V_URPRIVS
+
+  D_V_OUTER_DIRECTIONS_BASE:
+      - D_OUTER_DIRECTIONS
+      - D_LPUDICT
+      - D_V_URPRIVS
+
   D_V_VISITS:
       - D_DIRECTION_SERVICES
       - D_SERVICES
       - D_VISITS
       - D_V_URPRIVS
 
-  D_V_SYS_EMERGENCYJOURNAL:
-      - D_AGENT_ADDRS
-      - D_AGENT_PERSDOCS
-      - D_VISIT_FIELDS
-      - D_AGENT_WORK_PLACES
-      - D_DIRECTIONS
-      - D_HPK_PLAN_JOURNALS
-      - D_HOSP_HISTORIES
-      - D_EMERGENCYJOURNAL
-      - D_VIS_DIAGNOSISES
-      - D_MKB10
-      - D_INJURE_KINDS
-      - D_V_URPRIVS
-
-  D_V_VIS_TEMPLATE_REPORTS:
-      - D_VIS_TEMPLATE_REPORTS
-      - D_V_URPRIVS
-
-  D_V_VIS_TEMP_SERVICES:
-      - D_VIS_TEMP_SERVICES
-      - D_V_URPRIVS
-
-  D_V_DIRECTION_SERVICES:
-      - D_SERVICES_STR
-      - D_VISITKINDS
-      - D_DIRECTION_SERVICES
-      - D_SERVICES
+  D_V_PERSMEDCARD:
+      - D_PERSMEDCARD
+      - D_AGENTS
+      - D_BLOODGROUPE
+      - D_DIVISIONS
+      - D_RHESUS
+      - D_EMPLOYERS
       - D_CABLAB
-      - D_VISITPURPOSES
-      - D_REFERENCE_KINDS
-      - D_EMPLOYERS
-      - D_AGENTS
-      - D_DEPS
-      - D_DIRECTIONS
-      - D_REG_TYPES
-      - D_DS_SERV_STATUSES
-      - D_SCHEDULE_TIME_TYPES
+      - D_V_URPRIVS
+
+  D_V_PAYMENT_KIND_BASE:
       - D_PAYMENT_KIND
       - D_V_URPRIVS
 
-  D_V_VISIT_TEMPLATES:
-      - D_VISIT_TEMPLATES
+  D_V_LPU_BASE:
+      - D_LPU
       - D_V_URPRIVS
 
-  D_V_HOSP_HISTORY_DEPS:
-      - D_AGENT_NAMES
+  D_V_HPK_PLAN_JOURNALS_ADD:
       - D_HOSP_HISTORY_DEPS
-      - D_HOSP_HISTORIES
-      - D_DEPS
-      - D_DEPS_TYPES
-      - D_PAYMENT_KIND
-      - D_MKB10
-      - D_HOSP_RESULTS
-      - D_KSGCODES
-      - D_BED_TYPES
-      - D_EMPLOYERS
+      - D_AGENT_CONTACTS
+      - D_AGENT_ADDRS
+      - D_AGENT_SOCIAL_STATES
       - D_AGENTS
-      - D_VMP
-      - D_HOSP_OUTCOMES
-      - D_MED_THERAPY_SCHEMES_DESC
-      - D_MED_THERAPY_SCHEMES
-      - D_ALV
-      - D_SCALE_REHAB
+      - D_AGENT_WORK_PLACES
+      - D_AGENT_CATEGORIES
+      - D_AGENT_POLIS
+      - D_AGENT_PERSDOCS
+      - D_HPK_PLAN_JOURNALS
+      - D_HPK_PLANS
+      - D_HOSP_PLAN_KINDS
+      - D_PERSMEDCARD
+      - D_EMPLOYERS
+      - D_PAYMENT_KIND
+      - D_HOSP_HISTORIES
+      - D_SERVICES
+      - D_HOSPITALIZATION_TYPES
+      - D_LPUDICT
+      - D_HPKPJ_VMP_STATES
+      - D_DIRECTIONS
+      - D_DIRECTION_KINDS
+      - D_DIR_CANC_REASONS
+      - D_MKB10
       - D_V_URPRIVS
 
-УНИКАЛЬНЫЕ ТАБЛИЦЫ ИЗ ВСЕХ ВЬЮХ НА ФОРМЕ (без дубликатов):
-  - D_AGENT_RELATIVES
-  - D_AGENTS
-  - D_HOSP_HISTORIES
-  - D_PERSMEDCARD
-  - D_HOSP_REASONS
-  - D_HOSPITALIZATION_TYPES
-  - D_TRANSPORTATION_KINDS
-  - D_LPUDICT
-  - D_MKB10
-  - D_HOSP_RESULTS
-  - D_DEPS
-  - D_HPK_PLAN_JOURNALS
-  - D_HPKPJ_VMP_STATES
-  - D_HOSP_OUTCOMES
-  - D_HOSP_HOURS
-  - D_HH_TRANSFER_REASONS
-  - D_ABILITY_STATUS
-  - D_DIRECTORIES_DATA_VER
-  - D_HOSP_INCOMES
-  - D_DIRECTION_HOSP
-  - D_V_URPRIVS
-  - D_DIRECTION_SERVICES
-  - D_SERVICES
-  - D_VISITS
-  - D_AGENT_ADDRS
-  - D_AGENT_PERSDOCS
-  - D_VISIT_FIELDS
-  - D_AGENT_WORK_PLACES
-  - D_DIRECTIONS
-  - D_EMERGENCYJOURNAL
-  - D_VIS_DIAGNOSISES
-  - D_INJURE_KINDS
-  - D_VIS_TEMPLATE_REPORTS
-  - D_VIS_TEMP_SERVICES
-  - D_SERVICES_STR
-  - D_VISITKINDS
-  - D_CABLAB
-  - D_VISITPURPOSES
-  - D_REFERENCE_KINDS
-  - D_EMPLOYERS
-  - D_REG_TYPES
-  - D_DS_SERV_STATUSES
-  - D_SCHEDULE_TIME_TYPES
-  - D_PAYMENT_KIND
-  - D_VISIT_TEMPLATES
-  - D_AGENT_NAMES
-  - D_HOSP_HISTORY_DEPS
-  - D_DEPS_TYPES
-  - D_KSGCODES
-  - D_BED_TYPES
-  - D_VMP
-  - D_MED_THERAPY_SCHEMES_DESC
-  - D_MED_THERAPY_SCHEMES
-  - D_ALV
-  - D_SCALE_REHAB
+  D_V_HOSP_HISTORY_DIAGNS_BASE:
+      - D_HOSP_HISTORY_DIAGNS
+      - D_V_URPRIVS
 
-  Всего уникальных таблиц из вьюх: 55
+  D_V_MKB10_COVID:
+      - D_MKB10_COVID
+      - D_MKB10
+      - D_V_URPRIVS
+
+  D_V_NR_PATIENTS_BASE:
+      - D_NR_PATIENTS
+      - D_V_URPRIVS
+
+  D_V_NOS_REGISTRS_BASE:
+      - D_NOS_REGISTRS
+      - D_V_URPRIVS
+
+  D_V_INFECTIUS_CASES_BASE:
+      - D_INFECTIUS_CASES
+      - D_V_URPRIVS
+
+  D_V_IC_STAGES:
+      - D_IC_STAGES
+      - D_LPUDICT
+      - D_HOSP_HISTORIES
+      - D_DISEASECASES
+      - D_IC_OUTCOMES_TYPES
+      - D_V_URPRIVS
+
+  D_V_VMP_APPLICATIONS:
+      - D_AGENT_CONTACTS
+      - D_VMP_APPLICATIONS
+      - D_AGENTS
+      - D_V_URPRIVS
 
 
 ====================================================================================================
 === ИТОГОВАЯ СТАТИСТИКА ===
 Всего проанализировано форм: 1
-Всего SQL запросов: 2
+Всего SQL запросов: 37
 Базовые формы: 0
-Полностью замененные: 0
-Частично переопределенные: 1
-Уникальных таблиц: 54
-Уникальных представлений (вьюх): 9
-Уникальных пакетов/функций: 0
+Полностью замененные: 1
+Частично переопределенные: 0
+Уникальных таблиц: 112
+Уникальных представлений (вьюх): 55
+Уникальных пакетов/функций: 32
 Уникальных констант: 0
-Объектов для разбора: 0
+Объектов для разбора: 8
 ====================================================================================================

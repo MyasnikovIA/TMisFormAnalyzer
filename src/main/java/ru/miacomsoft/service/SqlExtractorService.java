@@ -297,7 +297,6 @@ public class SqlExtractorService {
 
     /**
      * Проверка, что содержимое является SQL запросом
-     * (отличаем от PHP или JavaScript)
      */
     private boolean isSqlContent(String content) {
         if (content == null || content.trim().isEmpty()) {
@@ -306,7 +305,9 @@ public class SqlExtractorService {
 
         String lowerContent = content.toLowerCase().trim();
 
-        // Если начинается с SELECT, INSERT, UPDATE, DELETE, BEGIN, WITH
+        // Для отладки
+        System.out.println("      Проверка isSqlContent, начало: " + lowerContent.substring(0, Math.min(50, lowerContent.length())));
+
         if (lowerContent.startsWith("select") ||
                 lowerContent.startsWith("insert") ||
                 lowerContent.startsWith("update") ||
@@ -315,12 +316,31 @@ public class SqlExtractorService {
                 lowerContent.startsWith("declare") ||
                 lowerContent.startsWith("with") ||
                 lowerContent.matches("^\\s*begin\\s+.*end\\s*;?\\s*$")) {
+            System.out.println("      isSqlContent: TRUE (начинается с ключевого слова)");
             return true;
         }
 
-        // Содержит SQL ключевые слова
-        return lowerContent.contains("select") &&
+        boolean result = lowerContent.contains("select") &&
                 (lowerContent.contains("from") || lowerContent.contains("into"));
+
+        System.out.println("      isSqlContent: " + result + " (contains select & from/into)");
+        return result;
+    }
+
+    /**
+     * Очистить тело компонента от вложенных тегов
+     */
+    private String cleanSqlBody(String body) {
+        if (body == null || body.isEmpty()) {
+            return null;
+        }
+
+        // Удаляем вложенные компоненты
+        String cleaned = body.replaceAll("<[^>]+>", "");
+        cleaned = removeSqlComments(cleaned);
+        cleaned = cleaned.replaceAll("\\n\\s*\\n", "\n");
+
+        return cleaned.trim();
     }
     /**
      * Очистить SQL от лишних пробелов
@@ -462,6 +482,9 @@ public class SqlExtractorService {
     /**
      * Извлечь системные опции из D_PKG_OPTIONS.GET
      */
+    /**
+     * Извлечь системные опции из D_PKG_OPTIONS.GET и D_PKG_OPTION_SPECS.GET
+     */
     private void extractSystemOptions(SqlInfo sqlInfo) {
         String sql = sqlInfo.getSqlContent();
         if (sql == null || sql.isEmpty()) {
@@ -470,22 +493,84 @@ public class SqlExtractorService {
 
         Set<String> options = new LinkedHashSet<>();
 
-        Pattern optionPattern = Pattern.compile(
+        // Паттерн для D_PKG_OPTIONS.GET('OPTION_NAME', ...)
+        // Поддерживает различные форматы вызова:
+        // 1. D_PKG_OPTIONS.GET('CheckDepBed_HeadNurse', :LPU)
+        // 2. D_PKG_OPTIONS.GET(psSO_CODE => 'ShowMainDepPat', pnLPU => :LPU)
+        // 3. D_PKG_OPTIONS.GET('VDAutoSet7VZNPriv', :LPU)
+        // 4. D_PKG_OPTIONS.GET(psSO_CODE => 'FrlloConfirmLgot', pnLPU => :LPU, pnRAISE => 0)
+
+        // Паттерн 1: D_PKG_OPTIONS.GET('OPTION_NAME', ...) - позиционные параметры
+        Pattern optionPattern1 = Pattern.compile(
                 "D_PKG_OPTIONS\\.GET\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher optionMatcher = optionPattern.matcher(sql);
-        while (optionMatcher.find()) {
-            String option = optionMatcher.group(1);
+        // Паттерн 2: D_PKG_OPTIONS.GET(psSO_CODE => 'OPTION_NAME', ...) - именованные параметры
+        Pattern optionPattern2 = Pattern.compile(
+                "D_PKG_OPTIONS\\.GET\\s*\\(\\s*psSO_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для D_PKG_OPTION_SPECS.GET('OPTION_NAME', ...)
+        Pattern optionSpecPattern1 = Pattern.compile(
+                "D_PKG_OPTION_SPECS\\.GET\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для D_PKG_OPTION_SPECS.GET(psSO_CODE => 'OPTION_NAME', ...)
+        Pattern optionSpecPattern2 = Pattern.compile(
+                "D_PKG_OPTION_SPECS\\.GET\\s*\\(\\s*psSO_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Извлекаем из D_PKG_OPTIONS.GET - паттерн 1
+        Matcher matcher1 = optionPattern1.matcher(sql);
+        while (matcher1.find()) {
+            String option = matcher1.group(1);
             if (option != null && !option.isEmpty()) {
                 options.add(option);
-                System.out.println("      Найдена системная опция: " + option);
+                System.out.println("      Найдена системная опция (D_PKG_OPTIONS): " + option);
             }
         }
 
+        // Извлекаем из D_PKG_OPTIONS.GET - паттерн 2
+        Matcher matcher2 = optionPattern2.matcher(sql);
+        while (matcher2.find()) {
+            String option = matcher2.group(1);
+            if (option != null && !option.isEmpty()) {
+                options.add(option);
+                System.out.println("      Найдена системная опция (D_PKG_OPTIONS named): " + option);
+            }
+        }
+
+        // Извлекаем из D_PKG_OPTION_SPECS.GET - паттерн 1
+        Matcher matcher3 = optionSpecPattern1.matcher(sql);
+        while (matcher3.find()) {
+            String option = matcher3.group(1);
+            if (option != null && !option.isEmpty()) {
+                options.add(option);
+                System.out.println("      Найдена системная опция (D_PKG_OPTION_SPECS): " + option);
+            }
+        }
+
+        // Извлекаем из D_PKG_OPTION_SPECS.GET - паттерн 2
+        Matcher matcher4 = optionSpecPattern2.matcher(sql);
+        while (matcher4.find()) {
+            String option = matcher4.group(1);
+            if (option != null && !option.isEmpty()) {
+                options.add(option);
+                System.out.println("      Найдена системная опция (D_PKG_OPTION_SPECS named): " + option);
+            }
+        }
+
+        // Добавляем найденные опции в SqlInfo
         for (String option : options) {
             sqlInfo.addSystemOption(option);
+        }
+
+        if (!options.isEmpty()) {
+            System.out.println("    Всего найдено системных опций: " + options.size());
         }
     }
 
@@ -513,6 +598,7 @@ public class SqlExtractorService {
         extractAllObjectsDirectly(cleanedSql, sqlInfo);
         extractUserProcedures(sqlInfo);
         extractSystemOptions(sqlInfo);
+        extractConstants(sqlInfo);
 
         // Список объектов для принудительного переноса в unknown
         Set<String> forcedToUnknown = new HashSet<>(Arrays.asList(
@@ -549,60 +635,113 @@ public class SqlExtractorService {
 
     /**
      * Извлечь константы из D_PKG_CONSTANTS.SEARCH_STR, SEARCH_NUM, SEARCH_DATE
+     * Поддерживает как позиционные, так и именованные параметры
+     */
+    /**
+     * Извлечь константы из D_PKG_CONSTANTS.SEARCH_STR, SEARCH_NUM, SEARCH_DATE
+     * Поддерживает как позиционные, так и именованные параметры
      */
     private void extractConstants(SqlInfo sqlInfo) {
-        String sql = sqlInfo.getSqlContent();
+        String sql = sqlInfo.getCleanSql(); // Используем cleanSql, а не sqlContent
         if (sql == null || sql.isEmpty()) {
-            return;
+            sql = sqlInfo.getSqlContent();
+            if (sql == null || sql.isEmpty()) {
+                return;
+            }
         }
 
         Set<String> constants = new LinkedHashSet<>();
 
-        // Паттерн для SEARCH_STR
-        Pattern strPattern = Pattern.compile(
+        // Паттерн для SEARCH_STR с позиционными параметрами
+        Pattern strPattern1 = Pattern.compile(
                 "D_PKG_CONSTANTS\\.SEARCH_STR\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для SEARCH_NUM
-        Pattern numPattern = Pattern.compile(
+        // Паттерн для SEARCH_STR с именованными параметрами
+        Pattern strPattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_STR\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_NUM с позиционными параметрами
+        Pattern numPattern1 = Pattern.compile(
                 "D_PKG_CONSTANTS\\.SEARCH_NUM\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        // Паттерн для SEARCH_DATE
-        Pattern datePattern = Pattern.compile(
+        // Паттерн для SEARCH_NUM с именованными параметрами
+        Pattern numPattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_NUM\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_DATE с позиционными параметрами
+        Pattern datePattern1 = Pattern.compile(
                 "D_PKG_CONSTANTS\\.SEARCH_DATE\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
+        // Паттерн для SEARCH_DATE с именованными параметрами
+        Pattern datePattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_DATE\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
         // Извлекаем из SEARCH_STR
-        Matcher strMatcher = strPattern.matcher(sql);
-        while (strMatcher.find()) {
-            String constant = strMatcher.group(1);
+        Matcher strMatcher1 = strPattern1.matcher(sql);
+        while (strMatcher1.find()) {
+            String constant = strMatcher1.group(1);
             if (constant != null && !constant.isEmpty()) {
                 constants.add(constant);
-                System.out.println("      Найдена константа (STR): " + constant);
+                System.out.println("      [extractConstants] Найдена константа (STR позиционная): " + constant);
+            }
+        }
+
+        Matcher strMatcher2 = strPattern2.matcher(sql);
+        while (strMatcher2.find()) {
+            String constant = strMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [extractConstants] Найдена константа (STR именованная): " + constant);
             }
         }
 
         // Извлекаем из SEARCH_NUM
-        Matcher numMatcher = numPattern.matcher(sql);
-        while (numMatcher.find()) {
-            String constant = numMatcher.group(1);
+        Matcher numMatcher1 = numPattern1.matcher(sql);
+        while (numMatcher1.find()) {
+            String constant = numMatcher1.group(1);
             if (constant != null && !constant.isEmpty()) {
                 constants.add(constant);
-                System.out.println("      Найдена константа (NUM): " + constant);
+                System.out.println("      [extractConstants] Найдена константа (NUM позиционная): " + constant);
+            }
+        }
+
+        Matcher numMatcher2 = numPattern2.matcher(sql);
+        while (numMatcher2.find()) {
+            String constant = numMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [extractConstants] Найдена константа (NUM именованная): " + constant);
             }
         }
 
         // Извлекаем из SEARCH_DATE
-        Matcher dateMatcher = datePattern.matcher(sql);
-        while (dateMatcher.find()) {
-            String constant = dateMatcher.group(1);
+        Matcher dateMatcher1 = datePattern1.matcher(sql);
+        while (dateMatcher1.find()) {
+            String constant = dateMatcher1.group(1);
             if (constant != null && !constant.isEmpty()) {
                 constants.add(constant);
-                System.out.println("      Найдена константа (DATE): " + constant);
+                System.out.println("      [extractConstants] Найдена константа (DATE позиционная): " + constant);
+            }
+        }
+
+        Matcher dateMatcher2 = datePattern2.matcher(sql);
+        while (dateMatcher2.find()) {
+            String constant = dateMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [extractConstants] Найдена константа (DATE именованная): " + constant);
             }
         }
 
@@ -611,9 +750,8 @@ public class SqlExtractorService {
             sqlInfo.addConstant(constant);
         }
 
-        // Логируем общее количество найденных констант
         if (!constants.isEmpty()) {
-            System.out.println("    Всего найдено констант в SQL: " + constants.size());
+            System.out.println("    [extractConstants] Всего найдено констант: " + constants.size());
         }
     }
 
@@ -646,10 +784,14 @@ public class SqlExtractorService {
             sqlInfo.addUserProcedure(proc);
         }
     }
+
+
     private List<SqlInfo> extractAllComponents(String content, String sourcePath, String baseFormPath) {
         List<SqlInfo> queries = new ArrayList<>();
 
-        // 1. Паттерн для D3 компонентов c CDATA (cmpDataSet) - только DataSet
+        System.out.println("  Поиск компонентов в файле...");
+
+        // 1. Паттерн для D3 компонентов c CDATA (cmpDataSet)
         Pattern d3DatasetPattern = Pattern.compile(
                 "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpDataSet>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -663,27 +805,47 @@ public class SqlExtractorService {
             processSqlComponent("D3 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
         }
 
-        // 2. Паттерн для D3 компонентов БЕЗ CDATA (cmpDataSet)
-        Pattern d3DatasetDirectPattern = Pattern.compile(
-                "<cmpDataSet\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpDataSet>",
+        // 2. Паттерн для D3 Action с CDATA (cmpAction) - УПРОЩЕННЫЙ ВАРИАНТ
+        Pattern d3ActionPattern = Pattern.compile(
+                "<cmpAction\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpAction>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
-        Matcher d3DatasetDirectMatcher = d3DatasetDirectPattern.matcher(content);
-        while (d3DatasetDirectMatcher.find()) {
-            String componentName = d3DatasetDirectMatcher.group(1);
-            String body = d3DatasetDirectMatcher.group(2);
+        Matcher d3ActionMatcher = d3ActionPattern.matcher(content);
+        while (d3ActionMatcher.find()) {
+            String componentName = d3ActionMatcher.group(1);
+            String body = d3ActionMatcher.group(2);
 
-            if (body != null && !body.contains("CDATA")) {
-                String sqlContent = cleanSqlBody(body);
-                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                    String fullXml = extractFullComponentXml(content, d3DatasetDirectMatcher.start(), "cmpDataSet");
-                    processSqlComponent("D3 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+            System.out.println("    Найден кандидат D3 Action: " + componentName);
+
+            String sqlContent = null;
+
+            // Проверяем наличие CDATA
+            if (body != null && body.contains("CDATA")) {
+                Pattern cdataPattern = Pattern.compile("<!\\[CDATA\\[(.*?)\\]\\]>", Pattern.DOTALL);
+                Matcher cdataMatcher = cdataPattern.matcher(body);
+                if (cdataMatcher.find()) {
+                    sqlContent = cdataMatcher.group(1);
+                    System.out.println("      Извлечено из CDATA, длина: " + sqlContent.length());
+                }
+            } else {
+                sqlContent = cleanSqlBody(body);
+                System.out.println("      Извлечено без CDATA, длина: " + (sqlContent != null ? sqlContent.length() : 0));
+            }
+
+            if (sqlContent != null && !sqlContent.trim().isEmpty()) {
+                System.out.println("      Первые 200 символов: " + sqlContent.substring(0, Math.min(200, sqlContent.length())));
+                if (isSqlContent(sqlContent)) {
+                    System.out.println("      Содержимое определено как SQL");
+                    String fullXml = extractFullComponentXml(content, d3ActionMatcher.start(), "cmpAction");
+                    processSqlComponent("D3 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
+                } else {
+                    System.out.println("      Содержимое НЕ определено как SQL");
                 }
             }
         }
 
-        // 3. Паттерн для M2 DataSet с CDATA
+        // 3. M2 DataSet с CDATA
         Pattern m2DatasetWithCDataPattern = Pattern.compile(
                 "<component\\s+cmptype\\s*=\\s*[\"']DataSet[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>.*?<!\\[CDATA\\[(.*?)\\]\\]>.*?</component>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -697,27 +859,7 @@ public class SqlExtractorService {
             processSqlComponent("M2 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
         }
 
-        // 4. Паттерн для M2 DataSet БЕЗ CDATA
-        Pattern m2DatasetWithoutCDataPattern = Pattern.compile(
-                "<component\\s+cmptype\\s*=\\s*[\"']DataSet[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</component>",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher m2DatasetWithoutCDataMatcher = m2DatasetWithoutCDataPattern.matcher(content);
-        while (m2DatasetWithoutCDataMatcher.find()) {
-            String componentName = m2DatasetWithoutCDataMatcher.group(1);
-            String body = m2DatasetWithoutCDataMatcher.group(2);
-
-            if (body != null && !body.contains("CDATA")) {
-                String sqlContent = cleanSqlBody(body);
-                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                    String fullXml = extractFullComponentXml(content, m2DatasetWithoutCDataMatcher.start(), "component");
-                    processSqlComponent("M2 DataSet", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
-                }
-            }
-        }
-
-        // 5. Паттерн для M2 Action с CDATA
+        // 4. M2 Action с CDATA
         Pattern m2ActionWithCDataPattern = Pattern.compile(
                 "<component\\s+cmptype\\s*=\\s*[\"']Action[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>.*?<!\\[CDATA\\[(.*?)\\]\\]>.*?</component>",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
@@ -731,86 +873,9 @@ public class SqlExtractorService {
             processSqlComponent("M2 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
         }
 
-        // 6. Паттерн для M2 Action БЕЗ CDATA
-        Pattern m2ActionWithoutCDataPattern = Pattern.compile(
-                "<component\\s+cmptype\\s*=\\s*[\"']Action[\"'][^>]*name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</component>",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher m2ActionWithoutCDataMatcher = m2ActionWithoutCDataPattern.matcher(content);
-        while (m2ActionWithoutCDataMatcher.find()) {
-            String componentName = m2ActionWithoutCDataMatcher.group(1);
-            String body = m2ActionWithoutCDataMatcher.group(2);
-
-            if (body != null && !body.contains("CDATA")) {
-                String sqlContent = cleanSqlBody(body);
-                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                    String fullXml = extractFullComponentXml(content, m2ActionWithoutCDataMatcher.start(), "component");
-                    processSqlComponent("M2 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
-                }
-            }
-        }
-
-        // 7. Паттерн для D3 Action с CDATA (cmpAction)
-        Pattern d3ActionWithCDataPattern = Pattern.compile(
-                "<cmpAction\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>\\s*<!\\[CDATA\\[(.*?)\\]\\]>\\s*</cmpAction>",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher d3ActionWithCDataMatcher = d3ActionWithCDataPattern.matcher(content);
-        while (d3ActionWithCDataMatcher.find()) {
-            String componentName = d3ActionWithCDataMatcher.group(1);
-            String sqlContent = d3ActionWithCDataMatcher.group(2);
-            String fullXml = extractFullComponentXml(content, d3ActionWithCDataMatcher.start(), "cmpAction");
-            processSqlComponent("D3 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
-        }
-
-        // 8. Паттерн для D3 Action БЕЗ CDATA (cmpAction)
-        Pattern d3ActionWithoutCDataPattern = Pattern.compile(
-                "<cmpAction\\s+name\\s*=\\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</cmpAction>",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
-
-        Matcher d3ActionWithoutCDataMatcher = d3ActionWithoutCDataPattern.matcher(content);
-        while (d3ActionWithoutCDataMatcher.find()) {
-            String componentName = d3ActionWithoutCDataMatcher.group(1);
-            String body = d3ActionWithoutCDataMatcher.group(2);
-
-            if (body != null && !body.contains("CDATA")) {
-                String sqlContent = cleanSqlBody(body);
-                if (sqlContent != null && !sqlContent.trim().isEmpty() && isSqlContent(sqlContent)) {
-                    String fullXml = extractFullComponentXml(content, d3ActionWithoutCDataMatcher.start(), "cmpAction");
-                    processSqlComponent("D3 Action", componentName, sqlContent, fullXml, sourcePath, baseFormPath, queries);
-                }
-            }
-        }
-
         return queries;
     }
 
-
-
-    /**
-     * Очистить тело компонента от вложенных тегов
-     */
-    private String cleanSqlBody(String body) {
-        if (body == null || body.isEmpty()) {
-            return null;
-        }
-
-        // Удаляем вложенные компоненты (ActionVar, Variable и т.д.)
-        String cleaned = body.replaceAll("<component[^>]*>.*?</component>", "");
-        // Удаляем одиночные теги
-        cleaned = cleaned.replaceAll("<[^>]+>", "");
-
-        // Удаляем SQL комментарии
-        cleaned = removeSqlComments(cleaned);
-
-        // Удаляем лишние пробелы и пустые строки
-        cleaned = cleaned.replaceAll("\\n\\s*\\n", "\n");
-
-        return cleaned.trim();
-    }
 
 
     /**
@@ -822,29 +887,209 @@ public class SqlExtractorService {
         // Очищаем от комментариев
         String cleanText = removeAllComments(sqlText);
 
-        // Временные множества для сбора всех объектов
-        Set<String> potentialViews = new HashSet<>();
-        Set<String> potentialPackageFunctions = new HashSet<>();
-        Set<String> potentialUnknown = new HashSet<>();
-        Set<String> potentialConstants = new HashSet<>();  // ДЛЯ КОНСТАНТ
+        // Приводим к верхнему регистру для удобства поиска (но для констант используем оригинал)
+        String upperText = cleanText.toUpperCase();
 
-        // ========== 1. СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ КОНСТАНТ ==========
-        Pattern constantSearchPattern = Pattern.compile(
-                "D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*'([^']+)'",
+        // ========== 1. СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ КОНСТАНТ (РАСШИРЕННЫЙ ШАБЛОН) ==========
+        Set<String> constants = new LinkedHashSet<>();
+
+        // Паттерн для SEARCH_STR с позиционными параметрами: D_PKG_CONSTANTS.SEARCH_STR('CONST_NAME', ...)
+        Pattern constStrPattern1 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_STR\\s*\\(\\s*'([^']+)'",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
-        Matcher constantMatcher = constantSearchPattern.matcher(cleanText);
-        while (constantMatcher.find()) {
-            String constant = constantMatcher.group(1);
+
+        // Паттерн для SEARCH_STR с именованными параметрами: D_PKG_CONSTANTS.SEARCH_STR(psCONST_CODE => 'CONST_NAME', ...)
+        Pattern constStrPattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_STR\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_NUM с позиционными параметрами: D_PKG_CONSTANTS.SEARCH_NUM('CONST_NAME', ...)
+        Pattern constNumPattern1 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_NUM\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_NUM с именованными параметрами: D_PKG_CONSTANTS.SEARCH_NUM(psCONST_CODE => 'CONST_NAME', ...)
+        Pattern constNumPattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_NUM\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_DATE с позиционными параметрами: D_PKG_CONSTANTS.SEARCH_DATE('CONST_NAME', ...)
+        Pattern constDatePattern1 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_DATE\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для SEARCH_DATE с именованными параметрами: D_PKG_CONSTANTS.SEARCH_DATE(psCONST_CODE => 'CONST_NAME', ...)
+        Pattern constDatePattern2 = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_DATE\\s*\\(\\s*psCONST_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Универсальный паттерн для любых констант (для отладки)
+        Pattern anyConstPattern = Pattern.compile(
+                "D_PKG_CONSTANTS\\.SEARCH_(?:STR|NUM|DATE)\\s*\\(\\s*(?:psCONST_CODE\\s*=>\\s*)?'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Извлекаем из SEARCH_STR (позиционные)
+        Matcher strMatcher1 = constStrPattern1.matcher(cleanText);
+        while (strMatcher1.find()) {
+            String constant = strMatcher1.group(1);
             if (constant != null && !constant.isEmpty()) {
-                potentialConstants.add(constant);
-                System.out.println("      [DEBUG] Найдена константа: '" + constant + "'");
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_STR позиционная): " + constant);
             }
         }
 
-        // ========== 2. Собираем все D_V_* как потенциальные вьюхи ==========
+        // Извлекаем из SEARCH_STR (именованные)
+        Matcher strMatcher2 = constStrPattern2.matcher(cleanText);
+        while (strMatcher2.find()) {
+            String constant = strMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_STR именованная): " + constant);
+            }
+        }
+
+        // Извлекаем из SEARCH_NUM (позиционные)
+        Matcher numMatcher1 = constNumPattern1.matcher(cleanText);
+        while (numMatcher1.find()) {
+            String constant = numMatcher1.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_NUM позиционная): " + constant);
+            }
+        }
+
+        // Извлекаем из SEARCH_NUM (именованные)
+        Matcher numMatcher2 = constNumPattern2.matcher(cleanText);
+        while (numMatcher2.find()) {
+            String constant = numMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_NUM именованная): " + constant);
+            }
+        }
+
+        // Извлекаем из SEARCH_DATE (позиционные)
+        Matcher dateMatcher1 = constDatePattern1.matcher(cleanText);
+        while (dateMatcher1.find()) {
+            String constant = dateMatcher1.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_DATE позиционная): " + constant);
+            }
+        }
+
+        // Извлекаем из SEARCH_DATE (именованные)
+        Matcher dateMatcher2 = constDatePattern2.matcher(cleanText);
+        while (dateMatcher2.find()) {
+            String constant = dateMatcher2.group(1);
+            if (constant != null && !constant.isEmpty()) {
+                constants.add(constant);
+                System.out.println("      [DEBUG] Найдена константа (SEARCH_DATE именованная): " + constant);
+            }
+        }
+
+        // Добавляем все найденные константы в sqlInfo
+        for (String constant : constants) {
+            sqlInfo.addConstant(constant);
+        }
+
+        if (!constants.isEmpty()) {
+            System.out.println("      [DEBUG] Всего найдено констант: " + constants.size());
+        }
+
+        // ========== 2. ИЗВЛЕЧЕНИЕ СИСТЕМНЫХ ОПЦИЙ ==========
+        // D_PKG_OPTIONS.GET('OPTION_NAME', ...)
+        Pattern optionPattern1 = Pattern.compile(
+                "D_PKG_OPTIONS\\.GET\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // D_PKG_OPTIONS.GET(psSO_CODE => 'OPTION_NAME', ...)
+        Pattern optionPattern2 = Pattern.compile(
+                "D_PKG_OPTIONS\\.GET\\s*\\(\\s*psSO_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // D_PKG_OPTION_SPECS.GET('OPTION_NAME', ...)
+        Pattern optionSpecPattern1 = Pattern.compile(
+                "D_PKG_OPTION_SPECS\\.GET\\s*\\(\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // D_PKG_OPTION_SPECS.GET(psSO_CODE => 'OPTION_NAME', ...)
+        Pattern optionSpecPattern2 = Pattern.compile(
+                "D_PKG_OPTION_SPECS\\.GET\\s*\\(\\s*psSO_CODE\\s*=>\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Set<String> systemOptions = new LinkedHashSet<>();
+
+        Matcher optMatcher1 = optionPattern1.matcher(cleanText);
+        while (optMatcher1.find()) {
+            String option = optMatcher1.group(1);
+            if (option != null && !option.isEmpty()) {
+                systemOptions.add(option);
+                System.out.println("      [DEBUG] Найдена системная опция (D_PKG_OPTIONS): " + option);
+            }
+        }
+
+        Matcher optMatcher2 = optionPattern2.matcher(cleanText);
+        while (optMatcher2.find()) {
+            String option = optMatcher2.group(1);
+            if (option != null && !option.isEmpty()) {
+                systemOptions.add(option);
+                System.out.println("      [DEBUG] Найдена системная опция (D_PKG_OPTIONS named): " + option);
+            }
+        }
+
+        Matcher optMatcher3 = optionSpecPattern1.matcher(cleanText);
+        while (optMatcher3.find()) {
+            String option = optMatcher3.group(1);
+            if (option != null && !option.isEmpty()) {
+                systemOptions.add(option);
+                System.out.println("      [DEBUG] Найдена системная опция (D_PKG_OPTION_SPECS): " + option);
+            }
+        }
+
+        Matcher optMatcher4 = optionSpecPattern2.matcher(cleanText);
+        while (optMatcher4.find()) {
+            String option = optMatcher4.group(1);
+            if (option != null && !option.isEmpty()) {
+                systemOptions.add(option);
+                System.out.println("      [DEBUG] Найдена системная опция (D_PKG_OPTION_SPECS named): " + option);
+            }
+        }
+
+        for (String option : systemOptions) {
+            sqlInfo.addSystemOption(option);
+        }
+
+        // ========== 3. ПОЛЬЗОВАТЕЛЬСКИЕ ПРОЦЕДУРЫ ==========
+        Pattern userProcPattern = Pattern.compile(
+                "D_V_USERPROCS\\s+.*?PR_CODE\\s*=\\s*'([^']+)'",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher userProcMatcher = userProcPattern.matcher(cleanText);
+        while (userProcMatcher.find()) {
+            String prCode = userProcMatcher.group(1);
+            if (prCode != null && !prCode.isEmpty()) {
+                sqlInfo.addUserProcedure(prCode);
+                System.out.println("      [DEBUG] Найдена пользовательская процедура: " + prCode);
+            }
+        }
+
+        // ========== 4. СОБИРАЕМ ВСЕ D_V_* КАК ПОТЕНЦИАЛЬНЫЕ ВЬЮХИ ==========
         Pattern viewPattern = Pattern.compile("\\b[Dd]_[Vv]_[A-Za-z0-9_]+\\b");
-        Matcher viewMatcher = viewPattern.matcher(cleanText);
+        Matcher viewMatcher = viewPattern.matcher(upperText);
+        Set<String> potentialViews = new LinkedHashSet<>();
         while (viewMatcher.find()) {
             String name = viewMatcher.group().toUpperCase();
             if (!isSystemAlias(name)) {
@@ -852,36 +1097,32 @@ public class SqlExtractorService {
             }
         }
 
-        // ========== 3. Собираем все D_PKG_*.XXX как потенциальные пакетные функции ==========
-        // ИСКЛЮЧАЕМ D_PKG_CONSTANTS (уже обработаны)
-        Pattern pkgPattern = Pattern.compile("\\b[Dd]_[Pp][Kk][Gg]_(?!CONSTANTS)[A-Za-z0-9_]+\\s*\\.\\s*[A-Za-z0-9_]+\\b");
-        Matcher pkgMatcher = pkgPattern.matcher(cleanText);
+        // ========== 5. СОБИРАЕМ ВСЕ D_PKG_*.XXX КАК ПОТЕНЦИАЛЬНЫЕ ПАКЕТНЫЕ ФУНКЦИИ ==========
+        // ИСКЛЮЧАЕМ D_PKG_CONSTANTS, D_PKG_OPTIONS, D_PKG_OPTION_SPECS (уже обработаны)
+        Pattern pkgPattern = Pattern.compile("\\b[Dd]_[Pp][Kk][Gg]_(?!CONSTANTS|OPTIONS|OPTION_SPECS)[A-Za-z0-9_]+\\s*\\.\\s*[A-Za-z0-9_]+\\b");
+        Matcher pkgMatcher = pkgPattern.matcher(upperText);
+        Set<String> potentialPackageFunctions = new LinkedHashSet<>();
         while (pkgMatcher.find()) {
             String fullName = pkgMatcher.group().toUpperCase();
             potentialPackageFunctions.add(fullName);
         }
 
-        // ========== 4. Собираем все остальные D_* объекты ==========
+        // ========== 6. СОБИРАЕМ ВСЕ ОСТАЛЬНЫЕ D_* ОБЪЕКТЫ ==========
         Pattern otherPattern = Pattern.compile("\\b[Dd]_[A-Za-z0-9_]+\\b");
-        Matcher otherMatcher = otherPattern.matcher(cleanText);
+        Matcher otherMatcher = otherPattern.matcher(upperText);
+        Set<String> potentialUnknown = new LinkedHashSet<>();
         while (otherMatcher.find()) {
             String name = otherMatcher.group().toUpperCase();
-            // Пропускаем вьюхи, пакетные функции и константы
+            // Пропускаем вьюхи, пакетные функции, системные опции и константы
             if (!name.startsWith("D_V_") &&
                     !name.startsWith("D_PKG_") &&
+                    !name.startsWith("D_V_URPRIVS") &&
                     !isSystemAlias(name)) {
                 potentialUnknown.add(name);
             }
         }
 
-        // ========== 5. ДОБАВЛЯЕМ КОНСТАНТЫ В SQLINFO ==========
-        for (String constant : potentialConstants) {
-            sqlInfo.addConstant(constant);
-            System.out.println("      [DEBUG] Добавлена константа в sqlInfo: " + constant);
-        }
-        System.out.println("      [DEBUG] Всего констант в sqlInfo: " + sqlInfo.getConstants().size());
-
-        // ========== 6. СПИСОК ОБЪЕКТОВ, КОТОРЫЕ ДОЛЖНЫ БЫТЬ В "РАЗОБРАТЬ АНАЛИТИКОМ" ==========
+        // ========== 7. СПИСОК ОБЪЕКТОВ, КОТОРЫЕ ДОЛЖНЫ БЫТЬ В "РАЗОБРАТЬ АНАЛИТИКОМ" ==========
         Set<String> forcedToUnknown = new HashSet<>(Arrays.asList(
                 "D_PKG_STD.FRM_D",
                 "D_PKG_STD.FRM_T",
@@ -890,8 +1131,6 @@ public class SqlExtractorService {
                 "D_C_ID",
                 "D_STRAGG_EX",
                 "D_PKG_STD.TREF",
-                "D_PKG_OPTIONS.GET",
-                "D_PKG_OPTION_SPECS.GET",
                 "D_TP_STRAGG_REC",
                 "D_STRAGG",
                 "D_ID",
@@ -903,13 +1142,15 @@ public class SqlExtractorService {
                 "D_PKG_STD.FRM_DT"
         ));
 
-        // ========== 7. РАСПРЕДЕЛЯЕМ ОБЪЕКТЫ ==========
+        // ========== 8. РАСПРЕДЕЛЯЕМ ОБЪЕКТЫ ==========
         // Вьюхи
         for (String view : potentialViews) {
             if (!forcedToUnknown.contains(view)) {
                 sqlInfo.addTableView(view);
+                System.out.println("      [DEBUG] Добавлена вьюха: " + view);
             } else {
                 sqlInfo.addUnknownObject(view);
+                System.out.println("      [DEBUG] Добавлен в unknown (вьюха): " + view);
             }
         }
 
@@ -917,21 +1158,50 @@ public class SqlExtractorService {
         for (String pkgFunc : potentialPackageFunctions) {
             if (!forcedToUnknown.contains(pkgFunc)) {
                 sqlInfo.addPackageFunction(pkgFunc);
+                System.out.println("      [DEBUG] Добавлен пакет/функция: " + pkgFunc);
             } else {
                 sqlInfo.addUnknownObject(pkgFunc);
+                System.out.println("      [DEBUG] Добавлен в unknown (пакет): " + pkgFunc);
             }
         }
 
         // Остальные объекты
         for (String unknown : potentialUnknown) {
             if (!forcedToUnknown.contains(unknown)) {
-                // Проверяем, не является ли это константой
-                if (!potentialConstants.contains(unknown)) {
+                // Проверяем, не является ли это константой или системной опцией
+                if (!systemOptions.contains(unknown) && !constants.contains(unknown)) {
                     sqlInfo.addUnknownObject(unknown);
+                    System.out.println("      [DEBUG] Добавлен в unknown: " + unknown);
                 }
+            } else {
+                sqlInfo.addUnknownObject(unknown);
+                System.out.println("      [DEBUG] Добавлен в unknown (forced): " + unknown);
             }
         }
+
+        // Выводим статистику
+        System.out.println("      [DEBUG] ИТОГО: констант=" + constants.size() +
+                ", системных опций=" + systemOptions.size() +
+                ", вьюх=" + potentialViews.size() +
+                ", пакетов=" + potentialPackageFunctions.size() +
+                ", unknown=" + potentialUnknown.size());
     }
+
+    /**
+     * Проверка, является ли имя алиасом (не реальным объектом БД)
+     */
+    private boolean isSystemAlias(String name) {
+        Set<String> aliases = new HashSet<>(Arrays.asList(
+                "D_PREF", "D_NUMB", "D_DATE", "OD_NUMB", "LPU_TO", "LPU_TO_HANDLE",
+                "PATIENT", "POLIS", "PHONE", "PAYMENT_KIND", "DIR_COMMENT",
+                "HOSP_DEP_NAME", "DIRECTION_KIND", "LAST_HPK_DATE", "HH_STATUS",
+                "LAST_HOSP_DATE", "REG_DATE", "HOSP_PLAN_DATE", "PAT_BIRTHDATE",
+                "IS_CANCELED", "CANC_REASON_CODE", "CANC_REASON_NAME", "VISIT_DATE",
+                "HOSP_HISTORY_ID", "HOSP_HISTORY_DEP_ID", "AGENT_ID", "PERSMEDCARD_ID"
+        ));
+        return aliases.contains(name);
+    }
+
 
     /**
      * Очистить пакетные функции от объектов, которые должны быть в unknown
@@ -949,19 +1219,6 @@ public class SqlExtractorService {
         }
     }
 
-    /**
-     * Проверка, является ли имя алиасом (не реальным объектом БД)
-     */
-    private boolean isSystemAlias(String name) {
-        Set<String> aliases = new HashSet<>(Arrays.asList(
-                "D_PREF", "D_NUMB", "D_DATE", "OD_NUMB", "LPU_TO", "LPU_TO_HANDLE",
-                "PATIENT", "POLIS", "PHONE", "PAYMENT_KIND", "DIR_COMMENT",
-                "HOSP_DEP_NAME", "DIRECTION_KIND", "LAST_HPK_DATE", "HH_STATUS",
-                "LAST_HOSP_DATE", "REG_DATE", "HOSP_PLAN_DATE", "PAT_BIRTHDATE",
-                "IS_CANCELED", "CANC_REASON_CODE", "CANC_REASON_NAME", "VISIT_DATE"
-        ));
-        return aliases.contains(name);
-    }
 
     /**
      * Проверка, является ли текст частью комментария

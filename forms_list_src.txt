@@ -1,4 +1,3 @@
-/Forms/#examples/barcode.frm
 /Forms/ARMMainDoc/arm_director.frm
 /Forms/ARMMainDoc/main_doc.frm
 /Forms/ARMMainDoc/neotl_patients.frm

@@ -415,12 +415,16 @@ public class TmisFormAnalyzerService {
                 baseContent, baseFormPathObj.toString(), null
         );
 
+        // При добавлении SQL запросов в FormInfo
         for (SqlInfo sql : sqlQueries) {
             formInfo.addSqlQuery(sql);
             for (String tv : sql.getTablesViews()) formInfo.addTableView(tv);
             for (String pf : sql.getPackagesFunctions()) formInfo.addPackageFunction(pf);
             for (String proc : sql.getUserProcedures()) formInfo.addUserProcedure(proc);
-            for (String opt : sql.getSystemOptions()) formInfo.addSystemOption(opt);
+            for (String opt : sql.getSystemOptions()) {
+                formInfo.addSystemOption(opt);
+                System.out.println("  Добавлена системная опция: " + opt);
+            }
             for (String unknown : sql.getUnknownObjects()) formInfo.addUnknownObject(unknown);
             for (String constant : sql.getConstants()) {
                 formInfo.addConstant(constant);
@@ -508,51 +512,203 @@ public class TmisFormAnalyzerService {
 
         Set<String> foundForms = new LinkedHashSet<>();
 
+        // Паттерн для openD3Form с простым строковым параметром: openD3Form('form_path', ...)
         Pattern openD3FormPattern = Pattern.compile(
                 "openD3Form\\s*\\(\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
+        // Паттерн для openWindow с простым строковым параметром: openWindow('form_path', ...)
         Pattern openWindowPattern = Pattern.compile(
                 "openWindow\\s*\\(\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
+        // Паттерн для openD3Form с объектом: openD3Form({name:'form_path', ...})
         Pattern openD3FormObjectPattern = Pattern.compile(
                 "openD3Form\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
+        // Паттерн для openWindow с объектом: openWindow({name:'form_path', ...})
+        Pattern openWindowObjectPattern = Pattern.compile(
+                "openWindow\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для вызова с переменной: openWindow({name:varName, ...}) - пропускаем
+        // Паттерн для Form.showModal и Form.showModalDialog
+        Pattern showModalPattern = Pattern.compile(
+                "Form\\.showModal\\s*\\(\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Pattern showModalObjectPattern = Pattern.compile(
+                "Form\\.showModal\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Дополнительный паттерн для поиска любых упоминаний .frm файлов в JS
+        Pattern anyFormPattern = Pattern.compile(
+                "['\"]([A-Za-z0-9_/]+\\.frm)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Поиск openD3Form с простым строковым параметром
         Matcher d3Matcher = openD3FormPattern.matcher(content);
         while (d3Matcher.find()) {
             String formPath = d3Matcher.group(1).trim();
-            if (formPath != null && !formPath.isEmpty()) {
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
                 foundForms.add(formPath);
                 System.out.println("  Найдена openD3Form: " + formPath);
             }
         }
 
+        // Поиск openWindow с простым строковым параметром
         Matcher windowMatcher = openWindowPattern.matcher(content);
         while (windowMatcher.find()) {
             String formPath = windowMatcher.group(1).trim();
-            if (formPath != null && !formPath.isEmpty()) {
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
                 foundForms.add(formPath);
                 System.out.println("  Найдена openWindow: " + formPath);
             }
         }
 
-        Matcher objectMatcher = openD3FormObjectPattern.matcher(content);
-        while (objectMatcher.find()) {
-            String formPath = objectMatcher.group(1).trim();
-            if (formPath != null && !formPath.isEmpty()) {
+        // Поиск openD3Form с объектом
+        Matcher d3ObjectMatcher = openD3FormObjectPattern.matcher(content);
+        while (d3ObjectMatcher.find()) {
+            String formPath = d3ObjectMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
                 foundForms.add(formPath);
                 System.out.println("  Найдена openD3Form (объект): " + formPath);
             }
         }
 
-        for (String form : foundForms) {
-            formInfo.addJsForm(form);
+        // Поиск openWindow с объектом - ЭТОТ ПАТТЕРН НАЙДЕТ ВАШУ ФОРМУ
+        Matcher windowObjectMatcher = openWindowObjectPattern.matcher(content);
+        while (windowObjectMatcher.find()) {
+            String formPath = windowObjectMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена openWindow (объект): " + formPath);
+            }
         }
+
+        // Поиск Form.showModal
+        Matcher showModalMatcher = showModalPattern.matcher(content);
+        while (showModalMatcher.find()) {
+            String formPath = showModalMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена Form.showModal: " + formPath);
+            }
+        }
+
+        // Поиск Form.showModal с объектом
+        Matcher showModalObjectMatcher = showModalObjectPattern.matcher(content);
+        while (showModalObjectMatcher.find()) {
+            String formPath = showModalObjectMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена Form.showModal (объект): " + formPath);
+            }
+        }
+
+        // Дополнительный поиск любых .frm файлов в JS контенте
+        Matcher anyFormMatcher = anyFormPattern.matcher(content);
+        while (anyFormMatcher.find()) {
+            String formPath = anyFormMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
+                // Проверяем, что это не системный вызов
+                if (!formPath.contains("D_PKG") && !formPath.contains("executeAction") &&
+                        !formPath.contains("refreshDataSet") && !formPath.contains("printReportByCode")) {
+                    foundForms.add(formPath);
+                    System.out.println("  Найдена форма в кавычках: " + formPath);
+                }
+            }
+        }
+
+        for (String form : foundForms) {
+            // Нормализуем путь формы
+            String normalizedPath = normalizeFormPathFromJs(form);
+            if (normalizedPath != null && !normalizedPath.isEmpty()) {
+                formInfo.addJsForm(normalizedPath);
+            }
+        }
+    }
+
+    /**
+     * Нормализация пути формы из JS вызова
+     */
+    private String normalizeFormPathFromJs(String formPath) {
+        if (formPath == null || formPath.trim().isEmpty()) {
+            return null;
+        }
+
+        String normalized = formPath.trim();
+        normalized = normalized.replaceAll("^['\"]|['\"]$", "");
+
+        // Пропускаем переменные и выражения
+        if (normalized.contains("+") || normalized.contains("getVar") ||
+                normalized.contains("getValue") || normalized.contains("' +") ||
+                normalized.contains("\" +") || normalized.contains("$")) {
+            return null;
+        }
+
+        // Добавляем .frm если нет расширения
+        if (!normalized.endsWith(".frm") && !normalized.endsWith(".dfrm")) {
+            normalized = normalized + ".frm";
+        }
+
+        // Проверяем валидность пути (должен содержать слеш)
+        if (!normalized.contains("/")) {
+            return null;
+        }
+
+        return normalized;
+    }
+
+    /**
+     * Проверка валидности пути формы
+     */
+    private boolean isValidFormPath(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            return false;
+        }
+
+        String lowerPath = path.toLowerCase();
+
+        // Игнорируем специальные значения
+        if ("components_m2".equals(path) || "components_d3".equals(path) || "".equals(path.trim())) {
+            return false;
+        }
+
+        // Игнорируем строки, которые выглядят как JavaScript код
+        if (lowerPath.contains("function") || lowerPath.contains("setvalue") ||
+                lowerPath.contains("executeaction") || lowerPath.contains("getcontrol") ||
+                lowerPath.contains("printreportbycode") || lowerPath.contains("sysdate") ||
+                lowerPath.contains("refreshdataset") || lowerPath.contains("getdataset") ||
+                lowerPath.contains("showalert") || lowerPath.contains("confirm") ||
+                lowerPath.contains("closewindow") || lowerPath.contains("addlistener") ||
+                lowerPath.contains("getvar") || lowerPath.contains("setvar") ||
+                lowerPath.contains("modalresult") || lowerPath.contains("getproperty") ||
+                lowerPath.contains("sunit") || lowerPath.contains("composition") ||
+                lowerPath.contains("show_buttons") || lowerPath.contains("height") ||
+                lowerPath.contains("width") || lowerPath.contains("onclose") ||
+                lowerPath.contains("onafterclose") || lowerPath.contains("then") ||
+                lowerPath.contains("else") || lowerPath.contains("return") ||
+                lowerPath.contains("typeof") || lowerPath.contains("undefined") ||
+                lowerPath.contains("null") || lowerPath.contains("true") ||
+                lowerPath.contains("false") || lowerPath.contains("buttonedit_getcontrol") ||
+                lowerPath.contains("getproperty") || lowerPath.contains("setcontrolvalue") ||
+                lowerPath.contains("setcontrolcaption") || lowerPath.contains("getpage") ||
+                lowerPath.contains("getdom") || lowerPath.contains("this") ||
+                lowerPath.contains("_dom") || lowerPath.contains("refreshdata") ||
+                lowerPath.contains("console.") || lowerPath.contains(".addlistener")) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -563,22 +719,41 @@ public class TmisFormAnalyzerService {
 
         Set<String> foundForms = new LinkedHashSet<>();
 
+        // Паттерн для D3Api.showForm с кавычками
         Pattern d3ApiPattern = Pattern.compile(
                 "D3Api\\.showForm\\s*\\(\\s*['\"]([^'\"]+)['\"]",
+                Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        // Паттерн для D3Api.showForm с объектом
+        Pattern d3ApiObjectPattern = Pattern.compile(
+                "D3Api\\.showForm\\s*\\(\\s*\\{\\s*name\\s*:\\s*['\"]([^'\"]+)['\"]",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE
         );
 
         Matcher matcher = d3ApiPattern.matcher(content);
         while (matcher.find()) {
             String formPath = matcher.group(1).trim();
-            if (formPath != null && !formPath.isEmpty()) {
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
                 foundForms.add(formPath);
                 System.out.println("  Найдена D3Api.showForm: " + formPath);
             }
         }
 
+        Matcher objMatcher = d3ApiObjectPattern.matcher(content);
+        while (objMatcher.find()) {
+            String formPath = objMatcher.group(1).trim();
+            if (formPath != null && !formPath.isEmpty() && isValidFormPath(formPath)) {
+                foundForms.add(formPath);
+                System.out.println("  Найдена D3Api.showForm (объект): " + formPath);
+            }
+        }
+
         for (String form : foundForms) {
-            formInfo.addSubForm(form);
+            String normalizedPath = normalizeFormPathFromJs(form);
+            if (normalizedPath != null && !normalizedPath.isEmpty()) {
+                formInfo.addSubForm(form);
+            }
         }
     }
 
