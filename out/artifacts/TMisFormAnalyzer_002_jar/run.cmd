@@ -1,1 +1,0 @@
-java -jar TMisFormAnalyzer_002.jar

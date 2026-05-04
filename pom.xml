@@ -91,7 +91,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>ru.miacomsoft.ui.MainUI</mainClass>
+                                    <mainClass>ru.miacomsoft.MainUI</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

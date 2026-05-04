@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: ru.miacomsoft.ui.MainUI
+Main-Class: ru.miacomsoft.MainUI
 
